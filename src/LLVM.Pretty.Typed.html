@@ -1,0 +1,902 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE RecordWildCards, FlexibleInstances #-}</span><span>
+</span><span id="line-2"></span><span>
+</span><span id="line-3"></span><span class="hs-comment">-- TODO: remove this copy of the old &quot;typeOf&quot; implementation in llvm-hs-pure.</span><span>
+</span><span id="line-4"></span><span class="hs-comment">-- It's needed because the new type signature of &quot;typeOf&quot; has a Monad constraint,</span><span>
+</span><span id="line-5"></span><span class="hs-comment">-- which is not compatible with the pretty printing library that is used.</span><span>
+</span><span id="line-6"></span><span>
+</span><span id="line-7"></span><span class="annot"><span class="hs-comment">-- | Querying the type of LLVM expressions</span></span><span>
+</span><span id="line-8"></span><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">LLVM.Pretty.Typed</span><span> </span><span class="hs-special">(</span><span>
+</span><span id="line-9"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#Typed"><span class="hs-identifier">Typed</span></a></span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-10"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#getElementType"><span class="hs-identifier">getElementType</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-11"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#getElementPtrType"><span class="hs-identifier">getElementPtrType</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-12"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#extractValueType"><span class="hs-identifier">extractValueType</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-13"></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-14"></span><span>
+</span><span id="line-15"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.Prelude.html"><span class="hs-identifier">LLVM.Prelude</span></a></span><span>
+</span><span id="line-16"></span><span>
+</span><span id="line-17"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.html"><span class="hs-identifier">LLVM.AST</span></a></span><span>
+</span><span id="line-18"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Global.html"><span class="hs-identifier">LLVM.AST.Global</span></a></span><span>
+</span><span id="line-19"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Type.html"><span class="hs-identifier">LLVM.AST.Type</span></a></span><span>
+</span><span id="line-20"></span><span>
+</span><span id="line-21"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html"><span class="hs-identifier">LLVM.AST.Constant</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">C</span></span><span>
+</span><span id="line-22"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Float.html"><span class="hs-identifier">LLVM.AST.Float</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">F</span></span><span>
+</span><span id="line-23"></span><span>
+</span><span id="line-24"></span><span class="hs-keyword">class</span><span> </span><span id="Typed"><span class="annot"><a href="LLVM.Pretty.Typed.html#Typed"><span class="hs-identifier hs-var">Typed</span></a></span></span><span> </span><span id="local-6989586621679077626"><span class="annot"><a href="#local-6989586621679077626"><span class="hs-identifier hs-type">a</span></a></span></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-25"></span><span>    </span><span id="typeOf"><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-type">typeOf</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="#local-6989586621679077626"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Type.html#Type"><span class="hs-identifier hs-type">Type</span></a></span><span>
+</span><span id="line-26"></span><span>
+</span><span id="line-27"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="LLVM.Pretty.Typed.html#Typed"><span class="hs-identifier hs-type">Typed</span></a></span><span> </span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Operand.html#Operand"><span class="hs-identifier hs-type">Operand</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-28"></span><span>  </span><span id="local-6989586621679077712"><span class="annot"><span class="annottext">typeOf :: Operand -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var hs-var hs-var hs-var">typeOf</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Operand.html#LocalReference"><span class="hs-identifier hs-type">LocalReference</span></a></span><span> </span><span id="local-6989586621679077714"><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679077714"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="annot"><span class="annottext">Name
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679077714"><span class="hs-identifier hs-var">t</span></a></span><span>
+</span><span id="line-29"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Operand.html#ConstantOperand"><span class="hs-identifier hs-type">ConstantOperand</span></a></span><span> </span><span id="local-6989586621679077716"><span class="annot"><span class="annottext">Constant
+</span><a href="#local-6989586621679077716"><span class="hs-identifier hs-var">c</span></a></span></span><span class="hs-special">)</span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Constant -&gt; Type
+forall a. Typed a =&gt; a -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="annot"><span class="annottext">Constant
+</span><a href="#local-6989586621679077716"><span class="hs-identifier hs-var">c</span></a></span><span>
+</span><span id="line-30"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="annot"><span class="annottext">Operand
+</span><span class="hs-identifier">_</span></span><span>                    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Type.html#MetadataType"><span class="hs-identifier hs-var">MetadataType</span></a></span><span>
+</span><span id="line-31"></span><span>
+</span><span id="line-32"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="LLVM.Pretty.Typed.html#Typed"><span class="hs-identifier hs-type">Typed</span></a></span><span> </span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Operand.html#CallableOperand"><span class="hs-identifier hs-type">CallableOperand</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-33"></span><span>  </span><span id="local-6989586621679077723"><span class="annot"><span class="annottext">typeOf :: CallableOperand -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var hs-var hs-var hs-var">typeOf</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Right</span></span><span> </span><span id="local-6989586621679077724"><span class="annot"><span class="annottext">Operand
+</span><a href="#local-6989586621679077724"><span class="hs-identifier hs-var">op</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Operand -&gt; Type
+forall a. Typed a =&gt; a -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="annot"><span class="annottext">Operand
+</span><a href="#local-6989586621679077724"><span class="hs-identifier hs-var">op</span></a></span><span>
+</span><span id="line-34"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Left</span></span><span> </span><span class="annot"><span class="annottext">InlineAssembly
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; Type
+forall a. HasCallStack =&gt; [Char] -&gt; a
+</span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot;typeOf inline assembler is not defined. (Malformed AST)&quot;</span></span><span>
+</span><span id="line-35"></span><span>
+</span><span id="line-36"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="LLVM.Pretty.Typed.html#Typed"><span class="hs-identifier hs-type">Typed</span></a></span><span> </span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#Constant"><span class="hs-identifier hs-type">C.Constant</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-37"></span><span>  </span><span id="local-6989586621679077772"><span class="annot"><span class="annottext">typeOf :: Constant -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var hs-var hs-var hs-var">typeOf</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#Int"><span class="hs-identifier hs-type">C.Int</span></a></span><span> </span><span id="local-6989586621679077774"><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679077774"><span class="hs-identifier hs-var">bits</span></a></span></span><span> </span><span class="annot"><span class="annottext">Integer
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Word32 -&gt; Type
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Type.html#IntegerType"><span class="hs-identifier hs-var">IntegerType</span></a></span><span> </span><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679077774"><span class="hs-identifier hs-var">bits</span></a></span><span>
+</span><span id="line-38"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#Float"><span class="hs-identifier hs-type">C.Float</span></a></span><span> </span><span id="local-6989586621679077777"><span class="annot"><span class="annottext">SomeFloat
+</span><a href="#local-6989586621679077777"><span class="hs-identifier hs-var">t</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SomeFloat -&gt; Type
+forall a. Typed a =&gt; a -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="annot"><span class="annottext">SomeFloat
+</span><a href="#local-6989586621679077777"><span class="hs-identifier hs-var">t</span></a></span><span>
+</span><span id="line-39"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#Null"><span class="hs-identifier hs-type">C.Null</span></a></span><span> </span><span id="local-6989586621679077779"><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679077779"><span class="hs-identifier hs-var">t</span></a></span></span><span class="hs-special">)</span><span>      </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679077779"><span class="hs-identifier hs-var">t</span></a></span><span>
+</span><span id="line-40"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#AggregateZero"><span class="hs-identifier hs-type">C.AggregateZero</span></a></span><span> </span><span id="local-6989586621679077781"><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679077781"><span class="hs-identifier hs-var">t</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679077781"><span class="hs-identifier hs-var">t</span></a></span><span>
+</span><span id="line-41"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#Struct"><span class="hs-identifier hs-type">C.Struct</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679077783"><span id="local-6989586621679077784"><span id="local-6989586621679077785"><span class="annot"><span class="annottext">Bool
+[Constant]
+Maybe Name
+structName :: Maybe Name
+isPacked :: Bool
+memberValues :: [Constant]
+structName :: Constant -&gt; Maybe Name
+isPacked :: Constant -&gt; Bool
+memberValues :: Constant -&gt; [Constant]
+</span><a href="#local-6989586621679077783"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; [Type] -&gt; Type
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Type.html#StructureType"><span class="hs-identifier hs-var">StructureType</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679077784"><span class="hs-identifier hs-var">isPacked</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Constant -&gt; Type) -&gt; [Constant] -&gt; [Type]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="annot"><span class="annottext">Constant -&gt; Type
+forall a. Typed a =&gt; a -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="annot"><span class="annottext">[Constant]
+</span><a href="#local-6989586621679077785"><span class="hs-identifier hs-var">memberValues</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-42"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#Array"><span class="hs-identifier hs-type">C.Array</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679077791"><span id="local-6989586621679077792"><span class="annot"><span class="annottext">[Constant]
+Type
+memberValues :: Constant -&gt; [Constant]
+memberType :: Type
+memberValues :: [Constant]
+memberType :: Constant -&gt; Type
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#memberValues"><span class="hs-glyph hs-var hs-var hs-var hs-var">..</span></a></span></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Word64 -&gt; Type -&gt; Type
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Type.html#ArrayType"><span class="hs-identifier hs-var">ArrayType</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Word64
+forall a b. (Integral a, Num b) =&gt; a -&gt; b
+</span><span class="hs-identifier hs-var">fromIntegral</span></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Word64) -&gt; Int -&gt; Word64
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[Constant] -&gt; Int
+forall a. [a] -&gt; Int
+forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; Int
+</span><span class="hs-identifier hs-var">length</span></span><span> </span><span class="annot"><span class="annottext">[Constant]
+</span><a href="#local-6989586621679077792"><span class="hs-identifier hs-var">memberValues</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679077791"><span class="hs-identifier hs-var">memberType</span></a></span><span>
+</span><span id="line-43"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#Vector"><span class="hs-identifier hs-type">C.Vector</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679077797"><span class="annot"><span class="annottext">[Constant]
+memberValues :: Constant -&gt; [Constant]
+memberValues :: [Constant]
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#memberValues"><span class="hs-glyph hs-var hs-var">..</span></a></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Word32 -&gt; Type -&gt; Type
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Type.html#VectorType"><span class="hs-identifier hs-var">VectorType</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Int -&gt; Word32
+forall a b. (Integral a, Num b) =&gt; a -&gt; b
+</span><span class="hs-identifier hs-var">fromIntegral</span></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Word32) -&gt; Int -&gt; Word32
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[Constant] -&gt; Int
+forall a. [a] -&gt; Int
+forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; Int
+</span><span class="hs-identifier hs-var">length</span></span><span> </span><span class="annot"><span class="annottext">[Constant]
+</span><a href="#local-6989586621679077797"><span class="hs-identifier hs-var">memberValues</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(Type -&gt; Type) -&gt; Type -&gt; Type
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span>
+</span><span id="line-44"></span><span>                              </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">[Constant]
+</span><a href="#local-6989586621679077797"><span class="hs-identifier hs-var">memberValues</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-45"></span><span>                                  </span><span class="hs-special">[</span><span class="hs-special">]</span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; Type
+forall a. HasCallStack =&gt; [Char] -&gt; a
+</span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot;Vectors of size zero are not allowed. (Malformed AST)&quot;</span></span><span>
+</span><span id="line-46"></span><span>                                  </span><span class="hs-special">(</span><span id="local-6989586621679077799"><span class="annot"><span class="annottext">Constant
+</span><a href="#local-6989586621679077799"><span class="hs-identifier hs-var">x</span></a></span></span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span class="annot"><span class="annottext">[Constant]
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Constant -&gt; Type
+forall a. Typed a =&gt; a -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="annot"><span class="annottext">Constant
+</span><a href="#local-6989586621679077799"><span class="hs-identifier hs-var">x</span></a></span><span>
+</span><span id="line-47"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#Undef"><span class="hs-identifier hs-type">C.Undef</span></a></span><span> </span><span id="local-6989586621679077801"><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679077801"><span class="hs-identifier hs-var">t</span></a></span></span><span class="hs-special">)</span><span>     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679077801"><span class="hs-identifier hs-var">t</span></a></span><span>
+</span><span id="line-48"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#BlockAddress"><span class="hs-identifier hs-type">C.BlockAddress</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679077803"><span id="local-6989586621679077804"><span class="annot"><span class="annottext">Name
+blockAddressFunction :: Name
+blockAddressBlock :: Name
+blockAddressFunction :: Constant -&gt; Name
+blockAddressBlock :: Constant -&gt; Name
+</span><a href="#local-6989586621679077803"><span class="hs-glyph hs-var hs-var hs-var hs-var">..</span></a></span></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Type -&gt; Type
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Type.html#ptr"><span class="hs-identifier hs-var">ptr</span></a></span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Type.html#i8"><span class="hs-identifier hs-var">i8</span></a></span><span>
+</span><span id="line-49"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#GlobalReference"><span class="hs-identifier hs-type">C.GlobalReference</span></a></span><span> </span><span id="local-6989586621679077810"><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679077810"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="annot"><span class="annottext">Name
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679077810"><span class="hs-identifier hs-var">t</span></a></span><span>
+</span><span id="line-50"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#Add"><span class="hs-identifier hs-type">C.Add</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679077812"><span id="local-6989586621679077813"><span id="local-6989586621679077814"><span id="local-6989586621679077815"><span class="annot"><span class="annottext">Bool
+Constant
+nsw :: Bool
+nuw :: Bool
+operand0 :: Constant
+operand1 :: Constant
+nsw :: Constant -&gt; Bool
+nuw :: Constant -&gt; Bool
+operand0 :: Constant -&gt; Constant
+operand1 :: Constant -&gt; Constant
+</span><a href="#local-6989586621679077812"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span>     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Constant -&gt; Type
+forall a. Typed a =&gt; a -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="annot"><span class="annottext">Constant
+</span><a href="#local-6989586621679077814"><span class="hs-identifier hs-var">operand0</span></a></span><span>
+</span><span id="line-51"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#FAdd"><span class="hs-identifier hs-type">C.FAdd</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679077821"><span id="local-6989586621679077822"><span class="annot"><span class="annottext">Constant
+operand0 :: Constant -&gt; Constant
+operand1 :: Constant -&gt; Constant
+operand0 :: Constant
+operand1 :: Constant
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#operand0"><span class="hs-glyph hs-var hs-var hs-var hs-var">..</span></a></span></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Constant -&gt; Type
+forall a. Typed a =&gt; a -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="annot"><span class="annottext">Constant
+</span><a href="#local-6989586621679077821"><span class="hs-identifier hs-var">operand0</span></a></span><span>
+</span><span id="line-52"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#FDiv"><span class="hs-identifier hs-type">C.FDiv</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679077824"><span id="local-6989586621679077825"><span class="annot"><span class="annottext">Constant
+operand0 :: Constant -&gt; Constant
+operand1 :: Constant -&gt; Constant
+operand0 :: Constant
+operand1 :: Constant
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#operand0"><span class="hs-glyph hs-var hs-var hs-var hs-var">..</span></a></span></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Constant -&gt; Type
+forall a. Typed a =&gt; a -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="annot"><span class="annottext">Constant
+</span><a href="#local-6989586621679077824"><span class="hs-identifier hs-var">operand0</span></a></span><span>
+</span><span id="line-53"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#FRem"><span class="hs-identifier hs-type">C.FRem</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679077827"><span id="local-6989586621679077828"><span class="annot"><span class="annottext">Constant
+operand0 :: Constant -&gt; Constant
+operand1 :: Constant -&gt; Constant
+operand0 :: Constant
+operand1 :: Constant
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#operand0"><span class="hs-glyph hs-var hs-var hs-var hs-var">..</span></a></span></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Constant -&gt; Type
+forall a. Typed a =&gt; a -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="annot"><span class="annottext">Constant
+</span><a href="#local-6989586621679077827"><span class="hs-identifier hs-var">operand0</span></a></span><span>
+</span><span id="line-54"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#Sub"><span class="hs-identifier hs-type">C.Sub</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679077830"><span id="local-6989586621679077831"><span id="local-6989586621679077832"><span id="local-6989586621679077833"><span class="annot"><span class="annottext">Bool
+Constant
+nsw :: Constant -&gt; Bool
+nuw :: Constant -&gt; Bool
+operand0 :: Constant -&gt; Constant
+operand1 :: Constant -&gt; Constant
+nsw :: Bool
+nuw :: Bool
+operand0 :: Constant
+operand1 :: Constant
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#nsw"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span>     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Constant -&gt; Type
+forall a. Typed a =&gt; a -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="annot"><span class="annottext">Constant
+</span><a href="#local-6989586621679077832"><span class="hs-identifier hs-var">operand0</span></a></span><span>
+</span><span id="line-55"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#FSub"><span class="hs-identifier hs-type">C.FSub</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679077835"><span id="local-6989586621679077836"><span class="annot"><span class="annottext">Constant
+operand0 :: Constant -&gt; Constant
+operand1 :: Constant -&gt; Constant
+operand0 :: Constant
+operand1 :: Constant
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#operand0"><span class="hs-glyph hs-var hs-var hs-var hs-var">..</span></a></span></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Constant -&gt; Type
+forall a. Typed a =&gt; a -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="annot"><span class="annottext">Constant
+</span><a href="#local-6989586621679077835"><span class="hs-identifier hs-var">operand0</span></a></span><span>
+</span><span id="line-56"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#Mul"><span class="hs-identifier hs-type">C.Mul</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679077838"><span id="local-6989586621679077839"><span id="local-6989586621679077840"><span id="local-6989586621679077841"><span class="annot"><span class="annottext">Bool
+Constant
+nsw :: Constant -&gt; Bool
+nuw :: Constant -&gt; Bool
+operand0 :: Constant -&gt; Constant
+operand1 :: Constant -&gt; Constant
+nsw :: Bool
+nuw :: Bool
+operand0 :: Constant
+operand1 :: Constant
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#nsw"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span>     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Constant -&gt; Type
+forall a. Typed a =&gt; a -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="annot"><span class="annottext">Constant
+</span><a href="#local-6989586621679077840"><span class="hs-identifier hs-var">operand0</span></a></span><span>
+</span><span id="line-57"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#FMul"><span class="hs-identifier hs-type">C.FMul</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679077843"><span id="local-6989586621679077844"><span class="annot"><span class="annottext">Constant
+operand0 :: Constant -&gt; Constant
+operand1 :: Constant -&gt; Constant
+operand0 :: Constant
+operand1 :: Constant
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#operand0"><span class="hs-glyph hs-var hs-var hs-var hs-var">..</span></a></span></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Constant -&gt; Type
+forall a. Typed a =&gt; a -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="annot"><span class="annottext">Constant
+</span><a href="#local-6989586621679077843"><span class="hs-identifier hs-var">operand0</span></a></span><span>
+</span><span id="line-58"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#UDiv"><span class="hs-identifier hs-type">C.UDiv</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679077846"><span id="local-6989586621679077847"><span id="local-6989586621679077848"><span class="annot"><span class="annottext">Bool
+Constant
+operand0 :: Constant -&gt; Constant
+operand1 :: Constant -&gt; Constant
+exact :: Bool
+operand0 :: Constant
+operand1 :: Constant
+exact :: Constant -&gt; Bool
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#operand0"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Constant -&gt; Type
+forall a. Typed a =&gt; a -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="annot"><span class="annottext">Constant
+</span><a href="#local-6989586621679077847"><span class="hs-identifier hs-var">operand0</span></a></span><span>
+</span><span id="line-59"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#SDiv"><span class="hs-identifier hs-type">C.SDiv</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679077851"><span id="local-6989586621679077852"><span id="local-6989586621679077853"><span class="annot"><span class="annottext">Bool
+Constant
+operand0 :: Constant -&gt; Constant
+operand1 :: Constant -&gt; Constant
+exact :: Constant -&gt; Bool
+exact :: Bool
+operand0 :: Constant
+operand1 :: Constant
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#operand0"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Constant -&gt; Type
+forall a. Typed a =&gt; a -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="annot"><span class="annottext">Constant
+</span><a href="#local-6989586621679077852"><span class="hs-identifier hs-var">operand0</span></a></span><span>
+</span><span id="line-60"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#URem"><span class="hs-identifier hs-type">C.URem</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679077855"><span id="local-6989586621679077856"><span class="annot"><span class="annottext">Constant
+operand0 :: Constant -&gt; Constant
+operand1 :: Constant -&gt; Constant
+operand0 :: Constant
+operand1 :: Constant
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#operand0"><span class="hs-glyph hs-var hs-var hs-var hs-var">..</span></a></span></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Constant -&gt; Type
+forall a. Typed a =&gt; a -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="annot"><span class="annottext">Constant
+</span><a href="#local-6989586621679077855"><span class="hs-identifier hs-var">operand0</span></a></span><span>
+</span><span id="line-61"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#SRem"><span class="hs-identifier hs-type">C.SRem</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679077858"><span id="local-6989586621679077859"><span class="annot"><span class="annottext">Constant
+operand0 :: Constant -&gt; Constant
+operand1 :: Constant -&gt; Constant
+operand0 :: Constant
+operand1 :: Constant
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#operand0"><span class="hs-glyph hs-var hs-var hs-var hs-var">..</span></a></span></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Constant -&gt; Type
+forall a. Typed a =&gt; a -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="annot"><span class="annottext">Constant
+</span><a href="#local-6989586621679077858"><span class="hs-identifier hs-var">operand0</span></a></span><span>
+</span><span id="line-62"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#Shl"><span class="hs-identifier hs-type">C.Shl</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679077861"><span id="local-6989586621679077862"><span id="local-6989586621679077863"><span id="local-6989586621679077864"><span class="annot"><span class="annottext">Bool
+Constant
+nsw :: Constant -&gt; Bool
+nuw :: Constant -&gt; Bool
+operand0 :: Constant -&gt; Constant
+operand1 :: Constant -&gt; Constant
+nsw :: Bool
+nuw :: Bool
+operand0 :: Constant
+operand1 :: Constant
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#nsw"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span>     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Constant -&gt; Type
+forall a. Typed a =&gt; a -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="annot"><span class="annottext">Constant
+</span><a href="#local-6989586621679077863"><span class="hs-identifier hs-var">operand0</span></a></span><span>
+</span><span id="line-63"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#LShr"><span class="hs-identifier hs-type">C.LShr</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679077866"><span id="local-6989586621679077867"><span id="local-6989586621679077868"><span class="annot"><span class="annottext">Bool
+Constant
+operand0 :: Constant -&gt; Constant
+operand1 :: Constant -&gt; Constant
+exact :: Constant -&gt; Bool
+exact :: Bool
+operand0 :: Constant
+operand1 :: Constant
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#operand0"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Constant -&gt; Type
+forall a. Typed a =&gt; a -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="annot"><span class="annottext">Constant
+</span><a href="#local-6989586621679077867"><span class="hs-identifier hs-var">operand0</span></a></span><span>
+</span><span id="line-64"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#AShr"><span class="hs-identifier hs-type">C.AShr</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679077870"><span id="local-6989586621679077871"><span id="local-6989586621679077872"><span class="annot"><span class="annottext">Bool
+Constant
+operand0 :: Constant -&gt; Constant
+operand1 :: Constant -&gt; Constant
+exact :: Constant -&gt; Bool
+exact :: Bool
+operand0 :: Constant
+operand1 :: Constant
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#operand0"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Constant -&gt; Type
+forall a. Typed a =&gt; a -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="annot"><span class="annottext">Constant
+</span><a href="#local-6989586621679077871"><span class="hs-identifier hs-var">operand0</span></a></span><span>
+</span><span id="line-65"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#And"><span class="hs-identifier hs-type">C.And</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679077874"><span id="local-6989586621679077875"><span class="annot"><span class="annottext">Constant
+operand0 :: Constant -&gt; Constant
+operand1 :: Constant -&gt; Constant
+operand0 :: Constant
+operand1 :: Constant
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#operand0"><span class="hs-glyph hs-var hs-var hs-var hs-var">..</span></a></span></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span>     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Constant -&gt; Type
+forall a. Typed a =&gt; a -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="annot"><span class="annottext">Constant
+</span><a href="#local-6989586621679077874"><span class="hs-identifier hs-var">operand0</span></a></span><span>
+</span><span id="line-66"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#Or"><span class="hs-identifier hs-type">C.Or</span></a></span><span>  </span><span class="hs-special">{</span><span id="local-6989586621679077877"><span id="local-6989586621679077878"><span class="annot"><span class="annottext">Constant
+operand0 :: Constant -&gt; Constant
+operand1 :: Constant -&gt; Constant
+operand0 :: Constant
+operand1 :: Constant
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#operand0"><span class="hs-glyph hs-var hs-var hs-var hs-var">..</span></a></span></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span>     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Constant -&gt; Type
+forall a. Typed a =&gt; a -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="annot"><span class="annottext">Constant
+</span><a href="#local-6989586621679077877"><span class="hs-identifier hs-var">operand0</span></a></span><span>
+</span><span id="line-67"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#Xor"><span class="hs-identifier hs-type">C.Xor</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679077880"><span id="local-6989586621679077881"><span class="annot"><span class="annottext">Constant
+operand0 :: Constant -&gt; Constant
+operand1 :: Constant -&gt; Constant
+operand0 :: Constant
+operand1 :: Constant
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#operand0"><span class="hs-glyph hs-var hs-var hs-var hs-var">..</span></a></span></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span>     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Constant -&gt; Type
+forall a. Typed a =&gt; a -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="annot"><span class="annottext">Constant
+</span><a href="#local-6989586621679077880"><span class="hs-identifier hs-var">operand0</span></a></span><span>
+</span><span id="line-68"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#GetElementPtr"><span class="hs-identifier hs-type">C.GetElementPtr</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679077883"><span id="local-6989586621679077884"><span id="local-6989586621679077885"><span class="annot"><span class="annottext">Bool
+[Constant]
+Constant
+inBounds :: Bool
+address :: Constant
+indices :: [Constant]
+inBounds :: Constant -&gt; Bool
+address :: Constant -&gt; Constant
+indices :: Constant -&gt; [Constant]
+</span><a href="#local-6989586621679077883"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Type -&gt; [Constant] -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#getElementPtrType"><span class="hs-identifier hs-var">getElementPtrType</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Constant -&gt; Type
+forall a. Typed a =&gt; a -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="annot"><span class="annottext">Constant
+</span><a href="#local-6989586621679077884"><span class="hs-identifier hs-var">address</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[Constant]
+</span><a href="#local-6989586621679077885"><span class="hs-identifier hs-var">indices</span></a></span><span>
+</span><span id="line-69"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#Trunc"><span class="hs-identifier hs-type">C.Trunc</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679077890"><span id="local-6989586621679077891"><span class="annot"><span class="annottext">Type
+Constant
+operand0 :: Constant -&gt; Constant
+operand0 :: Constant
+type' :: Type
+type' :: Constant -&gt; Type
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#operand0"><span class="hs-glyph hs-var hs-var hs-var hs-var">..</span></a></span></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679077891"><span class="hs-identifier hs-var">type'</span></a></span><span>
+</span><span id="line-70"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#ZExt"><span class="hs-identifier hs-type">C.ZExt</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679077894"><span id="local-6989586621679077895"><span class="annot"><span class="annottext">Type
+Constant
+operand0 :: Constant -&gt; Constant
+type' :: Constant -&gt; Type
+operand0 :: Constant
+type' :: Type
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#operand0"><span class="hs-glyph hs-var hs-var hs-var hs-var">..</span></a></span></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679077895"><span class="hs-identifier hs-var">type'</span></a></span><span>
+</span><span id="line-71"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#SExt"><span class="hs-identifier hs-type">C.SExt</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679077897"><span id="local-6989586621679077898"><span class="annot"><span class="annottext">Type
+Constant
+operand0 :: Constant -&gt; Constant
+type' :: Constant -&gt; Type
+operand0 :: Constant
+type' :: Type
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#operand0"><span class="hs-glyph hs-var hs-var hs-var hs-var">..</span></a></span></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679077898"><span class="hs-identifier hs-var">type'</span></a></span><span>
+</span><span id="line-72"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#FPToUI"><span class="hs-identifier hs-type">C.FPToUI</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679077900"><span id="local-6989586621679077901"><span class="annot"><span class="annottext">Type
+Constant
+operand0 :: Constant -&gt; Constant
+type' :: Constant -&gt; Type
+operand0 :: Constant
+type' :: Type
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#operand0"><span class="hs-glyph hs-var hs-var hs-var hs-var">..</span></a></span></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679077901"><span class="hs-identifier hs-var">type'</span></a></span><span>
+</span><span id="line-73"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#FPToSI"><span class="hs-identifier hs-type">C.FPToSI</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679077903"><span id="local-6989586621679077904"><span class="annot"><span class="annottext">Type
+Constant
+operand0 :: Constant -&gt; Constant
+type' :: Constant -&gt; Type
+operand0 :: Constant
+type' :: Type
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#operand0"><span class="hs-glyph hs-var hs-var hs-var hs-var">..</span></a></span></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679077904"><span class="hs-identifier hs-var">type'</span></a></span><span>
+</span><span id="line-74"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#UIToFP"><span class="hs-identifier hs-type">C.UIToFP</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679077906"><span id="local-6989586621679077907"><span class="annot"><span class="annottext">Type
+Constant
+operand0 :: Constant -&gt; Constant
+type' :: Constant -&gt; Type
+operand0 :: Constant
+type' :: Type
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#operand0"><span class="hs-glyph hs-var hs-var hs-var hs-var">..</span></a></span></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679077907"><span class="hs-identifier hs-var">type'</span></a></span><span>
+</span><span id="line-75"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#SIToFP"><span class="hs-identifier hs-type">C.SIToFP</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679077909"><span id="local-6989586621679077910"><span class="annot"><span class="annottext">Type
+Constant
+operand0 :: Constant -&gt; Constant
+type' :: Constant -&gt; Type
+operand0 :: Constant
+type' :: Type
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#operand0"><span class="hs-glyph hs-var hs-var hs-var hs-var">..</span></a></span></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679077910"><span class="hs-identifier hs-var">type'</span></a></span><span>
+</span><span id="line-76"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#FPTrunc"><span class="hs-identifier hs-type">C.FPTrunc</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679077912"><span id="local-6989586621679077913"><span class="annot"><span class="annottext">Type
+Constant
+operand0 :: Constant -&gt; Constant
+type' :: Constant -&gt; Type
+operand0 :: Constant
+type' :: Type
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#operand0"><span class="hs-glyph hs-var hs-var hs-var hs-var">..</span></a></span></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679077913"><span class="hs-identifier hs-var">type'</span></a></span><span>
+</span><span id="line-77"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#FPExt"><span class="hs-identifier hs-type">C.FPExt</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679077915"><span id="local-6989586621679077916"><span class="annot"><span class="annottext">Type
+Constant
+operand0 :: Constant -&gt; Constant
+type' :: Constant -&gt; Type
+operand0 :: Constant
+type' :: Type
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#operand0"><span class="hs-glyph hs-var hs-var hs-var hs-var">..</span></a></span></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679077916"><span class="hs-identifier hs-var">type'</span></a></span><span>
+</span><span id="line-78"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#PtrToInt"><span class="hs-identifier hs-type">C.PtrToInt</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679077918"><span id="local-6989586621679077919"><span class="annot"><span class="annottext">Type
+Constant
+operand0 :: Constant -&gt; Constant
+type' :: Constant -&gt; Type
+operand0 :: Constant
+type' :: Type
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#operand0"><span class="hs-glyph hs-var hs-var hs-var hs-var">..</span></a></span></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679077919"><span class="hs-identifier hs-var">type'</span></a></span><span>
+</span><span id="line-79"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#IntToPtr"><span class="hs-identifier hs-type">C.IntToPtr</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679077921"><span id="local-6989586621679077922"><span class="annot"><span class="annottext">Type
+Constant
+operand0 :: Constant -&gt; Constant
+type' :: Constant -&gt; Type
+operand0 :: Constant
+type' :: Type
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#operand0"><span class="hs-glyph hs-var hs-var hs-var hs-var">..</span></a></span></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679077922"><span class="hs-identifier hs-var">type'</span></a></span><span>
+</span><span id="line-80"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#BitCast"><span class="hs-identifier hs-type">C.BitCast</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679077924"><span id="local-6989586621679077925"><span class="annot"><span class="annottext">Type
+Constant
+operand0 :: Constant -&gt; Constant
+type' :: Constant -&gt; Type
+operand0 :: Constant
+type' :: Type
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#operand0"><span class="hs-glyph hs-var hs-var hs-var hs-var">..</span></a></span></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679077925"><span class="hs-identifier hs-var">type'</span></a></span><span>
+</span><span id="line-81"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#ICmp"><span class="hs-identifier hs-type">C.ICmp</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679077927"><span id="local-6989586621679077928"><span id="local-6989586621679077929"><span class="annot"><span class="annottext">IntegerPredicate
+Constant
+operand0 :: Constant -&gt; Constant
+operand1 :: Constant -&gt; Constant
+iPredicate :: IntegerPredicate
+operand0 :: Constant
+operand1 :: Constant
+iPredicate :: Constant -&gt; IntegerPredicate
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#operand0"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Constant -&gt; Type
+forall a. Typed a =&gt; a -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="annot"><span class="annottext">Constant
+</span><a href="#local-6989586621679077928"><span class="hs-identifier hs-var">operand0</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-82"></span><span>                              </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Type.html#VectorType"><span class="hs-identifier hs-type">VectorType</span></a></span><span> </span><span id="local-6989586621679077931"><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679077931"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="annot"><span class="annottext">Type
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Word32 -&gt; Type -&gt; Type
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Type.html#VectorType"><span class="hs-identifier hs-var">VectorType</span></a></span><span> </span><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679077931"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Type.html#i1"><span class="hs-identifier hs-var">i1</span></a></span><span>
+</span><span id="line-83"></span><span>                              </span><span class="annot"><span class="annottext">Type
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Type.html#i1"><span class="hs-identifier hs-var">i1</span></a></span><span>
+</span><span id="line-84"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#FCmp"><span class="hs-identifier hs-type">C.FCmp</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679077934"><span id="local-6989586621679077935"><span id="local-6989586621679077936"><span class="annot"><span class="annottext">FloatingPointPredicate
+Constant
+operand0 :: Constant -&gt; Constant
+operand1 :: Constant -&gt; Constant
+fpPredicate :: FloatingPointPredicate
+operand0 :: Constant
+operand1 :: Constant
+fpPredicate :: Constant -&gt; FloatingPointPredicate
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#operand0"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Constant -&gt; Type
+forall a. Typed a =&gt; a -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="annot"><span class="annottext">Constant
+</span><a href="#local-6989586621679077935"><span class="hs-identifier hs-var">operand0</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-85"></span><span>                              </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Type.html#VectorType"><span class="hs-identifier hs-type">VectorType</span></a></span><span> </span><span id="local-6989586621679077938"><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679077938"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="annot"><span class="annottext">Type
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Word32 -&gt; Type -&gt; Type
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Type.html#VectorType"><span class="hs-identifier hs-var">VectorType</span></a></span><span> </span><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679077938"><span class="hs-identifier hs-var">n</span></a></span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Type.html#i1"><span class="hs-identifier hs-var">i1</span></a></span><span>
+</span><span id="line-86"></span><span>                              </span><span class="annot"><span class="annottext">Type
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Type.html#i1"><span class="hs-identifier hs-var">i1</span></a></span><span>
+</span><span id="line-87"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#Select"><span class="hs-identifier hs-type">C.Select</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679077940"><span id="local-6989586621679077941"><span id="local-6989586621679077942"><span class="annot"><span class="annottext">Constant
+condition' :: Constant
+trueValue :: Constant
+falseValue :: Constant
+condition' :: Constant -&gt; Constant
+trueValue :: Constant -&gt; Constant
+falseValue :: Constant -&gt; Constant
+</span><a href="#local-6989586621679077940"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Constant -&gt; Type
+forall a. Typed a =&gt; a -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="annot"><span class="annottext">Constant
+</span><a href="#local-6989586621679077941"><span class="hs-identifier hs-var">trueValue</span></a></span><span>
+</span><span id="line-88"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#ExtractElement"><span class="hs-identifier hs-type">C.ExtractElement</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679077947"><span id="local-6989586621679077948"><span class="annot"><span class="annottext">Constant
+vector :: Constant
+index :: Constant
+vector :: Constant -&gt; Constant
+index :: Constant -&gt; Constant
+</span><a href="#local-6989586621679077947"><span class="hs-glyph hs-var hs-var hs-var hs-var">..</span></a></span></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span>  </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Constant -&gt; Type
+forall a. Typed a =&gt; a -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="annot"><span class="annottext">Constant
+</span><a href="#local-6989586621679077947"><span class="hs-identifier hs-var">vector</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-89"></span><span>                                      </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Type.html#VectorType"><span class="hs-identifier hs-type">VectorType</span></a></span><span> </span><span class="annot"><span class="annottext">Word32
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679077951"><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679077951"><span class="hs-identifier hs-var">t</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679077951"><span class="hs-identifier hs-var">t</span></a></span><span>
+</span><span id="line-90"></span><span>                                      </span><span class="annot"><span class="annottext">Type
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; Type
+forall a. HasCallStack =&gt; [Char] -&gt; a
+</span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot;The first operand of an extractelement instruction is a value of vector type. (Malformed AST)&quot;</span></span><span>
+</span><span id="line-91"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#InsertElement"><span class="hs-identifier hs-type">C.InsertElement</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679077953"><span id="local-6989586621679077954"><span id="local-6989586621679077955"><span class="annot"><span class="annottext">Constant
+vector :: Constant -&gt; Constant
+index :: Constant -&gt; Constant
+vector :: Constant
+element :: Constant
+index :: Constant
+element :: Constant -&gt; Constant
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#vector"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Constant -&gt; Type
+forall a. Typed a =&gt; a -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="annot"><span class="annottext">Constant
+</span><a href="#local-6989586621679077953"><span class="hs-identifier hs-var">vector</span></a></span><span>
+</span><span id="line-92"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#ShuffleVector"><span class="hs-identifier hs-type">C.ShuffleVector</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679077958"><span id="local-6989586621679077959"><span id="local-6989586621679077960"><span class="annot"><span class="annottext">Constant
+operand0 :: Constant -&gt; Constant
+operand1 :: Constant -&gt; Constant
+operand0 :: Constant
+operand1 :: Constant
+mask :: Constant
+mask :: Constant -&gt; Constant
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#operand0"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Constant -&gt; Type
+forall a. Typed a =&gt; a -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="annot"><span class="annottext">Constant
+</span><a href="#local-6989586621679077958"><span class="hs-identifier hs-var">operand0</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Constant -&gt; Type
+forall a. Typed a =&gt; a -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="annot"><span class="annottext">Constant
+</span><a href="#local-6989586621679077960"><span class="hs-identifier hs-var">mask</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-93"></span><span>                                      </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Type.html#VectorType"><span class="hs-identifier hs-type">VectorType</span></a></span><span> </span><span class="annot"><span class="annottext">Word32
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679077962"><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679077962"><span class="hs-identifier hs-var">t</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Type.html#VectorType"><span class="hs-identifier hs-type">VectorType</span></a></span><span> </span><span id="local-6989586621679077963"><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679077963"><span class="hs-identifier hs-var">m</span></a></span></span><span> </span><span class="annot"><span class="annottext">Type
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Word32 -&gt; Type -&gt; Type
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Type.html#VectorType"><span class="hs-identifier hs-var">VectorType</span></a></span><span> </span><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679077963"><span class="hs-identifier hs-var">m</span></a></span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679077962"><span class="hs-identifier hs-var">t</span></a></span><span>
+</span><span id="line-94"></span><span>                                      </span><span class="annot"><span class="annottext">(Type, Type)
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; Type
+forall a. HasCallStack =&gt; [Char] -&gt; a
+</span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot;The first operand of an shufflevector instruction is a value of vector type. (Malformed AST)&quot;</span></span><span>
+</span><span id="line-95"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#ExtractValue"><span class="hs-identifier hs-type">C.ExtractValue</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679077965"><span id="local-6989586621679077966"><span class="annot"><span class="annottext">[Word32]
+Constant
+aggregate :: Constant
+indices' :: [Word32]
+aggregate :: Constant -&gt; Constant
+indices' :: Constant -&gt; [Word32]
+</span><a href="#local-6989586621679077965"><span class="hs-glyph hs-var hs-var hs-var hs-var">..</span></a></span></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Word32] -&gt; Type -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#extractValueType"><span class="hs-identifier hs-var">extractValueType</span></a></span><span> </span><span class="annot"><span class="annottext">[Word32]
+</span><a href="#local-6989586621679077966"><span class="hs-identifier hs-var">indices'</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Constant -&gt; Type
+forall a. Typed a =&gt; a -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="annot"><span class="annottext">Constant
+</span><a href="#local-6989586621679077965"><span class="hs-identifier hs-var">aggregate</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-96"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#InsertValue"><span class="hs-identifier hs-type">C.InsertValue</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679077970"><span id="local-6989586621679077971"><span id="local-6989586621679077972"><span class="annot"><span class="annottext">[Word32]
+Constant
+element :: Constant -&gt; Constant
+aggregate :: Constant -&gt; Constant
+indices' :: Constant -&gt; [Word32]
+aggregate :: Constant
+element :: Constant
+indices' :: [Word32]
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#element"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span>     </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Constant -&gt; Type
+forall a. Typed a =&gt; a -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="annot"><span class="annottext">Constant
+</span><a href="#local-6989586621679077970"><span class="hs-identifier hs-var">aggregate</span></a></span><span>
+</span><span id="line-97"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Constant
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#TokenNone"><span class="hs-identifier hs-var">C.TokenNone</span></a></span><span class="hs-special">)</span><span>          </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Type.html#TokenType"><span class="hs-identifier hs-var">TokenType</span></a></span><span>
+</span><span id="line-98"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#AddrSpaceCast"><span class="hs-identifier hs-type">C.AddrSpaceCast</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679077976"><span id="local-6989586621679077977"><span class="annot"><span class="annottext">Type
+Constant
+operand0 :: Constant -&gt; Constant
+type' :: Constant -&gt; Type
+operand0 :: Constant
+type' :: Type
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#operand0"><span class="hs-glyph hs-var hs-var hs-var hs-var">..</span></a></span></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679077977"><span class="hs-identifier hs-var">type'</span></a></span><span>
+</span><span id="line-99"></span><span>
+</span><span id="line-100"></span><span class="annot"><a href="LLVM.Pretty.Typed.html#getElementPtrType"><span class="hs-identifier hs-type">getElementPtrType</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Type.html#Type"><span class="hs-identifier hs-type">Type</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#Constant"><span class="hs-identifier hs-type">C.Constant</span></a></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Type.html#Type"><span class="hs-identifier hs-type">Type</span></a></span><span>
+</span><span id="line-101"></span><span id="getElementPtrType"><span class="annot"><span class="annottext">getElementPtrType :: Type -&gt; [Constant] -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#getElementPtrType"><span class="hs-identifier hs-var hs-var">getElementPtrType</span></a></span></span><span> </span><span id="local-6989586621679077978"><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679077978"><span class="hs-identifier hs-var">ty</span></a></span></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Type -&gt; Type
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Type.html#ptr"><span class="hs-identifier hs-var">ptr</span></a></span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679077978"><span class="hs-identifier hs-var">ty</span></a></span><span>
+</span><span id="line-102"></span><span class="annot"><a href="LLVM.Pretty.Typed.html#getElementPtrType"><span class="hs-identifier hs-var">getElementPtrType</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Type.html#PointerType"><span class="hs-identifier hs-type">PointerType</span></a></span><span> </span><span id="local-6989586621679077980"><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679077980"><span class="hs-identifier hs-var">ty</span></a></span></span><span> </span><span class="annot"><span class="annottext">AddrSpace
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Constant
+</span><span class="hs-identifier">_</span></span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span id="local-6989586621679077981"><span class="annot"><span class="annottext">[Constant]
+</span><a href="#local-6989586621679077981"><span class="hs-identifier hs-var">is</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Type -&gt; [Constant] -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#getElementPtrType"><span class="hs-identifier hs-var">getElementPtrType</span></a></span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679077980"><span class="hs-identifier hs-var">ty</span></a></span><span> </span><span class="annot"><span class="annottext">[Constant]
+</span><a href="#local-6989586621679077981"><span class="hs-identifier hs-var">is</span></a></span><span>
+</span><span id="line-103"></span><span class="annot"><a href="LLVM.Pretty.Typed.html#getElementPtrType"><span class="hs-identifier hs-var">getElementPtrType</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Type.html#StructureType"><span class="hs-identifier hs-type">StructureType</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679077982"><span class="annot"><span class="annottext">[Type]
+</span><a href="#local-6989586621679077982"><span class="hs-identifier hs-var">elTys</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Constant.html#Int"><span class="hs-identifier hs-type">C.Int</span></a></span><span> </span><span class="annot"><span class="annottext">Word32
+</span><span class="hs-number">32</span></span><span> </span><span id="local-6989586621679077983"><span class="annot"><span class="annottext">Integer
+</span><a href="#local-6989586621679077983"><span class="hs-identifier hs-var">val</span></a></span></span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span id="local-6989586621679077984"><span class="annot"><span class="annottext">[Constant]
+</span><a href="#local-6989586621679077984"><span class="hs-identifier hs-var">is</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-104"></span><span>  </span><span class="annot"><span class="annottext">Type -&gt; [Constant] -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#getElementPtrType"><span class="hs-identifier hs-var">getElementPtrType</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Type]
+</span><a href="#local-6989586621679077982"><span class="hs-identifier hs-var">elTys</span></a></span><span> </span><span class="annot"><span class="annottext">[Type] -&gt; Int -&gt; Type
+forall a. HasCallStack =&gt; [a] -&gt; Int -&gt; a
+</span><span class="hs-operator hs-var">!!</span></span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Int
+forall a b. (Integral a, Num b) =&gt; a -&gt; b
+</span><span class="hs-identifier hs-var">fromIntegral</span></span><span> </span><span class="annot"><span class="annottext">Integer
+</span><a href="#local-6989586621679077983"><span class="hs-identifier hs-var">val</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[Constant]
+</span><a href="#local-6989586621679077984"><span class="hs-identifier hs-var">is</span></a></span><span>
+</span><span id="line-105"></span><span class="annot"><a href="LLVM.Pretty.Typed.html#getElementPtrType"><span class="hs-identifier hs-var">getElementPtrType</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Type.html#VectorType"><span class="hs-identifier hs-type">VectorType</span></a></span><span> </span><span class="annot"><span class="annottext">Word32
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679077986"><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679077986"><span class="hs-identifier hs-var">elTy</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Constant
+</span><span class="hs-identifier">_</span></span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span id="local-6989586621679077987"><span class="annot"><span class="annottext">[Constant]
+</span><a href="#local-6989586621679077987"><span class="hs-identifier hs-var">is</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Type -&gt; [Constant] -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#getElementPtrType"><span class="hs-identifier hs-var">getElementPtrType</span></a></span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679077986"><span class="hs-identifier hs-var">elTy</span></a></span><span> </span><span class="annot"><span class="annottext">[Constant]
+</span><a href="#local-6989586621679077987"><span class="hs-identifier hs-var">is</span></a></span><span>
+</span><span id="line-106"></span><span class="annot"><a href="LLVM.Pretty.Typed.html#getElementPtrType"><span class="hs-identifier hs-var">getElementPtrType</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Type.html#ArrayType"><span class="hs-identifier hs-type">ArrayType</span></a></span><span> </span><span class="annot"><span class="annottext">Word64
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679077988"><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679077988"><span class="hs-identifier hs-var">elTy</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Constant
+</span><span class="hs-identifier">_</span></span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span id="local-6989586621679077989"><span class="annot"><span class="annottext">[Constant]
+</span><a href="#local-6989586621679077989"><span class="hs-identifier hs-var">is</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Type -&gt; [Constant] -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#getElementPtrType"><span class="hs-identifier hs-var">getElementPtrType</span></a></span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679077988"><span class="hs-identifier hs-var">elTy</span></a></span><span> </span><span class="annot"><span class="annottext">[Constant]
+</span><a href="#local-6989586621679077989"><span class="hs-identifier hs-var">is</span></a></span><span>
+</span><span id="line-107"></span><span class="annot"><a href="LLVM.Pretty.Typed.html#getElementPtrType"><span class="hs-identifier hs-var">getElementPtrType</span></a></span><span> </span><span class="annot"><span class="annottext">Type
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">[Constant]
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; Type
+forall a. HasCallStack =&gt; [Char] -&gt; a
+</span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot;Expecting aggregate type. (Malformed AST)&quot;</span></span><span>
+</span><span id="line-108"></span><span>
+</span><span id="line-109"></span><span class="annot"><a href="LLVM.Pretty.Typed.html#getElementType"><span class="hs-identifier hs-type">getElementType</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Type.html#Type"><span class="hs-identifier hs-type">Type</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Type.html#Type"><span class="hs-identifier hs-type">Type</span></a></span><span>
+</span><span id="line-110"></span><span id="getElementType"><span class="annot"><span class="annottext">getElementType :: Type -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#getElementType"><span class="hs-identifier hs-var hs-var">getElementType</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Type.html#PointerType"><span class="hs-identifier hs-type">PointerType</span></a></span><span> </span><span id="local-6989586621679077990"><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679077990"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="annot"><span class="annottext">AddrSpace
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679077990"><span class="hs-identifier hs-var">t</span></a></span><span>
+</span><span id="line-111"></span><span class="annot"><a href="LLVM.Pretty.Typed.html#getElementType"><span class="hs-identifier hs-var">getElementType</span></a></span><span> </span><span class="annot"><span class="annottext">Type
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; Type
+forall a. HasCallStack =&gt; [Char] -&gt; a
+</span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="annot"><span class="annottext">([Char] -&gt; Type) -&gt; [Char] -&gt; Type
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot;Expecting pointer type. (Malformed AST)&quot;</span></span><span>
+</span><span id="line-112"></span><span>
+</span><span id="line-113"></span><span class="annot"><a href="LLVM.Pretty.Typed.html#extractValueType"><span class="hs-identifier hs-type">extractValueType</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">Word32</span></span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Type.html#Type"><span class="hs-identifier hs-type">Type</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Type.html#Type"><span class="hs-identifier hs-type">Type</span></a></span><span>
+</span><span id="line-114"></span><span id="extractValueType"><span class="annot"><span class="annottext">extractValueType :: [Word32] -&gt; Type -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#extractValueType"><span class="hs-identifier hs-var hs-var">extractValueType</span></a></span></span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span id="local-6989586621679077991"><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679077991"><span class="hs-identifier hs-var">ty</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679077991"><span class="hs-identifier hs-var">ty</span></a></span><span>
+</span><span id="line-115"></span><span class="annot"><a href="LLVM.Pretty.Typed.html#extractValueType"><span class="hs-identifier hs-var">extractValueType</span></a></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679077992"><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679077992"><span class="hs-identifier hs-var">i</span></a></span></span><span> </span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span> </span><span id="local-6989586621679077993"><span class="annot"><span class="annottext">[Word32]
+</span><a href="#local-6989586621679077993"><span class="hs-identifier hs-var">is</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Type.html#ArrayType"><span class="hs-identifier hs-type">ArrayType</span></a></span><span> </span><span id="local-6989586621679077994"><span class="annot"><span class="annottext">Word64
+</span><a href="#local-6989586621679077994"><span class="hs-identifier hs-var">numEls</span></a></span></span><span> </span><span id="local-6989586621679077995"><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679077995"><span class="hs-identifier hs-var">elTy</span></a></span></span><span class="hs-special">)</span><span>
+</span><span id="line-116"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Word32 -&gt; Word64
+forall a b. (Integral a, Num b) =&gt; a -&gt; b
+</span><span class="hs-identifier hs-var">fromIntegral</span></span><span> </span><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679077992"><span class="hs-identifier hs-var">i</span></a></span><span> </span><span class="annot"><span class="annottext">Word64 -&gt; Word64 -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;</span></span><span> </span><span class="annot"><span class="annottext">Word64
+</span><a href="#local-6989586621679077994"><span class="hs-identifier hs-var">numEls</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Word32] -&gt; Type -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#extractValueType"><span class="hs-identifier hs-var">extractValueType</span></a></span><span> </span><span class="annot"><span class="annottext">[Word32]
+</span><a href="#local-6989586621679077993"><span class="hs-identifier hs-var">is</span></a></span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679077995"><span class="hs-identifier hs-var">elTy</span></a></span><span>
+</span><span id="line-117"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Word32 -&gt; Word64
+forall a b. (Integral a, Num b) =&gt; a -&gt; b
+</span><span class="hs-identifier hs-var">fromIntegral</span></span><span> </span><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679077992"><span class="hs-identifier hs-var">i</span></a></span><span> </span><span class="annot"><span class="annottext">Word64 -&gt; Word64 -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&gt;=</span></span><span> </span><span class="annot"><span class="annottext">Word64
+</span><a href="#local-6989586621679077994"><span class="hs-identifier hs-var">numEls</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; Type
+forall a. HasCallStack =&gt; [Char] -&gt; a
+</span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot;Expecting valid index into array type. (Malformed AST)&quot;</span></span><span>
+</span><span id="line-118"></span><span class="annot"><a href="LLVM.Pretty.Typed.html#extractValueType"><span class="hs-identifier hs-var">extractValueType</span></a></span><span> </span><span class="hs-special">(</span><span id="local-6989586621679077997"><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679077997"><span class="hs-identifier hs-var">i</span></a></span></span><span> </span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span> </span><span id="local-6989586621679077998"><span class="annot"><span class="annottext">[Word32]
+</span><a href="#local-6989586621679077998"><span class="hs-identifier hs-var">is</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Type.html#StructureType"><span class="hs-identifier hs-type">StructureType</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679077999"><span class="annot"><span class="annottext">[Type]
+</span><a href="#local-6989586621679077999"><span class="hs-identifier hs-var">elTys</span></a></span></span><span class="hs-special">)</span><span>
+</span><span id="line-119"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Word32 -&gt; Int
+forall a b. (Integral a, Num b) =&gt; a -&gt; b
+</span><span class="hs-identifier hs-var">fromIntegral</span></span><span> </span><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679077997"><span class="hs-identifier hs-var">i</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+forall a. Ord a =&gt; a -&gt; a -&gt; Bool
+</span><span class="hs-operator hs-var">&lt;</span></span><span> </span><span class="annot"><span class="annottext">[Type] -&gt; Int
+forall a. [a] -&gt; Int
+forall (t :: * -&gt; *) a. Foldable t =&gt; t a -&gt; Int
+</span><span class="hs-identifier hs-var">length</span></span><span> </span><span class="annot"><span class="annottext">[Type]
+</span><a href="#local-6989586621679077999"><span class="hs-identifier hs-var">elTys</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Word32] -&gt; Type -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#extractValueType"><span class="hs-identifier hs-var">extractValueType</span></a></span><span> </span><span class="annot"><span class="annottext">[Word32]
+</span><a href="#local-6989586621679077998"><span class="hs-identifier hs-var">is</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Type]
+</span><a href="#local-6989586621679077999"><span class="hs-identifier hs-var">elTys</span></a></span><span> </span><span class="annot"><span class="annottext">[Type] -&gt; Int -&gt; Type
+forall a. HasCallStack =&gt; [a] -&gt; Int -&gt; a
+</span><span class="hs-operator hs-var">!!</span></span><span> </span><span class="annot"><span class="annottext">Word32 -&gt; Int
+forall a b. (Integral a, Num b) =&gt; a -&gt; b
+</span><span class="hs-identifier hs-var">fromIntegral</span></span><span> </span><span class="annot"><span class="annottext">Word32
+</span><a href="#local-6989586621679077997"><span class="hs-identifier hs-var">i</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-120"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">otherwise</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; Type
+forall a. HasCallStack =&gt; [Char] -&gt; a
+</span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot;Expecting valid index into structure type. (Malformed AST)&quot;</span></span><span>
+</span><span id="line-121"></span><span class="annot"><a href="LLVM.Pretty.Typed.html#extractValueType"><span class="hs-identifier hs-var">extractValueType</span></a></span><span> </span><span class="annot"><span class="annottext">[Word32]
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">Type
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Char] -&gt; Type
+forall a. HasCallStack =&gt; [Char] -&gt; a
+</span><span class="hs-identifier hs-var">error</span></span><span> </span><span class="annot"><span class="annottext">[Char]
+</span><span class="hs-string">&quot;Expecting vector type. (Malformed AST)&quot;</span></span><span>
+</span><span id="line-122"></span><span>
+</span><span id="line-123"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="LLVM.Pretty.Typed.html#Typed"><span class="hs-identifier hs-type">Typed</span></a></span><span> </span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Float.html#SomeFloat"><span class="hs-identifier hs-type">F.SomeFloat</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-124"></span><span>  </span><span id="local-6989586621679078001"><span class="annot"><span class="annottext">typeOf :: SomeFloat -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var hs-var hs-var hs-var">typeOf</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Float.html#Half"><span class="hs-identifier hs-type">F.Half</span></a></span><span> </span><span class="annot"><span class="annottext">Word16
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span>          </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">FloatingPointType -&gt; Type
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Type.html#FloatingPointType"><span class="hs-identifier hs-var">FloatingPointType</span></a></span><span> </span><span class="annot"><span class="annottext">FloatingPointType
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Type.html#HalfFP"><span class="hs-identifier hs-var">HalfFP</span></a></span><span>
+</span><span id="line-125"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Float.html#Single"><span class="hs-identifier hs-type">F.Single</span></a></span><span> </span><span class="annot"><span class="annottext">Float
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span>        </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">FloatingPointType -&gt; Type
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Type.html#FloatingPointType"><span class="hs-identifier hs-var">FloatingPointType</span></a></span><span> </span><span class="annot"><span class="annottext">FloatingPointType
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Type.html#FloatFP"><span class="hs-identifier hs-var">FloatFP</span></a></span><span>
+</span><span id="line-126"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Float.html#Double"><span class="hs-identifier hs-type">F.Double</span></a></span><span> </span><span class="annot"><span class="annottext">Double
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span>        </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">FloatingPointType -&gt; Type
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Type.html#FloatingPointType"><span class="hs-identifier hs-var">FloatingPointType</span></a></span><span> </span><span class="annot"><span class="annottext">FloatingPointType
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Type.html#DoubleFP"><span class="hs-identifier hs-var">DoubleFP</span></a></span><span>
+</span><span id="line-127"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Float.html#Quadruple"><span class="hs-identifier hs-type">F.Quadruple</span></a></span><span> </span><span class="annot"><span class="annottext">Word64
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">Word64
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">FloatingPointType -&gt; Type
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Type.html#FloatingPointType"><span class="hs-identifier hs-var">FloatingPointType</span></a></span><span> </span><span class="annot"><span class="annottext">FloatingPointType
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Type.html#FP128FP"><span class="hs-identifier hs-var">FP128FP</span></a></span><span>
+</span><span id="line-128"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Float.html#X86_FP80"><span class="hs-identifier hs-type">F.X86_FP80</span></a></span><span> </span><span class="annot"><span class="annottext">Word16
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">Word64
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">FloatingPointType -&gt; Type
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Type.html#FloatingPointType"><span class="hs-identifier hs-var">FloatingPointType</span></a></span><span> </span><span class="annot"><span class="annottext">FloatingPointType
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Type.html#X86_FP80FP"><span class="hs-identifier hs-var">X86_FP80FP</span></a></span><span>
+</span><span id="line-129"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Float.html#PPC_FP128"><span class="hs-identifier hs-type">F.PPC_FP128</span></a></span><span> </span><span class="annot"><span class="annottext">Word64
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">Word64
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span>   </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">FloatingPointType -&gt; Type
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Type.html#FloatingPointType"><span class="hs-identifier hs-var">FloatingPointType</span></a></span><span> </span><span class="annot"><span class="annottext">FloatingPointType
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Type.html#PPC_FP128FP"><span class="hs-identifier hs-var">PPC_FP128FP</span></a></span><span>
+</span><span id="line-130"></span><span>
+</span><span id="line-131"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="LLVM.Pretty.Typed.html#Typed"><span class="hs-identifier hs-type">Typed</span></a></span><span> </span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Global.html#Global"><span class="hs-identifier hs-type">Global</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-132"></span><span>  </span><span id="local-6989586621679078019"><span class="annot"><span class="annottext">typeOf :: Global -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var hs-var hs-var hs-var">typeOf</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Global.html#GlobalVariable"><span class="hs-identifier hs-type">GlobalVariable</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679078021"><span id="local-6989586621679078022"><span id="local-6989586621679078023"><span id="local-6989586621679078024"><span id="local-6989586621679078025"><span id="local-6989586621679078026"><span id="local-6989586621679078027"><span id="local-6989586621679078028"><span id="local-6989586621679078029"><span id="local-6989586621679078030"><span id="local-6989586621679078031"><span id="local-6989586621679078032"><span id="local-6989586621679078033"><span id="local-6989586621679078034"><span class="annot"><span class="annottext">Bool
+[(ShortByteString, MDRef MDNode)]
+Maybe ShortByteString
+Maybe Model
+Maybe StorageClass
+Maybe Constant
+Maybe UnnamedAddr
+Word32
+Visibility
+Name
+Linkage
+AddrSpace
+Type
+name :: Name
+linkage :: Linkage
+visibility :: Visibility
+dllStorageClass :: Maybe StorageClass
+threadLocalMode :: Maybe Model
+unnamedAddr :: Maybe UnnamedAddr
+isConstant :: Bool
+type' :: Type
+addrSpace :: AddrSpace
+initializer :: Maybe Constant
+section :: Maybe ShortByteString
+comdat :: Maybe ShortByteString
+alignment :: Word32
+metadata :: [(ShortByteString, MDRef MDNode)]
+name :: Global -&gt; Name
+linkage :: Global -&gt; Linkage
+visibility :: Global -&gt; Visibility
+dllStorageClass :: Global -&gt; Maybe StorageClass
+threadLocalMode :: Global -&gt; Maybe Model
+unnamedAddr :: Global -&gt; Maybe UnnamedAddr
+isConstant :: Global -&gt; Bool
+type' :: Global -&gt; Type
+addrSpace :: Global -&gt; AddrSpace
+initializer :: Global -&gt; Maybe Constant
+section :: Global -&gt; Maybe ShortByteString
+comdat :: Global -&gt; Maybe ShortByteString
+alignment :: Global -&gt; Word32
+metadata :: Global -&gt; [(ShortByteString, MDRef MDNode)]
+</span><a href="#local-6989586621679078021"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679078028"><span class="hs-identifier hs-var">type'</span></a></span><span>
+</span><span id="line-133"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Global.html#GlobalAlias"><span class="hs-identifier hs-type">GlobalAlias</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679078050"><span id="local-6989586621679078051"><span id="local-6989586621679078052"><span id="local-6989586621679078053"><span id="local-6989586621679078054"><span id="local-6989586621679078055"><span id="local-6989586621679078056"><span id="local-6989586621679078057"><span id="local-6989586621679078058"><span class="annot"><span class="annottext">Maybe Model
+Maybe StorageClass
+Maybe UnnamedAddr
+Visibility
+Name
+Linkage
+AddrSpace
+Type
+Constant
+name :: Global -&gt; Name
+linkage :: Global -&gt; Linkage
+visibility :: Global -&gt; Visibility
+dllStorageClass :: Global -&gt; Maybe StorageClass
+threadLocalMode :: Global -&gt; Maybe Model
+unnamedAddr :: Global -&gt; Maybe UnnamedAddr
+type' :: Global -&gt; Type
+addrSpace :: Global -&gt; AddrSpace
+name :: Name
+linkage :: Linkage
+visibility :: Visibility
+dllStorageClass :: Maybe StorageClass
+threadLocalMode :: Maybe Model
+unnamedAddr :: Maybe UnnamedAddr
+type' :: Type
+addrSpace :: AddrSpace
+aliasee :: Constant
+aliasee :: Global -&gt; Constant
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Global.html#name"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span></span></span></span></span></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span>    </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679078056"><span class="hs-identifier hs-var">type'</span></a></span><span>
+</span><span id="line-134"></span><span>  </span><span class="annot"><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Global.html#Function"><span class="hs-identifier hs-type">Function</span></a></span><span> </span><span class="hs-special">{</span><span id="local-6989586621679078061"><span id="local-6989586621679078062"><span id="local-6989586621679078063"><span id="local-6989586621679078064"><span id="local-6989586621679078065"><span id="local-6989586621679078066"><span id="local-6989586621679078067"><span id="local-6989586621679078068"><span id="local-6989586621679078069"><span id="local-6989586621679078070"><span id="local-6989586621679078071"><span id="local-6989586621679078072"><span id="local-6989586621679078073"><span id="local-6989586621679078074"><span id="local-6989586621679078075"><span id="local-6989586621679078076"><span id="local-6989586621679078077"><span class="annot"><span class="annottext">[Either GroupID FunctionAttribute]
+[(ShortByteString, MDRef MDNode)]
+[ParameterAttribute]
+[BasicBlock]
+Maybe ShortByteString
+Maybe StorageClass
+Maybe Constant
+Word32
+([Parameter], Bool)
+Visibility
+Name
+Linkage
+CallingConvention
+Type
+name :: Global -&gt; Name
+linkage :: Global -&gt; Linkage
+visibility :: Global -&gt; Visibility
+dllStorageClass :: Global -&gt; Maybe StorageClass
+section :: Global -&gt; Maybe ShortByteString
+comdat :: Global -&gt; Maybe ShortByteString
+alignment :: Global -&gt; Word32
+metadata :: Global -&gt; [(ShortByteString, MDRef MDNode)]
+linkage :: Linkage
+visibility :: Visibility
+dllStorageClass :: Maybe StorageClass
+callingConvention :: CallingConvention
+returnAttributes :: [ParameterAttribute]
+returnType :: Type
+name :: Name
+parameters :: ([Parameter], Bool)
+functionAttributes :: [Either GroupID FunctionAttribute]
+section :: Maybe ShortByteString
+comdat :: Maybe ShortByteString
+alignment :: Word32
+garbageCollectorName :: Maybe ShortByteString
+prefix :: Maybe Constant
+basicBlocks :: [BasicBlock]
+personalityFunction :: Maybe Constant
+metadata :: [(ShortByteString, MDRef MDNode)]
+callingConvention :: Global -&gt; CallingConvention
+returnAttributes :: Global -&gt; [ParameterAttribute]
+returnType :: Global -&gt; Type
+parameters :: Global -&gt; ([Parameter], Bool)
+functionAttributes :: Global -&gt; [Either GroupID FunctionAttribute]
+garbageCollectorName :: Global -&gt; Maybe ShortByteString
+prefix :: Global -&gt; Maybe Constant
+basicBlocks :: Global -&gt; [BasicBlock]
+personalityFunction :: Global -&gt; Maybe Constant
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Global.html#name"><span class="hs-glyph hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">..</span></a></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span>       </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">let</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679078087"><span class="annot"><span class="annottext">[Parameter]
+</span><a href="#local-6989586621679078087"><span class="hs-identifier hs-var">params</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679078088"><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679078088"><span class="hs-identifier hs-var">isVarArg</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">([Parameter], Bool)
+</span><a href="#local-6989586621679078068"><span class="hs-identifier hs-var">parameters</span></a></span><span>
+</span><span id="line-135"></span><span>                                   </span><span class="hs-keyword">in</span><span> </span><span class="annot"><span class="annottext">Type -&gt; [Type] -&gt; Bool -&gt; Type
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Type.html#FunctionType"><span class="hs-identifier hs-var">FunctionType</span></a></span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679078066"><span class="hs-identifier hs-var">returnType</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Parameter -&gt; Type) -&gt; [Parameter] -&gt; [Type]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="annot"><span class="annottext">Parameter -&gt; Type
+forall a. Typed a =&gt; a -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var">typeOf</span></a></span><span> </span><span class="annot"><span class="annottext">[Parameter]
+</span><a href="#local-6989586621679078087"><span class="hs-identifier hs-var">params</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679078088"><span class="hs-identifier hs-var">isVarArg</span></a></span><span>
+</span><span id="line-136"></span><span class="hs-keyword">instance</span><span> </span><span class="annot"><a href="LLVM.Pretty.Typed.html#Typed"><span class="hs-identifier hs-type">Typed</span></a></span><span> </span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Global.html#Parameter"><span class="hs-identifier hs-type">Parameter</span></a></span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-137"></span><span>  </span><span id="local-6989586621679078091"><span class="annot"><span class="annottext">typeOf :: Parameter -&gt; Type
+</span><a href="LLVM.Pretty.Typed.html#typeOf"><span class="hs-identifier hs-var hs-var hs-var hs-var">typeOf</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-587c6f8345d88aaf99e816c1a36603f3fe95a2799c5615605d123805109f4482/share/doc/html/src/LLVM.AST.Global.html#Parameter"><span class="hs-identifier hs-type">Parameter</span></a></span><span> </span><span id="local-6989586621679078093"><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679078093"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="annot"><span class="annottext">Name
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">[ParameterAttribute]
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679078093"><span class="hs-identifier hs-var">t</span></a></span><span>
+</span><span id="line-138"></span></pre></body></html>
