@@ -1,0 +1,22 @@
+version: 2
+updates:
+
+  # NOTE: Dependabot official configuration documentation:
+  # https://docs.github.com/en/code-security/supply-chain-security/keeping-your-dependencies-updated-automatically/configuration-options-for-dependency-updates#package-ecosystem
+
+  # Maintain dependencies for internal GitHub Actions CI for pull requests
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+
+  ## Andreas, 2023-09-10, turn off dependabot for npm since it does not keep the files in sync.
+  ## See https://github.com/haskell-actions/setup/issues/33
+  ##
+  # # Enable version updates for npm
+  # - package-ecosystem: "npm"
+  #   # Look for `package.json` and `lock` files in the action's `root` directory
+  #   directory: "/"
+  #   # Check the npm registry for updates every day (weekdays)
+  #   schedule:
+  #     interval: "monthly"

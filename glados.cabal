@@ -1,0 +1,62 @@
+cabal-version: 3.4
+name: glados
+version: 0.0.0.1
+synopsis: Generic Language and Data Operand Syntax
+license: MIT
+license-file: LICENSE
+author: Javier R
+maintainer: javier.rios-urbano@epitech.eu
+category: Compilers
+build-type: Simple
+extra-doc-files: README.md
+
+source-repository head
+  type: git
+  location: git@github.com:EpitechPromo2027/B-FUN-500-BAR-5-2-glados-oriol.linan.git
+
+common warnings
+  ghc-options:
+    -Wall
+    -fhpc
+
+library
+  import: warnings
+  exposed-modules:
+    Ast.Types
+    Codegen.Codegen
+    Misc
+
+  build-depends:
+    base ^>=4.17.2.1,
+    containers >=0.6.7 && <0.7,
+    llvm-hs-pretty >=0.9.0 && <0.10,
+    llvm-hs-pure >=9.0.0 && <9.1,
+
+  hs-source-dirs: lib
+  default-language: Haskell2010
+
+executable glados
+  import: warnings
+  main-is: Main.hs
+  build-depends:
+    base ^>=4.17.2.1,
+    glados,
+    llvm-hs-pretty >=0.9.0 && <0.10,
+    text,
+
+  hs-source-dirs: app
+  default-language: Haskell2010
+
+test-suite glados-test
+  import: warnings
+  default-language: Haskell2010
+  type: exitcode-stdio-1.0
+  other-modules: Misc.MiscSpec
+  hs-source-dirs: test
+  main-is: Spec.hs
+  build-depends:
+    QuickCheck,
+    base ^>=4.17.2.1,
+    glados,
+    hspec,
+    hspec-discover,
