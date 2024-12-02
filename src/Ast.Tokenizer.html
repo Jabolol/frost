@@ -1,0 +1,336 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ast.Tokenizer</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ast.Tokenizer.html#Token"><span class="hs-identifier">Token</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ast.Tokenizer.html#Literal"><span class="hs-identifier">Literal</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ast.Tokenizer.html#Separator"><span class="hs-identifier">Separator</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ast.Tokenizer.html#tokenize"><span class="hs-identifier">tokenize</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-2"></span><span>
+</span><span id="line-3"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">Control.Applicative</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Alternative</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">some</span></span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="annot"><span class="hs-operator">(&lt;|&gt;)</span></span><span class="hs-special">)</span><span>
+</span><span id="line-4"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Data.Void</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">V</span></span><span>
+</span><span id="line-5"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><span class="hs-identifier">GHC.Base</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">Alternative</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier">empty</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-6"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-254e7cd385b8610c6e0097b68a756480a1e7fb0b9bce49eda1e86aa8b52e1a90/share/doc/html/src/Text.Megaparsec.html"><span class="hs-identifier">Text.Megaparsec</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">M</span></span><span>
+</span><span id="line-7"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-254e7cd385b8610c6e0097b68a756480a1e7fb0b9bce49eda1e86aa8b52e1a90/share/doc/html/src/Text.Megaparsec.Char.html"><span class="hs-identifier">Text.Megaparsec.Char</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">MC</span></span><span>
+</span><span id="line-8"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-254e7cd385b8610c6e0097b68a756480a1e7fb0b9bce49eda1e86aa8b52e1a90/share/doc/html/src/Text.Megaparsec.Char.Lexer.html"><span class="hs-identifier">Text.Megaparsec.Char.Lexer</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">ML</span></span><span>
+</span><span id="line-9"></span><span>
+</span><span id="line-10"></span><span class="hs-keyword">type</span><span> </span><span id="Parser"><span class="annot"><a href="Ast.Tokenizer.html#Parser"><span class="hs-identifier hs-var">Parser</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-254e7cd385b8610c6e0097b68a756480a1e7fb0b9bce49eda1e86aa8b52e1a90/share/doc/html/src/Text.Megaparsec.html#Parsec"><span class="hs-identifier hs-type">M.Parsec</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">V.Void</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-11"></span><span>
+</span><span id="line-12"></span><span class="hs-keyword">data</span><span> </span><span id="Separator"><span class="annot"><a href="Ast.Tokenizer.html#Separator"><span class="hs-identifier hs-var">Separator</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="OpenParen"><span class="annot"><a href="Ast.Tokenizer.html#OpenParen"><span class="hs-identifier hs-var">OpenParen</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="CloseParen"><span class="annot"><a href="Ast.Tokenizer.html#CloseParen"><span class="hs-identifier hs-var">CloseParen</span></a></span></span><span> </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679060270"><span id="local-6989586621679060272"><span id="local-6989586621679060276"><span class="annot"><span class="annottext">Int -&gt; Separator -&gt; ShowS
+[Separator] -&gt; ShowS
+Separator -&gt; String
+(Int -&gt; Separator -&gt; ShowS)
+-&gt; (Separator -&gt; String)
+-&gt; ([Separator] -&gt; ShowS)
+-&gt; Show Separator
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+$cshowsPrec :: Int -&gt; Separator -&gt; ShowS
+showsPrec :: Int -&gt; Separator -&gt; ShowS
+$cshow :: Separator -&gt; String
+show :: Separator -&gt; String
+$cshowList :: [Separator] -&gt; ShowS
+showList :: [Separator] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679060280"><span id="local-6989586621679060282"><span class="annot"><span class="annottext">Separator -&gt; Separator -&gt; Bool
+(Separator -&gt; Separator -&gt; Bool)
+-&gt; (Separator -&gt; Separator -&gt; Bool) -&gt; Eq Separator
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+$c== :: Separator -&gt; Separator -&gt; Bool
+== :: Separator -&gt; Separator -&gt; Bool
+$c/= :: Separator -&gt; Separator -&gt; Bool
+/= :: Separator -&gt; Separator -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-13"></span><span>
+</span><span id="line-14"></span><span class="hs-keyword">data</span><span> </span><span id="Literal"><span class="annot"><a href="Ast.Tokenizer.html#Literal"><span class="hs-identifier hs-var">Literal</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="LNumber"><span class="annot"><a href="Ast.Tokenizer.html#LNumber"><span class="hs-identifier hs-var">LNumber</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="LBoolean"><span class="annot"><a href="Ast.Tokenizer.html#LBoolean"><span class="hs-identifier hs-var">LBoolean</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">Bool</span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="LSymbol"><span class="annot"><a href="Ast.Tokenizer.html#LSymbol"><span class="hs-identifier hs-var">LSymbol</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679060290"><span id="local-6989586621679060303"><span id="local-6989586621679060307"><span class="annot"><span class="annottext">Int -&gt; Literal -&gt; ShowS
+[Literal] -&gt; ShowS
+Literal -&gt; String
+(Int -&gt; Literal -&gt; ShowS)
+-&gt; (Literal -&gt; String) -&gt; ([Literal] -&gt; ShowS) -&gt; Show Literal
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+$cshowsPrec :: Int -&gt; Literal -&gt; ShowS
+showsPrec :: Int -&gt; Literal -&gt; ShowS
+$cshow :: Literal -&gt; String
+show :: Literal -&gt; String
+$cshowList :: [Literal] -&gt; ShowS
+showList :: [Literal] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679060311"><span id="local-6989586621679060320"><span class="annot"><span class="annottext">Literal -&gt; Literal -&gt; Bool
+(Literal -&gt; Literal -&gt; Bool)
+-&gt; (Literal -&gt; Literal -&gt; Bool) -&gt; Eq Literal
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+$c== :: Literal -&gt; Literal -&gt; Bool
+== :: Literal -&gt; Literal -&gt; Bool
+$c/= :: Literal -&gt; Literal -&gt; Bool
+/= :: Literal -&gt; Literal -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-15"></span><span>
+</span><span id="line-16"></span><span class="hs-keyword">data</span><span> </span><span id="Token"><span class="annot"><a href="Ast.Tokenizer.html#Token"><span class="hs-identifier hs-var">Token</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="TLiteral"><span class="annot"><a href="Ast.Tokenizer.html#TLiteral"><span class="hs-identifier hs-var">TLiteral</span></a></span></span><span> </span><span class="annot"><a href="Ast.Tokenizer.html#Literal"><span class="hs-identifier hs-type">Literal</span></a></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="TSeparator"><span class="annot"><a href="Ast.Tokenizer.html#TSeparator"><span class="hs-identifier hs-var">TSeparator</span></a></span></span><span> </span><span class="annot"><a href="Ast.Tokenizer.html#Separator"><span class="hs-identifier hs-type">Separator</span></a></span><span> </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679060327"><span id="local-6989586621679060333"><span id="local-6989586621679060337"><span class="annot"><span class="annottext">Int -&gt; Token -&gt; ShowS
+[Token] -&gt; ShowS
+Token -&gt; String
+(Int -&gt; Token -&gt; ShowS)
+-&gt; (Token -&gt; String) -&gt; ([Token] -&gt; ShowS) -&gt; Show Token
+forall a.
+(Int -&gt; a -&gt; ShowS) -&gt; (a -&gt; String) -&gt; ([a] -&gt; ShowS) -&gt; Show a
+$cshowsPrec :: Int -&gt; Token -&gt; ShowS
+showsPrec :: Int -&gt; Token -&gt; ShowS
+$cshow :: Token -&gt; String
+show :: Token -&gt; String
+$cshowList :: [Token] -&gt; ShowS
+showList :: [Token] -&gt; ShowS
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679060340"><span id="local-6989586621679060344"><span class="annot"><span class="annottext">Token -&gt; Token -&gt; Bool
+(Token -&gt; Token -&gt; Bool) -&gt; (Token -&gt; Token -&gt; Bool) -&gt; Eq Token
+forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
+$c== :: Token -&gt; Token -&gt; Bool
+== :: Token -&gt; Token -&gt; Bool
+$c/= :: Token -&gt; Token -&gt; Bool
+/= :: Token -&gt; Token -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">)</span><span>
+</span><span id="line-17"></span><span>
+</span><span id="line-18"></span><span class="annot"><a href="Ast.Tokenizer.html#tokenize"><span class="hs-identifier hs-type">tokenize</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Either</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Ast.Tokenizer.html#Token"><span class="hs-identifier hs-type">Token</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-19"></span><span id="tokenize"><span class="annot"><span class="annottext">tokenize :: String -&gt; Either String [Token]
+</span><a href="Ast.Tokenizer.html#tokenize"><span class="hs-identifier hs-var hs-var">tokenize</span></a></span></span><span> </span><span id="local-6989586621679060347"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679060347"><span class="hs-identifier hs-var">input</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Parsec Void String [Token]
+-&gt; String
+-&gt; String
+-&gt; Either (ParseErrorBundle String Void) [Token]
+forall e s a.
+Parsec e s a -&gt; String -&gt; s -&gt; Either (ParseErrorBundle s e) a
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-254e7cd385b8610c6e0097b68a756480a1e7fb0b9bce49eda1e86aa8b52e1a90/share/doc/html/src/Text.Megaparsec.html#parse"><span class="hs-identifier hs-var">M.parse</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ParsecT Void String Identity Token -&gt; Parsec Void String [Token]
+forall a.
+ParsecT Void String Identity a -&gt; ParsecT Void String Identity [a]
+forall (f :: * -&gt; *) a. Alternative f =&gt; f a -&gt; f [a]
+</span><span class="hs-identifier hs-var">some</span></span><span> </span><span class="annot"><span class="annottext">ParsecT Void String Identity Token
+</span><a href="Ast.Tokenizer.html#token"><span class="hs-identifier hs-var">token</span></a></span><span> </span><span class="annot"><span class="annottext">Parsec Void String [Token]
+-&gt; ParsecT Void String Identity () -&gt; Parsec Void String [Token]
+forall a b.
+ParsecT Void String Identity a
+-&gt; ParsecT Void String Identity b -&gt; ParsecT Void String Identity a
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f a -&gt; f b -&gt; f a
+</span><span class="hs-operator hs-var">&lt;*</span></span><span> </span><span class="annot"><span class="annottext">ParsecT Void String Identity ()
+forall e s (m :: * -&gt; *). MonadParsec e s m =&gt; m ()
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-254e7cd385b8610c6e0097b68a756480a1e7fb0b9bce49eda1e86aa8b52e1a90/share/doc/html/src/Text.Megaparsec.Class.html#eof"><span class="hs-identifier hs-var">M.eof</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;&quot;</span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679060347"><span class="hs-identifier hs-var">input</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-20"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Left</span></span><span> </span><span id="local-6989586621679060352"><span class="annot"><span class="annottext">ParseErrorBundle String Void
+</span><a href="#local-6989586621679060352"><span class="hs-identifier hs-var">err</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String -&gt; Either String [Token]
+forall a b. a -&gt; Either a b
+</span><span class="hs-identifier hs-var">Left</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ParseErrorBundle String Void -&gt; String
+forall s e.
+(VisualStream s, TraversableStream s, ShowErrorComponent e) =&gt;
+ParseErrorBundle s e -&gt; String
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-254e7cd385b8610c6e0097b68a756480a1e7fb0b9bce49eda1e86aa8b52e1a90/share/doc/html/src/Text.Megaparsec.Error.html#errorBundlePretty"><span class="hs-identifier hs-var">M.errorBundlePretty</span></a></span><span> </span><span class="annot"><span class="annottext">ParseErrorBundle String Void
+</span><a href="#local-6989586621679060352"><span class="hs-identifier hs-var">err</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-21"></span><span>  </span><span class="annot"><span class="hs-identifier hs-type">Right</span></span><span> </span><span id="local-6989586621679060354"><span class="annot"><span class="annottext">[Token]
+</span><a href="#local-6989586621679060354"><span class="hs-identifier hs-var">tokens</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">[Token] -&gt; Either String [Token]
+forall a b. b -&gt; Either a b
+</span><span class="hs-identifier hs-var">Right</span></span><span> </span><span class="annot"><span class="annottext">[Token]
+</span><a href="#local-6989586621679060354"><span class="hs-identifier hs-var">tokens</span></a></span><span>
+</span><span id="line-22"></span><span>
+</span><span id="line-23"></span><span class="annot"><a href="Ast.Tokenizer.html#token"><span class="hs-identifier hs-type">token</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ast.Tokenizer.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="annot"><a href="Ast.Tokenizer.html#Token"><span class="hs-identifier hs-type">Token</span></a></span><span>
+</span><span id="line-24"></span><span id="token"><span class="annot"><span class="annottext">token :: ParsecT Void String Identity Token
+</span><a href="Ast.Tokenizer.html#token"><span class="hs-identifier hs-var hs-var">token</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ParsecT Void String Identity Token
+-&gt; ParsecT Void String Identity Token
+forall a. Parser a -&gt; Parser a
+</span><a href="Ast.Tokenizer.html#lexeme"><span class="hs-identifier hs-var">lexeme</span></a></span><span> </span><span class="annot"><span class="annottext">(ParsecT Void String Identity Token
+ -&gt; ParsecT Void String Identity Token)
+-&gt; ParsecT Void String Identity Token
+-&gt; ParsecT Void String Identity Token
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[ParsecT Void String Identity Token]
+-&gt; ParsecT Void String Identity Token
+forall (f :: * -&gt; *) (m :: * -&gt; *) a.
+(Foldable f, Alternative m) =&gt;
+f (m a) -&gt; m a
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/parser-combinators-1.3.0-9b370a1b31ee44298d2c1bca68e9ef4cc03c8895564c2250de06b22891ce7a3e/share/doc/html/src/Control.Applicative.Combinators.html#choice"><span class="hs-identifier hs-var">M.choice</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">ParsecT Void String Identity Token
+</span><a href="Ast.Tokenizer.html#separator"><span class="hs-identifier hs-var">separator</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">ParsecT Void String Identity Token
+</span><a href="Ast.Tokenizer.html#boolean"><span class="hs-identifier hs-var">boolean</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">ParsecT Void String Identity Token
+</span><a href="Ast.Tokenizer.html#number"><span class="hs-identifier hs-var">number</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">ParsecT Void String Identity Token
+</span><a href="Ast.Tokenizer.html#symbol"><span class="hs-identifier hs-var">symbol</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-25"></span><span>
+</span><span id="line-26"></span><span class="annot"><a href="Ast.Tokenizer.html#sc"><span class="hs-identifier hs-type">sc</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ast.Tokenizer.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
+</span><span id="line-27"></span><span id="sc"><span class="annot"><span class="annottext">sc :: ParsecT Void String Identity ()
+</span><a href="Ast.Tokenizer.html#sc"><span class="hs-identifier hs-var hs-var">sc</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ParsecT Void String Identity ()
+-&gt; ParsecT Void String Identity ()
+-&gt; ParsecT Void String Identity ()
+-&gt; ParsecT Void String Identity ()
+forall e s (m :: * -&gt; *).
+MonadParsec e s m =&gt;
+m () -&gt; m () -&gt; m () -&gt; m ()
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-254e7cd385b8610c6e0097b68a756480a1e7fb0b9bce49eda1e86aa8b52e1a90/share/doc/html/src/Text.Megaparsec.Lexer.html#space"><span class="hs-identifier hs-var">ML.space</span></a></span><span> </span><span class="annot"><span class="annottext">ParsecT Void String Identity ()
+forall e s (m :: * -&gt; *).
+(MonadParsec e s m, Token s ~ Char) =&gt;
+m ()
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-254e7cd385b8610c6e0097b68a756480a1e7fb0b9bce49eda1e86aa8b52e1a90/share/doc/html/src/Text.Megaparsec.Char.html#space1"><span class="hs-identifier hs-var">MC.space1</span></a></span><span> </span><span class="annot"><span class="annottext">ParsecT Void String Identity ()
+forall a. ParsecT Void String Identity a
+forall (f :: * -&gt; *) a. Alternative f =&gt; f a
+</span><span class="hs-identifier hs-var">empty</span></span><span> </span><span class="annot"><span class="annottext">ParsecT Void String Identity ()
+forall a. ParsecT Void String Identity a
+forall (f :: * -&gt; *) a. Alternative f =&gt; f a
+</span><span class="hs-identifier hs-var">empty</span></span><span>
+</span><span id="line-28"></span><span>
+</span><span id="line-29"></span><span id="local-6989586621679060150"><span class="annot"><a href="Ast.Tokenizer.html#lexeme"><span class="hs-identifier hs-type">lexeme</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ast.Tokenizer.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679060150"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ast.Tokenizer.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679060150"><span class="hs-identifier hs-type">a</span></a></span></span><span>
+</span><span id="line-30"></span><span id="lexeme"><span class="annot"><span class="annottext">lexeme :: forall a. Parser a -&gt; Parser a
+</span><a href="Ast.Tokenizer.html#lexeme"><span class="hs-identifier hs-var hs-var">lexeme</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ParsecT Void String Identity ()
+-&gt; ParsecT Void String Identity a -&gt; ParsecT Void String Identity a
+forall e s (m :: * -&gt; *) a. MonadParsec e s m =&gt; m () -&gt; m a -&gt; m a
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-254e7cd385b8610c6e0097b68a756480a1e7fb0b9bce49eda1e86aa8b52e1a90/share/doc/html/src/Text.Megaparsec.Lexer.html#lexeme"><span class="hs-identifier hs-var">ML.lexeme</span></a></span><span> </span><span class="annot"><span class="annottext">ParsecT Void String Identity ()
+</span><a href="Ast.Tokenizer.html#sc"><span class="hs-identifier hs-var">sc</span></a></span><span>
+</span><span id="line-31"></span><span>
+</span><span id="line-32"></span><span class="annot"><a href="Ast.Tokenizer.html#separator"><span class="hs-identifier hs-type">separator</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ast.Tokenizer.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="annot"><a href="Ast.Tokenizer.html#Token"><span class="hs-identifier hs-type">Token</span></a></span><span>
+</span><span id="line-33"></span><span id="separator"><span class="annot"><span class="annottext">separator :: ParsecT Void String Identity Token
+</span><a href="Ast.Tokenizer.html#separator"><span class="hs-identifier hs-var hs-var">separator</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Separator -&gt; Token
+</span><a href="Ast.Tokenizer.html#TSeparator"><span class="hs-identifier hs-var">TSeparator</span></a></span><span> </span><span class="annot"><span class="annottext">Separator
+</span><a href="Ast.Tokenizer.html#OpenParen"><span class="hs-identifier hs-var">OpenParen</span></a></span><span> </span><span class="annot"><span class="annottext">Token
+-&gt; ParsecT Void String Identity Char
+-&gt; ParsecT Void String Identity Token
+forall a b.
+a
+-&gt; ParsecT Void String Identity b -&gt; ParsecT Void String Identity a
+forall (f :: * -&gt; *) a b. Functor f =&gt; a -&gt; f b -&gt; f a
+</span><span class="hs-operator hs-var">&lt;$</span></span><span> </span><span class="annot"><span class="annottext">Token String -&gt; ParsecT Void String Identity (Token String)
+forall e s (m :: * -&gt; *).
+(MonadParsec e s m, Token s ~ Char) =&gt;
+Token s -&gt; m (Token s)
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-254e7cd385b8610c6e0097b68a756480a1e7fb0b9bce49eda1e86aa8b52e1a90/share/doc/html/src/Text.Megaparsec.Char.html#char"><span class="hs-identifier hs-var">MC.char</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+Token String
+</span><span class="hs-char">'('</span></span><span> </span><span class="annot"><span class="annottext">ParsecT Void String Identity Token
+-&gt; ParsecT Void String Identity Token
+-&gt; ParsecT Void String Identity Token
+forall a.
+ParsecT Void String Identity a
+-&gt; ParsecT Void String Identity a -&gt; ParsecT Void String Identity a
+forall (f :: * -&gt; *) a. Alternative f =&gt; f a -&gt; f a -&gt; f a
+</span><span class="hs-operator hs-var">&lt;|&gt;</span></span><span> </span><span class="annot"><span class="annottext">Separator -&gt; Token
+</span><a href="Ast.Tokenizer.html#TSeparator"><span class="hs-identifier hs-var">TSeparator</span></a></span><span> </span><span class="annot"><span class="annottext">Separator
+</span><a href="Ast.Tokenizer.html#CloseParen"><span class="hs-identifier hs-var">CloseParen</span></a></span><span> </span><span class="annot"><span class="annottext">Token
+-&gt; ParsecT Void String Identity Char
+-&gt; ParsecT Void String Identity Token
+forall a b.
+a
+-&gt; ParsecT Void String Identity b -&gt; ParsecT Void String Identity a
+forall (f :: * -&gt; *) a b. Functor f =&gt; a -&gt; f b -&gt; f a
+</span><span class="hs-operator hs-var">&lt;$</span></span><span> </span><span class="annot"><span class="annottext">Token String -&gt; ParsecT Void String Identity (Token String)
+forall e s (m :: * -&gt; *).
+(MonadParsec e s m, Token s ~ Char) =&gt;
+Token s -&gt; m (Token s)
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-254e7cd385b8610c6e0097b68a756480a1e7fb0b9bce49eda1e86aa8b52e1a90/share/doc/html/src/Text.Megaparsec.Char.html#char"><span class="hs-identifier hs-var">MC.char</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+Token String
+</span><span class="hs-char">')'</span></span><span>
+</span><span id="line-34"></span><span>
+</span><span id="line-35"></span><span class="annot"><a href="Ast.Tokenizer.html#boolean"><span class="hs-identifier hs-type">boolean</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ast.Tokenizer.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="annot"><a href="Ast.Tokenizer.html#Token"><span class="hs-identifier hs-type">Token</span></a></span><span>
+</span><span id="line-36"></span><span id="boolean"><span class="annot"><span class="annottext">boolean :: ParsecT Void String Identity Token
+</span><a href="Ast.Tokenizer.html#boolean"><span class="hs-identifier hs-var hs-var">boolean</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Literal -&gt; Token
+</span><a href="Ast.Tokenizer.html#TLiteral"><span class="hs-identifier hs-var">TLiteral</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Literal
+</span><a href="Ast.Tokenizer.html#LBoolean"><span class="hs-identifier hs-var">LBoolean</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Token
+-&gt; ParsecT Void String Identity (Tokens String)
+-&gt; ParsecT Void String Identity Token
+forall a b.
+a
+-&gt; ParsecT Void String Identity b -&gt; ParsecT Void String Identity a
+forall (f :: * -&gt; *) a b. Functor f =&gt; a -&gt; f b -&gt; f a
+</span><span class="hs-operator hs-var">&lt;$</span></span><span> </span><span class="annot"><span class="annottext">Tokens String -&gt; ParsecT Void String Identity (Tokens String)
+forall e s (m :: * -&gt; *).
+MonadParsec e s m =&gt;
+Tokens s -&gt; m (Tokens s)
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-254e7cd385b8610c6e0097b68a756480a1e7fb0b9bce49eda1e86aa8b52e1a90/share/doc/html/src/Text.Megaparsec.Common.html#string"><span class="hs-identifier hs-var">MC.string</span></a></span><span> </span><span class="annot"><span class="annottext">String
+Tokens String
+</span><span class="hs-string">&quot;#t&quot;</span></span><span> </span><span class="annot"><span class="annottext">ParsecT Void String Identity Token
+-&gt; ParsecT Void String Identity Token
+-&gt; ParsecT Void String Identity Token
+forall a.
+ParsecT Void String Identity a
+-&gt; ParsecT Void String Identity a -&gt; ParsecT Void String Identity a
+forall (f :: * -&gt; *) a. Alternative f =&gt; f a -&gt; f a -&gt; f a
+</span><span class="hs-operator hs-var">&lt;|&gt;</span></span><span> </span><span class="annot"><span class="annottext">Literal -&gt; Token
+</span><a href="Ast.Tokenizer.html#TLiteral"><span class="hs-identifier hs-var">TLiteral</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Bool -&gt; Literal
+</span><a href="Ast.Tokenizer.html#LBoolean"><span class="hs-identifier hs-var">LBoolean</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Token
+-&gt; ParsecT Void String Identity (Tokens String)
+-&gt; ParsecT Void String Identity Token
+forall a b.
+a
+-&gt; ParsecT Void String Identity b -&gt; ParsecT Void String Identity a
+forall (f :: * -&gt; *) a b. Functor f =&gt; a -&gt; f b -&gt; f a
+</span><span class="hs-operator hs-var">&lt;$</span></span><span> </span><span class="annot"><span class="annottext">Tokens String -&gt; ParsecT Void String Identity (Tokens String)
+forall e s (m :: * -&gt; *).
+MonadParsec e s m =&gt;
+Tokens s -&gt; m (Tokens s)
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-254e7cd385b8610c6e0097b68a756480a1e7fb0b9bce49eda1e86aa8b52e1a90/share/doc/html/src/Text.Megaparsec.Common.html#string"><span class="hs-identifier hs-var">MC.string</span></a></span><span> </span><span class="annot"><span class="annottext">String
+Tokens String
+</span><span class="hs-string">&quot;#f&quot;</span></span><span>
+</span><span id="line-37"></span><span>
+</span><span id="line-38"></span><span class="annot"><a href="Ast.Tokenizer.html#number"><span class="hs-identifier hs-type">number</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ast.Tokenizer.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="annot"><a href="Ast.Tokenizer.html#Token"><span class="hs-identifier hs-type">Token</span></a></span><span>
+</span><span id="line-39"></span><span id="number"><span class="annot"><span class="annottext">number :: ParsecT Void String Identity Token
+</span><a href="Ast.Tokenizer.html#number"><span class="hs-identifier hs-var hs-var">number</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ParsecT Void String Identity Token
+-&gt; ParsecT Void String Identity Token
+forall a. Parser a -&gt; Parser a
+forall e s (m :: * -&gt; *) a. MonadParsec e s m =&gt; m a -&gt; m a
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-254e7cd385b8610c6e0097b68a756480a1e7fb0b9bce49eda1e86aa8b52e1a90/share/doc/html/src/Text.Megaparsec.Class.html#try"><span class="hs-identifier hs-var">M.try</span></a></span><span> </span><span class="annot"><span class="annottext">(ParsecT Void String Identity Token
+ -&gt; ParsecT Void String Identity Token)
+-&gt; ParsecT Void String Identity Token
+-&gt; ParsecT Void String Identity Token
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Literal -&gt; Token
+</span><a href="Ast.Tokenizer.html#TLiteral"><span class="hs-identifier hs-var">TLiteral</span></a></span><span> </span><span class="annot"><span class="annottext">(Literal -&gt; Token) -&gt; (Int -&gt; Literal) -&gt; Int -&gt; Token
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Literal
+</span><a href="Ast.Tokenizer.html#LNumber"><span class="hs-identifier hs-var">LNumber</span></a></span><span> </span><span class="annot"><span class="annottext">(Int -&gt; Token)
+-&gt; ParsecT Void String Identity Int
+-&gt; ParsecT Void String Identity Token
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">ParsecT Void String Identity ()
+-&gt; ParsecT Void String Identity Int
+-&gt; ParsecT Void String Identity Int
+forall e s (m :: * -&gt; *) a.
+(MonadParsec e s m, Token s ~ Char, Num a) =&gt;
+m () -&gt; m a -&gt; m a
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-254e7cd385b8610c6e0097b68a756480a1e7fb0b9bce49eda1e86aa8b52e1a90/share/doc/html/src/Text.Megaparsec.Char.Lexer.html#signed"><span class="hs-identifier hs-var">ML.signed</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">() -&gt; ParsecT Void String Identity ()
+forall a. a -&gt; ParsecT Void String Identity a
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><span class="hs-identifier hs-var">pure</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">ParsecT Void String Identity Int
+forall e s (m :: * -&gt; *) a.
+(MonadParsec e s m, Token s ~ Char, Num a) =&gt;
+m a
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-254e7cd385b8610c6e0097b68a756480a1e7fb0b9bce49eda1e86aa8b52e1a90/share/doc/html/src/Text.Megaparsec.Char.Lexer.html#decimal"><span class="hs-identifier hs-var">ML.decimal</span></a></span><span>
+</span><span id="line-40"></span><span>
+</span><span id="line-41"></span><span class="annot"><a href="Ast.Tokenizer.html#symbol"><span class="hs-identifier hs-type">symbol</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ast.Tokenizer.html#Parser"><span class="hs-identifier hs-type">Parser</span></a></span><span> </span><span class="annot"><a href="Ast.Tokenizer.html#Token"><span class="hs-identifier hs-type">Token</span></a></span><span>
+</span><span id="line-42"></span><span id="symbol"><span class="annot"><span class="annottext">symbol :: ParsecT Void String Identity Token
+</span><a href="Ast.Tokenizer.html#symbol"><span class="hs-identifier hs-var hs-var">symbol</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Literal -&gt; Token
+</span><a href="Ast.Tokenizer.html#TLiteral"><span class="hs-identifier hs-var">TLiteral</span></a></span><span> </span><span class="annot"><span class="annottext">(Literal -&gt; Token) -&gt; (String -&gt; Literal) -&gt; String -&gt; Token
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; Literal
+</span><a href="Ast.Tokenizer.html#LSymbol"><span class="hs-identifier hs-var">LSymbol</span></a></span><span> </span><span class="annot"><span class="annottext">(String -&gt; Token)
+-&gt; ParsecT Void String Identity String
+-&gt; ParsecT Void String Identity Token
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">ParsecT Void String Identity Char
+-&gt; ParsecT Void String Identity String
+forall a.
+ParsecT Void String Identity a -&gt; ParsecT Void String Identity [a]
+forall (f :: * -&gt; *) a. Alternative f =&gt; f a -&gt; f [a]
+</span><span class="hs-identifier hs-var">some</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ParsecT Void String Identity Char
+ParsecT Void String Identity (Token String)
+forall e s (m :: * -&gt; *).
+(MonadParsec e s m, Token s ~ Char) =&gt;
+m (Token s)
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-254e7cd385b8610c6e0097b68a756480a1e7fb0b9bce49eda1e86aa8b52e1a90/share/doc/html/src/Text.Megaparsec.Char.html#alphaNumChar"><span class="hs-identifier hs-var">MC.alphaNumChar</span></a></span><span> </span><span class="annot"><span class="annottext">ParsecT Void String Identity Char
+-&gt; ParsecT Void String Identity Char
+-&gt; ParsecT Void String Identity Char
+forall a.
+ParsecT Void String Identity a
+-&gt; ParsecT Void String Identity a -&gt; ParsecT Void String Identity a
+forall (f :: * -&gt; *) a. Alternative f =&gt; f a -&gt; f a -&gt; f a
+</span><span class="hs-operator hs-var">&lt;|&gt;</span></span><span> </span><span class="annot"><span class="annottext">ParsecT Void String Identity Char
+ParsecT Void String Identity (Token String)
+forall e s (m :: * -&gt; *).
+(MonadParsec e s m, Token s ~ Char) =&gt;
+m (Token s)
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-254e7cd385b8610c6e0097b68a756480a1e7fb0b9bce49eda1e86aa8b52e1a90/share/doc/html/src/Text.Megaparsec.Char.html#symbolChar"><span class="hs-identifier hs-var">MC.symbolChar</span></a></span><span> </span><span class="annot"><span class="annottext">ParsecT Void String Identity Char
+-&gt; ParsecT Void String Identity Char
+-&gt; ParsecT Void String Identity Char
+forall a.
+ParsecT Void String Identity a
+-&gt; ParsecT Void String Identity a -&gt; ParsecT Void String Identity a
+forall (f :: * -&gt; *) a. Alternative f =&gt; f a -&gt; f a -&gt; f a
+</span><span class="hs-operator hs-var">&lt;|&gt;</span></span><span> </span><span class="annot"><span class="annottext">[Token String] -&gt; ParsecT Void String Identity (Token String)
+forall (f :: * -&gt; *) e s (m :: * -&gt; *).
+(Foldable f, MonadParsec e s m) =&gt;
+f (Token s) -&gt; m (Token s)
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-254e7cd385b8610c6e0097b68a756480a1e7fb0b9bce49eda1e86aa8b52e1a90/share/doc/html/src/Text.Megaparsec.html#oneOf"><span class="hs-identifier hs-var">M.oneOf</span></a></span><span> </span><span class="annot"><span class="annottext">String
+[Token String]
+</span><span class="hs-string">&quot;+-*_&quot;</span></span><span class="hs-special">)</span><span>
+</span><span id="line-43"></span></pre></body></html>
