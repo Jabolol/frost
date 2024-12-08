@@ -11,6 +11,7 @@ jobs:
           - ubuntu-latest
           - macos-14
           - macos-13
+          - windows-latest
     runs-on: "${{ matrix.os }}"
     if: github.ref == 'refs/heads/main'
     steps:
@@ -27,6 +28,11 @@ jobs:
         if: matrix.os == 'macos-14' || matrix.os == 'macos-13'
         run: brew install libffi zlib
 
+      - name: Install required packages
+        if: matrix.os == 'windows-latest'
+        run: |
+          choco install haskell-dev
+
       - name: Setup Haskell
         uses: ./external/haskell-setup
         with:
@@ -37,9 +43,23 @@ jobs:
         run: cabal build
 
       - name: Get binary path
+        if: matrix.os != 'windows-latest'
         run: |
-          mv "$(cabal list-bin exe:glados)" "$(cabal list-bin exe:glados)_$(uname -s)_$(uname -m)"
-          echo "GLADOS_BIN=$(cabal list-bin exe:glados)_$(uname -s)_$(uname -m)" >> $GITHUB_ENV
+          bin_path="$(cabal list-bin exe:glados)"
+          new_bin_path="${bin_path}_$(uname -s)_$(uname -m)"
+          mv "$bin_path" "$new_bin_path"
+          echo "GLADOS_BIN=$new_bin_path" >> $GITHUB_ENV
+
+      - name: Get binary path
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          $osName = "Windows"
+          $arch = (Get-WmiObject -Class Win32_ComputerSystem).SystemType
+          $binPath = "$(cabal list-bin exe:glados)"
+          $newBinPath = $binPath -replace ".exe", "_$osName_$arch.exe"
+          Move-Item -Path $binPath -Destination $newBinPath
+          Write-Output "GLADOS_BIN=$newBinPath" | Out-File -FilePath $env:GITHUB_ENV -Append
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
