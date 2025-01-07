@@ -1,27 +1,14 @@
-module Ast.Parser.Utils where
+module Ast.Utils where
 
 import qualified Ast.Parser.Env as E
 import qualified Control.Monad.State as S
+import Data.Void (Void)
 import qualified Text.Megaparsec as M
 import qualified Text.Megaparsec.Char as MC
 import qualified Text.Megaparsec.Char.Lexer as ML
 
 -- | A type alias for the parser, based on `Parsec` with `Void` error type and `String` input.
-type Parser = M.ParsecT ParseErrorCustom String (S.State E.Env)
-
-data ParseErrorCustom
-  = UnknownType String
-  | UndefinedVar String
-  | UndefinedFunction String
-  deriving (Show, Ord, Eq)
-
-instance M.ShowErrorComponent ParseErrorCustom where
-  showErrorComponent (UnknownType n) =
-    "Unknown type: type \"" ++ n ++ "\" does not exist"
-  showErrorComponent (UndefinedVar n) =
-    "Undefined Variable: variable \"" ++ n ++ "\" is not defined"
-  showErrorComponent (UndefinedFunction n) =
-    "Undefined Function: function \"" ++ n ++ "\" is not defined"
+type Parser = M.ParsecT Void String (S.State E.Env)
 
 -- | Skips whitespace and comments (starting with `%`). Ensures proper handling of spacing in parsers.
 sc :: Parser ()
@@ -41,6 +28,5 @@ triedChoice ps =
   let triedPs = map M.try (init ps) ++ [last ps]
    in M.choice triedPs
 
--- | An identifier in our language syntax
 identifier :: Parser String
 identifier = lexeme ((:) <$> MC.letterChar <*> M.many MC.alphaNumChar)
