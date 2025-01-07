@@ -1,0 +1,251 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ast.Parser.Literal</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-2"></span><span>
+</span><span id="line-3"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="Ast.Parser.Utils.html"><span class="hs-identifier">Ast.Parser.Utils</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">PU</span></span><span>
+</span><span id="line-4"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="Ast.Types.html"><span class="hs-identifier">Ast.Types</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">AT</span></span><span>
+</span><span id="line-5"></span><span class="hs-keyword">import</span><span> </span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-817db0b2e2b3288129ebf9aa2d88a46b2ffe29add993d761d62a18e444ece278/share/doc/html/src/Text.Megaparsec.html"><span class="hs-identifier">Text.Megaparsec</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="hs-operator">(&lt;|&gt;)</span></span><span class="hs-special">)</span><span>
+</span><span id="line-6"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-817db0b2e2b3288129ebf9aa2d88a46b2ffe29add993d761d62a18e444ece278/share/doc/html/src/Text.Megaparsec.html"><span class="hs-identifier">Text.Megaparsec</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">M</span></span><span>
+</span><span id="line-7"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-817db0b2e2b3288129ebf9aa2d88a46b2ffe29add993d761d62a18e444ece278/share/doc/html/src/Text.Megaparsec.Char.html"><span class="hs-identifier">Text.Megaparsec.Char</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">MC</span></span><span>
+</span><span id="line-8"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-817db0b2e2b3288129ebf9aa2d88a46b2ffe29add993d761d62a18e444ece278/share/doc/html/src/Text.Megaparsec.Char.Lexer.html"><span class="hs-identifier">Text.Megaparsec.Char.Lexer</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">ML</span></span><span>
+</span><span id="line-9"></span><span>
+</span><span id="line-10"></span><span class="annot"><a href="Ast.Parser.Literal.html#trueSymbol"><span class="hs-identifier hs-type">trueSymbol</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-11"></span><span id="trueSymbol"><span class="annot"><span class="annottext">trueSymbol :: String
+</span><a href="Ast.Parser.Literal.html#trueSymbol"><span class="hs-identifier hs-var hs-var">trueSymbol</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;true&quot;</span></span><span>
+</span><span id="line-12"></span><span>
+</span><span id="line-13"></span><span class="annot"><a href="Ast.Parser.Literal.html#falseSymbol"><span class="hs-identifier hs-type">falseSymbol</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-14"></span><span id="falseSymbol"><span class="annot"><span class="annottext">falseSymbol :: String
+</span><a href="Ast.Parser.Literal.html#falseSymbol"><span class="hs-identifier hs-var hs-var">falseSymbol</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;false&quot;</span></span><span>
+</span><span id="line-15"></span><span>
+</span><span id="line-16"></span><span class="annot"><a href="Ast.Parser.Literal.html#nullSymbol"><span class="hs-identifier hs-type">nullSymbol</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-17"></span><span id="nullSymbol"><span class="annot"><span class="annottext">nullSymbol :: String
+</span><a href="Ast.Parser.Literal.html#nullSymbol"><span class="hs-identifier hs-var hs-var">nullSymbol</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;null&quot;</span></span><span>
+</span><span id="line-18"></span><span>
+</span><span id="line-19"></span><span class="annot"><a href="Ast.Parser.Literal.html#parseLiteral"><span class="hs-identifier hs-type">parseLiteral</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ast.Parser.Utils.html#Parser"><span class="hs-identifier hs-type">PU.Parser</span></a></span><span> </span><span class="annot"><a href="Ast.Types.html#Literal"><span class="hs-identifier hs-type">AT.Literal</span></a></span><span>
+</span><span id="line-20"></span><span id="parseLiteral"><span class="annot"><span class="annottext">parseLiteral :: Parser Literal
+</span><a href="Ast.Parser.Literal.html#parseLiteral"><span class="hs-identifier hs-var hs-var">parseLiteral</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Parser Literal] -&gt; Parser Literal
+forall a. [Parser a] -&gt; Parser a
+</span><a href="Ast.Parser.Utils.html#triedChoice"><span class="hs-identifier hs-var">PU.triedChoice</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Parser Literal
+</span><a href="Ast.Parser.Literal.html#parseArray"><span class="hs-identifier hs-var">parseArray</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Parser Literal
+</span><a href="Ast.Parser.Literal.html#parseChar"><span class="hs-identifier hs-var">parseChar</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Parser Literal
+</span><a href="Ast.Parser.Literal.html#parseFloat"><span class="hs-identifier hs-var">parseFloat</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Parser Literal
+</span><a href="Ast.Parser.Literal.html#parseInt"><span class="hs-identifier hs-var">parseInt</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Parser Literal
+</span><a href="Ast.Parser.Literal.html#parseBool"><span class="hs-identifier hs-var">parseBool</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Parser Literal
+</span><a href="Ast.Parser.Literal.html#parseNull"><span class="hs-identifier hs-var">parseNull</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-21"></span><span>
+</span><span id="line-22"></span><span class="hs-comment">-- | Parses an integer literal, supporting signed values.</span><span>
+</span><span id="line-23"></span><span class="hs-comment">-- Returns a `Literal` of type `LInt`.</span><span>
+</span><span id="line-24"></span><span class="annot"><a href="Ast.Parser.Literal.html#parseInt"><span class="hs-identifier hs-type">parseInt</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ast.Parser.Utils.html#Parser"><span class="hs-identifier hs-type">PU.Parser</span></a></span><span> </span><span class="annot"><a href="Ast.Types.html#Literal"><span class="hs-identifier hs-type">AT.Literal</span></a></span><span>
+</span><span id="line-25"></span><span id="parseInt"><span class="annot"><span class="annottext">parseInt :: Parser Literal
+</span><a href="Ast.Parser.Literal.html#parseInt"><span class="hs-identifier hs-var hs-var">parseInt</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Integer -&gt; Literal
+</span><a href="Ast.Types.html#LInt"><span class="hs-identifier hs-var">AT.LInt</span></a></span><span> </span><span class="annot"><span class="annottext">(Integer -&gt; Literal)
+-&gt; ParsecT ParseErrorCustom String (State Env) Integer
+-&gt; Parser Literal
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">ParsecT ParseErrorCustom String (State Env) ()
+-&gt; ParsecT ParseErrorCustom String (State Env) Integer
+-&gt; ParsecT ParseErrorCustom String (State Env) Integer
+forall e s (m :: * -&gt; *) a.
+(MonadParsec e s m, Token s ~ Char, Num a) =&gt;
+m () -&gt; m a -&gt; m a
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-817db0b2e2b3288129ebf9aa2d88a46b2ffe29add993d761d62a18e444ece278/share/doc/html/src/Text.Megaparsec.Char.Lexer.html#signed"><span class="hs-identifier hs-var">ML.signed</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">() -&gt; ParsecT ParseErrorCustom String (State Env) ()
+forall a. a -&gt; ParsecT ParseErrorCustom String (State Env) a
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><span class="hs-identifier hs-var">pure</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">ParsecT ParseErrorCustom String (State Env) Integer
+forall e s (m :: * -&gt; *) a.
+(MonadParsec e s m, Token s ~ Char, Num a) =&gt;
+m a
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-817db0b2e2b3288129ebf9aa2d88a46b2ffe29add993d761d62a18e444ece278/share/doc/html/src/Text.Megaparsec.Char.Lexer.html#decimal"><span class="hs-identifier hs-var">ML.decimal</span></a></span><span>
+</span><span id="line-26"></span><span>
+</span><span id="line-27"></span><span class="hs-comment">-- | Parses a floating-point literal.</span><span>
+</span><span id="line-28"></span><span class="hs-comment">-- Returns a `Literal` of type `LFloat`.</span><span>
+</span><span id="line-29"></span><span class="annot"><a href="Ast.Parser.Literal.html#parseFloat"><span class="hs-identifier hs-type">parseFloat</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ast.Parser.Utils.html#Parser"><span class="hs-identifier hs-type">PU.Parser</span></a></span><span> </span><span class="annot"><a href="Ast.Types.html#Literal"><span class="hs-identifier hs-type">AT.Literal</span></a></span><span>
+</span><span id="line-30"></span><span id="parseFloat"><span class="annot"><span class="annottext">parseFloat :: Parser Literal
+</span><a href="Ast.Parser.Literal.html#parseFloat"><span class="hs-identifier hs-var hs-var">parseFloat</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Double -&gt; Literal
+</span><a href="Ast.Types.html#LFloat"><span class="hs-identifier hs-var">AT.LFloat</span></a></span><span> </span><span class="annot"><span class="annottext">(Double -&gt; Literal)
+-&gt; ParsecT ParseErrorCustom String (State Env) Double
+-&gt; Parser Literal
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">ParsecT ParseErrorCustom String (State Env) ()
+-&gt; ParsecT ParseErrorCustom String (State Env) Double
+-&gt; ParsecT ParseErrorCustom String (State Env) Double
+forall e s (m :: * -&gt; *) a.
+(MonadParsec e s m, Token s ~ Char, Num a) =&gt;
+m () -&gt; m a -&gt; m a
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-817db0b2e2b3288129ebf9aa2d88a46b2ffe29add993d761d62a18e444ece278/share/doc/html/src/Text.Megaparsec.Char.Lexer.html#signed"><span class="hs-identifier hs-var">ML.signed</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">() -&gt; ParsecT ParseErrorCustom String (State Env) ()
+forall a. a -&gt; ParsecT ParseErrorCustom String (State Env) a
+forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
+</span><span class="hs-identifier hs-var">pure</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">ParsecT ParseErrorCustom String (State Env) Double
+forall e s (m :: * -&gt; *) a.
+(MonadParsec e s m, Token s ~ Char, RealFloat a) =&gt;
+m a
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-817db0b2e2b3288129ebf9aa2d88a46b2ffe29add993d761d62a18e444ece278/share/doc/html/src/Text.Megaparsec.Char.Lexer.html#float"><span class="hs-identifier hs-var">ML.float</span></a></span><span>
+</span><span id="line-31"></span><span>
+</span><span id="line-32"></span><span class="hs-comment">-- | Parses a boolean literal (`true` or `false`).</span><span>
+</span><span id="line-33"></span><span class="hs-comment">-- Returns a `Literal` of type `LBool`.</span><span>
+</span><span id="line-34"></span><span class="annot"><a href="Ast.Parser.Literal.html#parseBool"><span class="hs-identifier hs-type">parseBool</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ast.Parser.Utils.html#Parser"><span class="hs-identifier hs-type">PU.Parser</span></a></span><span> </span><span class="annot"><a href="Ast.Types.html#Literal"><span class="hs-identifier hs-type">AT.Literal</span></a></span><span>
+</span><span id="line-35"></span><span id="parseBool"><span class="annot"><span class="annottext">parseBool :: Parser Literal
+</span><a href="Ast.Parser.Literal.html#parseBool"><span class="hs-identifier hs-var hs-var">parseBool</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Literal
+</span><a href="Ast.Types.html#LBool"><span class="hs-identifier hs-var">AT.LBool</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">True</span></span><span> </span><span class="annot"><span class="annottext">Literal
+-&gt; ParsecT ParseErrorCustom String (State Env) String
+-&gt; Parser Literal
+forall a b.
+a
+-&gt; ParsecT ParseErrorCustom String (State Env) b
+-&gt; ParsecT ParseErrorCustom String (State Env) a
+forall (f :: * -&gt; *) a b. Functor f =&gt; a -&gt; f b -&gt; f a
+</span><span class="hs-operator hs-var">&lt;$</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ParsecT ParseErrorCustom String (State Env) String
+</span><a href="Ast.Parser.Utils.html#symbol"><span class="hs-identifier hs-var">PU.symbol</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="Ast.Parser.Literal.html#trueSymbol"><span class="hs-identifier hs-var">trueSymbol</span></a></span><span> </span><span class="annot"><span class="annottext">Parser Literal -&gt; Parser Literal -&gt; Parser Literal
+forall a.
+ParsecT ParseErrorCustom String (State Env) a
+-&gt; ParsecT ParseErrorCustom String (State Env) a
+-&gt; ParsecT ParseErrorCustom String (State Env) a
+forall (f :: * -&gt; *) a. Alternative f =&gt; f a -&gt; f a -&gt; f a
+</span><span class="hs-operator hs-var">&lt;|&gt;</span></span><span> </span><span class="annot"><span class="annottext">Bool -&gt; Literal
+</span><a href="Ast.Types.html#LBool"><span class="hs-identifier hs-var">AT.LBool</span></a></span><span> </span><span class="annot"><span class="annottext">Bool
+</span><span class="hs-identifier hs-var">False</span></span><span> </span><span class="annot"><span class="annottext">Literal
+-&gt; ParsecT ParseErrorCustom String (State Env) String
+-&gt; Parser Literal
+forall a b.
+a
+-&gt; ParsecT ParseErrorCustom String (State Env) b
+-&gt; ParsecT ParseErrorCustom String (State Env) a
+forall (f :: * -&gt; *) a b. Functor f =&gt; a -&gt; f b -&gt; f a
+</span><span class="hs-operator hs-var">&lt;$</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ParsecT ParseErrorCustom String (State Env) String
+</span><a href="Ast.Parser.Utils.html#symbol"><span class="hs-identifier hs-var">PU.symbol</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="Ast.Parser.Literal.html#falseSymbol"><span class="hs-identifier hs-var">falseSymbol</span></a></span><span>
+</span><span id="line-36"></span><span>
+</span><span id="line-37"></span><span class="hs-comment">-- | Parses a character literal (e.g., 'a').</span><span>
+</span><span id="line-38"></span><span class="hs-comment">-- Returns a `Literal` of type `LChar`.</span><span>
+</span><span id="line-39"></span><span class="annot"><a href="Ast.Parser.Literal.html#parseChar"><span class="hs-identifier hs-type">parseChar</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ast.Parser.Utils.html#Parser"><span class="hs-identifier hs-type">PU.Parser</span></a></span><span> </span><span class="annot"><a href="Ast.Types.html#Literal"><span class="hs-identifier hs-type">AT.Literal</span></a></span><span>
+</span><span id="line-40"></span><span id="parseChar"><span class="annot"><span class="annottext">parseChar :: Parser Literal
+</span><a href="Ast.Parser.Literal.html#parseChar"><span class="hs-identifier hs-var hs-var">parseChar</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Char -&gt; Literal
+</span><a href="Ast.Types.html#LChar"><span class="hs-identifier hs-var">AT.LChar</span></a></span><span> </span><span class="annot"><span class="annottext">(Char -&gt; Literal)
+-&gt; ParsecT ParseErrorCustom String (State Env) Char
+-&gt; Parser Literal
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">ParsecT ParseErrorCustom String (State Env) Char
+-&gt; ParsecT ParseErrorCustom String (State Env) Char
+-&gt; ParsecT ParseErrorCustom String (State Env) Char
+-&gt; ParsecT ParseErrorCustom String (State Env) Char
+forall (m :: * -&gt; *) open close a.
+Applicative m =&gt;
+m open -&gt; m close -&gt; m a -&gt; m a
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/parser-combinators-1.3.0-feda1c3b6159dd36c6ce34750cc148945f7b0112be9cb2b4f4804b1854519f15/share/doc/html/src/Control.Applicative.Combinators.html#between"><span class="hs-identifier hs-var">M.between</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Token String
+-&gt; ParsecT ParseErrorCustom String (State Env) (Token String)
+forall e s (m :: * -&gt; *).
+(MonadParsec e s m, Token s ~ Char) =&gt;
+Token s -&gt; m (Token s)
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-817db0b2e2b3288129ebf9aa2d88a46b2ffe29add993d761d62a18e444ece278/share/doc/html/src/Text.Megaparsec.Char.html#char"><span class="hs-identifier hs-var">MC.char</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+Token String
+</span><span class="hs-char">'\''</span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Token String
+-&gt; ParsecT ParseErrorCustom String (State Env) (Token String)
+forall e s (m :: * -&gt; *).
+(MonadParsec e s m, Token s ~ Char) =&gt;
+Token s -&gt; m (Token s)
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-817db0b2e2b3288129ebf9aa2d88a46b2ffe29add993d761d62a18e444ece278/share/doc/html/src/Text.Megaparsec.Char.html#char"><span class="hs-identifier hs-var">MC.char</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+Token String
+</span><span class="hs-char">'\''</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">ParsecT ParseErrorCustom String (State Env) Char
+ParsecT ParseErrorCustom String (State Env) (Token String)
+forall e s (m :: * -&gt; *). MonadParsec e s m =&gt; m (Token s)
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-817db0b2e2b3288129ebf9aa2d88a46b2ffe29add993d761d62a18e444ece278/share/doc/html/src/Text.Megaparsec.html#anySingle"><span class="hs-identifier hs-var">M.anySingle</span></a></span><span>
+</span><span id="line-41"></span><span>
+</span><span id="line-42"></span><span class="hs-comment">-- | Parses an array of literals.</span><span>
+</span><span id="line-43"></span><span class="hs-comment">-- Supports string literals as arrays of characters or standard arrays of literals.</span><span>
+</span><span id="line-44"></span><span class="hs-comment">-- Returns a `Literal` of type `LArray`.</span><span>
+</span><span id="line-45"></span><span class="annot"><a href="Ast.Parser.Literal.html#parseArray"><span class="hs-identifier hs-type">parseArray</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ast.Parser.Utils.html#Parser"><span class="hs-identifier hs-type">PU.Parser</span></a></span><span> </span><span class="annot"><a href="Ast.Types.html#Literal"><span class="hs-identifier hs-type">AT.Literal</span></a></span><span>
+</span><span id="line-46"></span><span id="parseArray"><span class="annot"><span class="annottext">parseArray :: Parser Literal
+</span><a href="Ast.Parser.Literal.html#parseArray"><span class="hs-identifier hs-var hs-var">parseArray</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-47"></span><span>  </span><span class="annot"><span class="annottext">[Parser Literal] -&gt; Parser Literal
+forall (f :: * -&gt; *) (m :: * -&gt; *) a.
+(Foldable f, Alternative m) =&gt;
+f (m a) -&gt; m a
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/parser-combinators-1.3.0-feda1c3b6159dd36c6ce34750cc148945f7b0112be9cb2b4f4804b1854519f15/share/doc/html/src/Control.Applicative.Combinators.html#choice"><span class="hs-identifier hs-var">M.choice</span></a></span><span>
+</span><span id="line-48"></span><span>    </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">[Literal] -&gt; Literal
+</span><a href="Ast.Types.html#LArray"><span class="hs-identifier hs-var">AT.LArray</span></a></span><span> </span><span class="annot"><span class="annottext">([Literal] -&gt; Literal)
+-&gt; (String -&gt; [Literal]) -&gt; String -&gt; Literal
+forall b c a. (b -&gt; c) -&gt; (a -&gt; b) -&gt; a -&gt; c
+</span><span class="hs-operator hs-var">.</span></span><span> </span><span class="annot"><span class="annottext">(Char -&gt; Literal) -&gt; String -&gt; [Literal]
+forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
+</span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="annot"><span class="annottext">Char -&gt; Literal
+</span><a href="Ast.Types.html#LChar"><span class="hs-identifier hs-var">AT.LChar</span></a></span><span> </span><span class="annot"><span class="annottext">(String -&gt; Literal)
+-&gt; ParsecT ParseErrorCustom String (State Env) String
+-&gt; Parser Literal
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">ParsecT ParseErrorCustom String (State Env) Char
+-&gt; ParsecT ParseErrorCustom String (State Env) Char
+-&gt; ParsecT ParseErrorCustom String (State Env) String
+-&gt; ParsecT ParseErrorCustom String (State Env) String
+forall (m :: * -&gt; *) open close a.
+Applicative m =&gt;
+m open -&gt; m close -&gt; m a -&gt; m a
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/parser-combinators-1.3.0-feda1c3b6159dd36c6ce34750cc148945f7b0112be9cb2b4f4804b1854519f15/share/doc/html/src/Control.Applicative.Combinators.html#between"><span class="hs-identifier hs-var">M.between</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Token String
+-&gt; ParsecT ParseErrorCustom String (State Env) (Token String)
+forall e s (m :: * -&gt; *).
+(MonadParsec e s m, Token s ~ Char) =&gt;
+Token s -&gt; m (Token s)
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-817db0b2e2b3288129ebf9aa2d88a46b2ffe29add993d761d62a18e444ece278/share/doc/html/src/Text.Megaparsec.Char.html#char"><span class="hs-identifier hs-var">MC.char</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+Token String
+</span><span class="hs-char">'\&quot;'</span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Token String
+-&gt; ParsecT ParseErrorCustom String (State Env) (Token String)
+forall e s (m :: * -&gt; *).
+(MonadParsec e s m, Token s ~ Char) =&gt;
+Token s -&gt; m (Token s)
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-817db0b2e2b3288129ebf9aa2d88a46b2ffe29add993d761d62a18e444ece278/share/doc/html/src/Text.Megaparsec.Char.html#char"><span class="hs-identifier hs-var">MC.char</span></a></span><span> </span><span class="annot"><span class="annottext">Char
+Token String
+</span><span class="hs-char">'\&quot;'</span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ParsecT ParseErrorCustom String (State Env) Char
+-&gt; ParsecT ParseErrorCustom String (State Env) String
+forall (m :: * -&gt; *) a. MonadPlus m =&gt; m a -&gt; m [a]
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/parser-combinators-1.3.0-feda1c3b6159dd36c6ce34750cc148945f7b0112be9cb2b4f4804b1854519f15/share/doc/html/src/Control.Monad.Combinators.html#many"><span class="hs-identifier hs-var">M.many</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">[Token String]
+-&gt; ParsecT ParseErrorCustom String (State Env) (Token String)
+forall (f :: * -&gt; *) e s (m :: * -&gt; *).
+(Foldable f, MonadParsec e s m) =&gt;
+f (Token s) -&gt; m (Token s)
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-817db0b2e2b3288129ebf9aa2d88a46b2ffe29add993d761d62a18e444ece278/share/doc/html/src/Text.Megaparsec.html#noneOf"><span class="hs-identifier hs-var">M.noneOf</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Char
+</span><span class="hs-char">'&quot;'</span></span><span class="hs-special">]</span><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-49"></span><span>      </span><span class="annot"><span class="annottext">[Literal] -&gt; Literal
+</span><a href="Ast.Types.html#LArray"><span class="hs-identifier hs-var">AT.LArray</span></a></span><span> </span><span class="annot"><span class="annottext">([Literal] -&gt; Literal)
+-&gt; ParsecT ParseErrorCustom String (State Env) [Literal]
+-&gt; Parser Literal
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">ParsecT ParseErrorCustom String (State Env) String
+-&gt; ParsecT ParseErrorCustom String (State Env) String
+-&gt; ParsecT ParseErrorCustom String (State Env) [Literal]
+-&gt; ParsecT ParseErrorCustom String (State Env) [Literal]
+forall (m :: * -&gt; *) open close a.
+Applicative m =&gt;
+m open -&gt; m close -&gt; m a -&gt; m a
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/parser-combinators-1.3.0-feda1c3b6159dd36c6ce34750cc148945f7b0112be9cb2b4f4804b1854519f15/share/doc/html/src/Control.Applicative.Combinators.html#between"><span class="hs-identifier hs-var">M.between</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String -&gt; ParsecT ParseErrorCustom String (State Env) String
+</span><a href="Ast.Parser.Utils.html#symbol"><span class="hs-identifier hs-var">PU.symbol</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;[&quot;</span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String -&gt; ParsecT ParseErrorCustom String (State Env) String
+</span><a href="Ast.Parser.Utils.html#symbol"><span class="hs-identifier hs-var">PU.symbol</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;]&quot;</span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Parser Literal
+-&gt; ParsecT ParseErrorCustom String (State Env) String
+-&gt; ParsecT ParseErrorCustom String (State Env) [Literal]
+forall (m :: * -&gt; *) a sep. MonadPlus m =&gt; m a -&gt; m sep -&gt; m [a]
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/parser-combinators-1.3.0-feda1c3b6159dd36c6ce34750cc148945f7b0112be9cb2b4f4804b1854519f15/share/doc/html/src/Control.Monad.Combinators.html#sepBy"><span class="hs-identifier hs-var">M.sepBy</span></a></span><span> </span><span class="annot"><span class="annottext">Parser Literal
+</span><a href="Ast.Parser.Literal.html#parseLiteral"><span class="hs-identifier hs-var">parseLiteral</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String -&gt; ParsecT ParseErrorCustom String (State Env) String
+</span><a href="Ast.Parser.Utils.html#symbol"><span class="hs-identifier hs-var">PU.symbol</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;,&quot;</span></span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><span id="line-50"></span><span>    </span><span class="hs-special">]</span><span>
+</span><span id="line-51"></span><span>
+</span><span id="line-52"></span><span class="hs-comment">-- | Parses a `null` literal.</span><span>
+</span><span id="line-53"></span><span class="hs-comment">-- Returns a `Literal` of type `LNull`.</span><span>
+</span><span id="line-54"></span><span class="annot"><a href="Ast.Parser.Literal.html#parseNull"><span class="hs-identifier hs-type">parseNull</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ast.Parser.Utils.html#Parser"><span class="hs-identifier hs-type">PU.Parser</span></a></span><span> </span><span class="annot"><a href="Ast.Types.html#Literal"><span class="hs-identifier hs-type">AT.Literal</span></a></span><span>
+</span><span id="line-55"></span><span id="parseNull"><span class="annot"><span class="annottext">parseNull :: Parser Literal
+</span><a href="Ast.Parser.Literal.html#parseNull"><span class="hs-identifier hs-var hs-var">parseNull</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Literal
+</span><a href="Ast.Types.html#LNull"><span class="hs-identifier hs-var">AT.LNull</span></a></span><span> </span><span class="annot"><span class="annottext">Literal
+-&gt; ParsecT ParseErrorCustom String (State Env) String
+-&gt; Parser Literal
+forall a b.
+a
+-&gt; ParsecT ParseErrorCustom String (State Env) b
+-&gt; ParsecT ParseErrorCustom String (State Env) a
+forall (f :: * -&gt; *) a b. Functor f =&gt; a -&gt; f b -&gt; f a
+</span><span class="hs-operator hs-var">&lt;$</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ParsecT ParseErrorCustom String (State Env) String
+</span><a href="Ast.Parser.Utils.html#symbol"><span class="hs-identifier hs-var">PU.symbol</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="Ast.Parser.Literal.html#nullSymbol"><span class="hs-identifier hs-var">nullSymbol</span></a></span><span>
+</span><span id="line-56"></span></pre></body></html>

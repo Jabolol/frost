@@ -1,0 +1,569 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ast.Parser.Expr</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-2"></span><span>
+</span><span id="line-3"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="Ast.Parser.Env.html"><span class="hs-identifier">Ast.Parser.Env</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">E</span></span><span>
+</span><span id="line-4"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="Ast.Parser.Literal.html"><span class="hs-identifier">Ast.Parser.Literal</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">PL</span></span><span>
+</span><span id="line-5"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="Ast.Parser.Operation.html"><span class="hs-identifier">Ast.Parser.Operation</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">PO</span></span><span>
+</span><span id="line-6"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="Ast.Parser.Type.html"><span class="hs-identifier">Ast.Parser.Type</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">PT</span></span><span>
+</span><span id="line-7"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="Ast.Parser.UnaryOperation.html"><span class="hs-identifier">Ast.Parser.UnaryOperation</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">PUO</span></span><span>
+</span><span id="line-8"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="Ast.Parser.Utils.html"><span class="hs-identifier">Ast.Parser.Utils</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">PU</span></span><span>
+</span><span id="line-9"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="Ast.Types.html"><span class="hs-identifier">Ast.Types</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">AT</span></span><span>
+</span><span id="line-10"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Control.Monad.State</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">S</span></span><span>
+</span><span id="line-11"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-817db0b2e2b3288129ebf9aa2d88a46b2ffe29add993d761d62a18e444ece278/share/doc/html/src/Text.Megaparsec.html"><span class="hs-identifier">Text.Megaparsec</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">M</span></span><span>
+</span><span id="line-12"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-817db0b2e2b3288129ebf9aa2d88a46b2ffe29add993d761d62a18e444ece278/share/doc/html/src/Text.Megaparsec.Pos.html"><span class="hs-identifier">Text.Megaparsec.Pos</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">MP</span></span><span>
+</span><span id="line-13"></span><span>
+</span><span id="line-14"></span><span class="hs-comment">-- TODO: rethink order</span><span>
+</span><span id="line-15"></span><span class="annot"><a href="Ast.Parser.Expr.html#parseExpr"><span class="hs-identifier hs-type">parseExpr</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ast.Parser.Utils.html#Parser"><span class="hs-identifier hs-type">PU.Parser</span></a></span><span> </span><span class="annot"><a href="Ast.Types.html#Expr"><span class="hs-identifier hs-type">AT.Expr</span></a></span><span>
+</span><span id="line-16"></span><span id="parseExpr"><span class="annot"><span class="annottext">parseExpr :: Parser Expr
+</span><a href="Ast.Parser.Expr.html#parseExpr"><span class="hs-identifier hs-var hs-var">parseExpr</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Parser Expr] -&gt; Parser Expr
+forall a. [Parser a] -&gt; Parser a
+</span><a href="Ast.Parser.Utils.html#triedChoice"><span class="hs-identifier hs-var">PU.triedChoice</span></a></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">Parser Expr
+</span><a href="Ast.Parser.Expr.html#parseLit"><span class="hs-identifier hs-var">parseLit</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Parser Expr
+</span><a href="Ast.Parser.Expr.html#parseVar"><span class="hs-identifier hs-var">parseVar</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Parser Expr
+</span><a href="Ast.Parser.Expr.html#parseFunction"><span class="hs-identifier hs-var">parseFunction</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Parser Expr
+</span><a href="Ast.Parser.Expr.html#parseDeclaration"><span class="hs-identifier hs-var">parseDeclaration</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Parser Expr
+</span><a href="Ast.Parser.Expr.html#parseAssignment"><span class="hs-identifier hs-var">parseAssignment</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Parser Expr
+</span><a href="Ast.Parser.Expr.html#parseCall"><span class="hs-identifier hs-var">parseCall</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Parser Expr
+</span><a href="Ast.Parser.Expr.html#parseIf"><span class="hs-identifier hs-var">parseIf</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Parser Expr
+</span><a href="Ast.Parser.Expr.html#parseBlock"><span class="hs-identifier hs-var">parseBlock</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Parser Expr
+</span><a href="Ast.Parser.Expr.html#parseOp"><span class="hs-identifier hs-var">parseOp</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-17"></span><span>
+</span><span id="line-18"></span><span class="annot"><a href="Ast.Parser.Expr.html#parseLit"><span class="hs-identifier hs-type">parseLit</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ast.Parser.Utils.html#Parser"><span class="hs-identifier hs-type">PU.Parser</span></a></span><span> </span><span class="annot"><a href="Ast.Types.html#Expr"><span class="hs-identifier hs-type">AT.Expr</span></a></span><span>
+</span><span id="line-19"></span><span id="parseLit"><span class="annot"><span class="annottext">parseLit :: Parser Expr
+</span><a href="Ast.Parser.Expr.html#parseLit"><span class="hs-identifier hs-var hs-var">parseLit</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-20"></span><span>  </span><span id="local-6989586621679076074"><span class="annot"><span class="annottext">Literal
+</span><a href="#local-6989586621679076074"><span class="hs-identifier hs-var">lit</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parser Literal
+</span><a href="Ast.Parser.Literal.html#parseLiteral"><span class="hs-identifier hs-var">PL.parseLiteral</span></a></span><span>
+</span><span id="line-21"></span><span>  </span><span id="local-6989586621679076076"><span class="annot"><span class="annottext">SrcLoc
+</span><a href="#local-6989586621679076076"><span class="hs-identifier hs-var">srcLoc</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parser SrcLoc
+</span><a href="Ast.Parser.Expr.html#parseSrcLoc"><span class="hs-identifier hs-var">parseSrcLoc</span></a></span><span>
+</span><span id="line-22"></span><span>  </span><span class="annot"><span class="annottext">Expr -&gt; Parser Expr
+forall a. a -&gt; ParsecT ParseErrorCustom String (State Env) a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(Expr -&gt; Parser Expr) -&gt; Expr -&gt; Parser Expr
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">SrcLoc -&gt; Literal -&gt; Expr
+</span><a href="Ast.Types.html#Lit"><span class="hs-identifier hs-var">AT.Lit</span></a></span><span> </span><span class="annot"><span class="annottext">SrcLoc
+</span><a href="#local-6989586621679076076"><span class="hs-identifier hs-var">srcLoc</span></a></span><span> </span><span class="annot"><span class="annottext">Literal
+</span><a href="#local-6989586621679076074"><span class="hs-identifier hs-var">lit</span></a></span><span>
+</span><span id="line-23"></span><span>
+</span><span id="line-24"></span><span class="annot"><a href="Ast.Parser.Expr.html#parseVar"><span class="hs-identifier hs-type">parseVar</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ast.Parser.Utils.html#Parser"><span class="hs-identifier hs-type">PU.Parser</span></a></span><span> </span><span class="annot"><a href="Ast.Types.html#Expr"><span class="hs-identifier hs-type">AT.Expr</span></a></span><span>
+</span><span id="line-25"></span><span id="parseVar"><span class="annot"><span class="annottext">parseVar :: Parser Expr
+</span><a href="Ast.Parser.Expr.html#parseVar"><span class="hs-identifier hs-var hs-var">parseVar</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-26"></span><span>  </span><span id="local-6989586621679076079"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679076079"><span class="hs-identifier hs-var">name</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parser String
+</span><a href="Ast.Parser.Utils.html#identifier"><span class="hs-identifier hs-var">PU.identifier</span></a></span><span>
+</span><span id="line-27"></span><span>  </span><span id="local-6989586621679076081"><span class="annot"><span class="annottext">SrcLoc
+</span><a href="#local-6989586621679076081"><span class="hs-identifier hs-var">srcLoc</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parser SrcLoc
+</span><a href="Ast.Parser.Expr.html#parseSrcLoc"><span class="hs-identifier hs-var">parseSrcLoc</span></a></span><span>
+</span><span id="line-28"></span><span>  </span><span id="local-6989586621679076082"><span class="annot"><span class="annottext">Env
+</span><a href="#local-6989586621679076082"><span class="hs-identifier hs-var">env</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">ParsecT ParseErrorCustom String (State Env) Env
+forall s (m :: * -&gt; *). MonadState s m =&gt; m s
+</span><span class="hs-identifier hs-var">S.get</span></span><span>
+</span><span id="line-29"></span><span>  </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">String -&gt; Env -&gt; Maybe Type
+</span><a href="Ast.Parser.Env.html#lookupVar"><span class="hs-identifier hs-var">E.lookupVar</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679076079"><span class="hs-identifier hs-var">name</span></a></span><span> </span><span class="annot"><span class="annottext">Env
+</span><a href="#local-6989586621679076082"><span class="hs-identifier hs-var">env</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-30"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span id="local-6989586621679076085"><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679076085"><span class="hs-identifier hs-var">t</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Expr -&gt; Parser Expr
+forall a. a -&gt; ParsecT ParseErrorCustom String (State Env) a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(Expr -&gt; Parser Expr) -&gt; Expr -&gt; Parser Expr
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">SrcLoc -&gt; String -&gt; Type -&gt; Expr
+</span><a href="Ast.Types.html#Var"><span class="hs-identifier hs-var">AT.Var</span></a></span><span> </span><span class="annot"><span class="annottext">SrcLoc
+</span><a href="#local-6989586621679076081"><span class="hs-identifier hs-var">srcLoc</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679076079"><span class="hs-identifier hs-var">name</span></a></span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679076085"><span class="hs-identifier hs-var">t</span></a></span><span>
+</span><span id="line-31"></span><span>    </span><span class="annot"><span class="annottext">Maybe Type
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">ParseErrorCustom -&gt; Parser Expr
+forall e s (m :: * -&gt; *) a. MonadParsec e s m =&gt; e -&gt; m a
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-817db0b2e2b3288129ebf9aa2d88a46b2ffe29add993d761d62a18e444ece278/share/doc/html/src/Text.Megaparsec.html#customFailure"><span class="hs-identifier hs-var">M.customFailure</span></a></span><span> </span><span class="annot"><span class="annottext">(ParseErrorCustom -&gt; Parser Expr)
+-&gt; ParseErrorCustom -&gt; Parser Expr
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ParseErrorCustom
+</span><a href="Ast.Parser.Utils.html#UndefinedVar"><span class="hs-identifier hs-var">PU.UndefinedVar</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679076079"><span class="hs-identifier hs-var">name</span></a></span><span>
+</span><span id="line-32"></span><span>
+</span><span id="line-33"></span><span class="hs-comment">-- TODO: improve implicit return to handle ifs</span><span>
+</span><span id="line-34"></span><span class="annot"><a href="Ast.Parser.Expr.html#parseFunction"><span class="hs-identifier hs-type">parseFunction</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ast.Parser.Utils.html#Parser"><span class="hs-identifier hs-type">PU.Parser</span></a></span><span> </span><span class="annot"><a href="Ast.Types.html#Expr"><span class="hs-identifier hs-type">AT.Expr</span></a></span><span>
+</span><span id="line-35"></span><span id="parseFunction"><span class="annot"><span class="annottext">parseFunction :: Parser Expr
+</span><a href="Ast.Parser.Expr.html#parseFunction"><span class="hs-identifier hs-var hs-var">parseFunction</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-36"></span><span>  </span><span id="local-6989586621679076089"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679076089"><span class="hs-identifier hs-var">name</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parser String
+</span><a href="Ast.Parser.Utils.html#identifier"><span class="hs-identifier hs-var">PU.identifier</span></a></span><span>
+</span><span id="line-37"></span><span>  </span><span id="local-6989586621679076090"><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679076090"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">String -&gt; Parser String
+</span><a href="Ast.Parser.Utils.html#symbol"><span class="hs-identifier hs-var">PU.symbol</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;:&quot;</span></span><span> </span><span class="annot"><span class="annottext">Parser String
+-&gt; ParsecT ParseErrorCustom String (State Env) Type
+-&gt; ParsecT ParseErrorCustom String (State Env) Type
+forall a b.
+ParsecT ParseErrorCustom String (State Env) a
+-&gt; ParsecT ParseErrorCustom String (State Env) b
+-&gt; ParsecT ParseErrorCustom String (State Env) b
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f a -&gt; f b -&gt; f b
+</span><span class="hs-operator hs-var">*&gt;</span></span><span> </span><span class="annot"><span class="annottext">ParsecT ParseErrorCustom String (State Env) Type
+</span><a href="Ast.Parser.Type.html#parseType"><span class="hs-identifier hs-var">PT.parseType</span></a></span><span>
+</span><span id="line-38"></span><span>  </span><span id="local-6989586621679076093"><span class="annot"><span class="annottext">[String]
+</span><a href="#local-6989586621679076093"><span class="hs-identifier hs-var">params</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">String -&gt; Parser String
+</span><a href="Ast.Parser.Utils.html#symbol"><span class="hs-identifier hs-var">PU.symbol</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;=&quot;</span></span><span> </span><span class="annot"><span class="annottext">Parser String
+-&gt; ParsecT ParseErrorCustom String (State Env) [String]
+-&gt; ParsecT ParseErrorCustom String (State Env) [String]
+forall a b.
+ParsecT ParseErrorCustom String (State Env) a
+-&gt; ParsecT ParseErrorCustom String (State Env) b
+-&gt; ParsecT ParseErrorCustom String (State Env) b
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f a -&gt; f b -&gt; f b
+</span><span class="hs-operator hs-var">*&gt;</span></span><span> </span><span class="annot"><span class="annottext">Parser String
+-&gt; ParsecT ParseErrorCustom String (State Env) [String]
+forall (m :: * -&gt; *) a. MonadPlus m =&gt; m a -&gt; m [a]
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/parser-combinators-1.3.0-feda1c3b6159dd36c6ce34750cc148945f7b0112be9cb2b4f4804b1854519f15/share/doc/html/src/Control.Monad.Combinators.html#many"><span class="hs-identifier hs-var">M.many</span></a></span><span> </span><span class="annot"><span class="annottext">Parser String
+</span><a href="Ast.Parser.Utils.html#identifier"><span class="hs-identifier hs-var">PU.identifier</span></a></span><span>
+</span><span id="line-39"></span><span>  </span><span class="hs-special">(</span><span class="annot"><a href="Ast.Types.html#Block"><span class="hs-identifier hs-type">AT.Block</span></a></span><span> </span><span id="local-6989586621679076096"><span class="annot"><span class="annottext">[Expr]
+</span><a href="#local-6989586621679076096"><span class="hs-identifier hs-var">exprs</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parser Expr
+</span><a href="Ast.Parser.Expr.html#parseBlock"><span class="hs-identifier hs-var">parseBlock</span></a></span><span>
+</span><span id="line-40"></span><span>  </span><span id="local-6989586621679076097"><span class="annot"><span class="annottext">SrcLoc
+</span><a href="#local-6989586621679076097"><span class="hs-identifier hs-var">srcLoc</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parser SrcLoc
+</span><a href="Ast.Parser.Expr.html#parseSrcLoc"><span class="hs-identifier hs-var">parseSrcLoc</span></a></span><span>
+</span><span id="line-41"></span><span>  </span><span id="local-6989586621679076098"><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679076098"><span class="hs-identifier hs-var">body</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">[Expr] -&gt; Expr
+forall a. HasCallStack =&gt; [a] -&gt; a
+</span><span class="hs-identifier hs-var">last</span></span><span> </span><span class="annot"><span class="annottext">[Expr]
+</span><a href="#local-6989586621679076096"><span class="hs-identifier hs-var">exprs</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-42"></span><span>    </span><span class="hs-special">(</span><span class="annot"><a href="Ast.Types.html#Return"><span class="hs-identifier hs-type">AT.Return</span></a></span><span> </span><span class="annot"><span class="annottext">SrcLoc
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">Maybe Expr
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Expr -&gt; Parser Expr
+forall a. a -&gt; ParsecT ParseErrorCustom String (State Env) a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(Expr -&gt; Parser Expr) -&gt; Expr -&gt; Parser Expr
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[Expr] -&gt; Expr
+</span><a href="Ast.Types.html#Block"><span class="hs-identifier hs-var">AT.Block</span></a></span><span> </span><span class="annot"><span class="annottext">[Expr]
+</span><a href="#local-6989586621679076096"><span class="hs-identifier hs-var">exprs</span></a></span><span>
+</span><span id="line-43"></span><span>    </span><span id="local-6989586621679076101"><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679076101"><span class="hs-identifier hs-var">e</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Expr -&gt; Parser Expr
+forall a. a -&gt; ParsecT ParseErrorCustom String (State Env) a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(Expr -&gt; Parser Expr) -&gt; Expr -&gt; Parser Expr
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[Expr] -&gt; Expr
+</span><a href="Ast.Types.html#Block"><span class="hs-identifier hs-var">AT.Block</span></a></span><span> </span><span class="annot"><span class="annottext">([Expr] -&gt; Expr) -&gt; [Expr] -&gt; Expr
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[Expr] -&gt; [Expr]
+forall a. HasCallStack =&gt; [a] -&gt; [a]
+</span><span class="hs-identifier hs-var">init</span></span><span> </span><span class="annot"><span class="annottext">[Expr]
+</span><a href="#local-6989586621679076096"><span class="hs-identifier hs-var">exprs</span></a></span><span> </span><span class="annot"><span class="annottext">[Expr] -&gt; [Expr] -&gt; [Expr]
+forall a. [a] -&gt; [a] -&gt; [a]
+</span><span class="hs-operator hs-var">++</span></span><span> </span><span class="hs-special">[</span><span class="annot"><span class="annottext">SrcLoc -&gt; Maybe Expr -&gt; Expr
+</span><a href="Ast.Types.html#Return"><span class="hs-identifier hs-var">AT.Return</span></a></span><span> </span><span class="annot"><span class="annottext">SrcLoc
+</span><a href="#local-6989586621679076097"><span class="hs-identifier hs-var">srcLoc</span></a></span><span> </span><span class="annot"><span class="annottext">(Maybe Expr -&gt; Expr) -&gt; Maybe Expr -&gt; Expr
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Expr -&gt; Maybe Expr
+forall a. a -&gt; Maybe a
+</span><span class="hs-identifier hs-var">Just</span></span><span> </span><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679076101"><span class="hs-identifier hs-var">e</span></a></span><span class="hs-special">]</span><span>
+</span><span id="line-44"></span><span>  </span><span class="annot"><span class="annottext">(Env -&gt; Env) -&gt; ParsecT ParseErrorCustom String (State Env) ()
+forall s (m :: * -&gt; *). MonadState s m =&gt; (s -&gt; s) -&gt; m ()
+</span><span class="hs-identifier hs-var">S.modify</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String -&gt; Type -&gt; Env -&gt; Env
+</span><a href="Ast.Parser.Env.html#insertVar"><span class="hs-identifier hs-var">E.insertVar</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679076089"><span class="hs-identifier hs-var">name</span></a></span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679076090"><span class="hs-identifier hs-var">t</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-45"></span><span>  </span><span class="annot"><span class="annottext">Expr -&gt; Parser Expr
+forall a. a -&gt; ParsecT ParseErrorCustom String (State Env) a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(Expr -&gt; Parser Expr) -&gt; Expr -&gt; Parser Expr
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><a href="Ast.Types.html#Function"><span class="hs-identifier hs-type">AT.Function</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">funcLoc :: SrcLoc
+</span><a href="Ast.Types.html#funcLoc"><span class="hs-identifier hs-var">AT.funcLoc</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SrcLoc
+</span><a href="#local-6989586621679076097"><span class="hs-identifier hs-var">srcLoc</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">funcName :: String
+</span><a href="Ast.Types.html#funcName"><span class="hs-identifier hs-var">AT.funcName</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679076089"><span class="hs-identifier hs-var">name</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">funcType :: Type
+</span><a href="Ast.Types.html#funcType"><span class="hs-identifier hs-var">AT.funcType</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679076090"><span class="hs-identifier hs-var">t</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">funcParams :: [String]
+</span><a href="Ast.Types.html#funcParams"><span class="hs-identifier hs-var">AT.funcParams</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[String]
+</span><a href="#local-6989586621679076093"><span class="hs-identifier hs-var">params</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">funcBody :: Expr
+</span><a href="Ast.Types.html#funcBody"><span class="hs-identifier hs-var">AT.funcBody</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679076098"><span class="hs-identifier hs-var">body</span></a></span><span class="hs-special">}</span><span>
+</span><span id="line-46"></span><span>
+</span><span id="line-47"></span><span class="annot"><a href="Ast.Parser.Expr.html#parseDeclaration"><span class="hs-identifier hs-type">parseDeclaration</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ast.Parser.Utils.html#Parser"><span class="hs-identifier hs-type">PU.Parser</span></a></span><span> </span><span class="annot"><a href="Ast.Types.html#Expr"><span class="hs-identifier hs-type">AT.Expr</span></a></span><span>
+</span><span id="line-48"></span><span id="parseDeclaration"><span class="annot"><span class="annottext">parseDeclaration :: Parser Expr
+</span><a href="Ast.Parser.Expr.html#parseDeclaration"><span class="hs-identifier hs-var hs-var">parseDeclaration</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-49"></span><span>  </span><span id="local-6989586621679076111"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679076111"><span class="hs-identifier hs-var">name</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parser String -&gt; Parser String
+forall a. Parser a -&gt; Parser a
+</span><a href="Ast.Parser.Utils.html#lexeme"><span class="hs-identifier hs-var">PU.lexeme</span></a></span><span> </span><span class="annot"><span class="annottext">Parser String
+</span><a href="Ast.Parser.Utils.html#identifier"><span class="hs-identifier hs-var">PU.identifier</span></a></span><span>
+</span><span id="line-50"></span><span>  </span><span id="local-6989586621679076113"><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679076113"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">String -&gt; Parser String
+</span><a href="Ast.Parser.Utils.html#symbol"><span class="hs-identifier hs-var">PU.symbol</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;:&quot;</span></span><span> </span><span class="annot"><span class="annottext">Parser String
+-&gt; ParsecT ParseErrorCustom String (State Env) Type
+-&gt; ParsecT ParseErrorCustom String (State Env) Type
+forall a b.
+ParsecT ParseErrorCustom String (State Env) a
+-&gt; ParsecT ParseErrorCustom String (State Env) b
+-&gt; ParsecT ParseErrorCustom String (State Env) b
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f a -&gt; f b -&gt; f b
+</span><span class="hs-operator hs-var">*&gt;</span></span><span> </span><span class="annot"><span class="annottext">ParsecT ParseErrorCustom String (State Env) Type
+</span><a href="Ast.Parser.Type.html#parseType"><span class="hs-identifier hs-var">PT.parseType</span></a></span><span>
+</span><span id="line-51"></span><span>  </span><span id="local-6989586621679076114"><span class="annot"><span class="annottext">Maybe Expr
+</span><a href="#local-6989586621679076114"><span class="hs-identifier hs-var">value</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parser Expr
+-&gt; ParsecT ParseErrorCustom String (State Env) (Maybe Expr)
+forall (f :: * -&gt; *) a. Alternative f =&gt; f a -&gt; f (Maybe a)
+</span><span class="hs-identifier hs-var">M.optional</span></span><span> </span><span class="annot"><span class="annottext">(Parser Expr
+ -&gt; ParsecT ParseErrorCustom String (State Env) (Maybe Expr))
+-&gt; Parser Expr
+-&gt; ParsecT ParseErrorCustom String (State Env) (Maybe Expr)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; Parser String
+</span><a href="Ast.Parser.Utils.html#symbol"><span class="hs-identifier hs-var">PU.symbol</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;=&quot;</span></span><span> </span><span class="annot"><span class="annottext">Parser String -&gt; Parser Expr -&gt; Parser Expr
+forall a b.
+ParsecT ParseErrorCustom String (State Env) a
+-&gt; ParsecT ParseErrorCustom String (State Env) b
+-&gt; ParsecT ParseErrorCustom String (State Env) b
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f a -&gt; f b -&gt; f b
+</span><span class="hs-operator hs-var">*&gt;</span></span><span> </span><span class="annot"><span class="annottext">Parser Expr
+</span><a href="Ast.Parser.Expr.html#parseExpr"><span class="hs-identifier hs-var">parseExpr</span></a></span><span>
+</span><span id="line-52"></span><span>  </span><span id="local-6989586621679076116"><span class="annot"><span class="annottext">SrcLoc
+</span><a href="#local-6989586621679076116"><span class="hs-identifier hs-var">srcLoc</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parser SrcLoc
+</span><a href="Ast.Parser.Expr.html#parseSrcLoc"><span class="hs-identifier hs-var">parseSrcLoc</span></a></span><span>
+</span><span id="line-53"></span><span>  </span><span class="annot"><span class="annottext">(Env -&gt; Env) -&gt; ParsecT ParseErrorCustom String (State Env) ()
+forall s (m :: * -&gt; *). MonadState s m =&gt; (s -&gt; s) -&gt; m ()
+</span><span class="hs-identifier hs-var">S.modify</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String -&gt; Type -&gt; Env -&gt; Env
+</span><a href="Ast.Parser.Env.html#insertVar"><span class="hs-identifier hs-var">E.insertVar</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679076111"><span class="hs-identifier hs-var">name</span></a></span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679076113"><span class="hs-identifier hs-var">t</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-54"></span><span>  </span><span class="annot"><span class="annottext">Expr -&gt; Parser Expr
+forall a. a -&gt; ParsecT ParseErrorCustom String (State Env) a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(Expr -&gt; Parser Expr) -&gt; Expr -&gt; Parser Expr
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><a href="Ast.Types.html#Declaration"><span class="hs-identifier hs-type">AT.Declaration</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">declLoc :: SrcLoc
+</span><a href="Ast.Types.html#declLoc"><span class="hs-identifier hs-var">AT.declLoc</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SrcLoc
+</span><a href="#local-6989586621679076116"><span class="hs-identifier hs-var">srcLoc</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">declName :: String
+</span><a href="Ast.Types.html#declName"><span class="hs-identifier hs-var">AT.declName</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679076111"><span class="hs-identifier hs-var">name</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">declType :: Type
+</span><a href="Ast.Types.html#declType"><span class="hs-identifier hs-var">AT.declType</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679076113"><span class="hs-identifier hs-var">t</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">declInit :: Maybe Expr
+</span><a href="Ast.Types.html#declInit"><span class="hs-identifier hs-var">AT.declInit</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe Expr
+</span><a href="#local-6989586621679076114"><span class="hs-identifier hs-var">value</span></a></span><span class="hs-special">}</span><span>
+</span><span id="line-55"></span><span>
+</span><span id="line-56"></span><span class="annot"><a href="Ast.Parser.Expr.html#parseAssignment"><span class="hs-identifier hs-type">parseAssignment</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ast.Parser.Utils.html#Parser"><span class="hs-identifier hs-type">PU.Parser</span></a></span><span> </span><span class="annot"><a href="Ast.Types.html#Expr"><span class="hs-identifier hs-type">AT.Expr</span></a></span><span>
+</span><span id="line-57"></span><span id="parseAssignment"><span class="annot"><span class="annottext">parseAssignment :: Parser Expr
+</span><a href="Ast.Parser.Expr.html#parseAssignment"><span class="hs-identifier hs-var hs-var">parseAssignment</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-58"></span><span>  </span><span id="local-6989586621679076122"><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679076122"><span class="hs-identifier hs-var">target</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parser Expr
+</span><a href="Ast.Parser.Expr.html#parseExpr"><span class="hs-identifier hs-var">parseExpr</span></a></span><span> </span><span class="annot"><span class="annottext">Parser Expr -&gt; Parser String -&gt; Parser Expr
+forall a b.
+ParsecT ParseErrorCustom String (State Env) a
+-&gt; ParsecT ParseErrorCustom String (State Env) b
+-&gt; ParsecT ParseErrorCustom String (State Env) a
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f a -&gt; f b -&gt; f a
+</span><span class="hs-operator hs-var">&lt;*</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; Parser String
+</span><a href="Ast.Parser.Utils.html#symbol"><span class="hs-identifier hs-var">PU.symbol</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;=&quot;</span></span><span>
+</span><span id="line-59"></span><span>  </span><span id="local-6989586621679076124"><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679076124"><span class="hs-identifier hs-var">value</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parser Expr
+</span><a href="Ast.Parser.Expr.html#parseExpr"><span class="hs-identifier hs-var">parseExpr</span></a></span><span>
+</span><span id="line-60"></span><span>  </span><span id="local-6989586621679076125"><span class="annot"><span class="annottext">SrcLoc
+</span><a href="#local-6989586621679076125"><span class="hs-identifier hs-var">srcLoc</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parser SrcLoc
+</span><a href="Ast.Parser.Expr.html#parseSrcLoc"><span class="hs-identifier hs-var">parseSrcLoc</span></a></span><span>
+</span><span id="line-61"></span><span>  </span><span class="annot"><span class="annottext">Expr -&gt; Parser Expr
+forall a. a -&gt; ParsecT ParseErrorCustom String (State Env) a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(Expr -&gt; Parser Expr) -&gt; Expr -&gt; Parser Expr
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><a href="Ast.Types.html#Assignment"><span class="hs-identifier hs-type">AT.Assignment</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">assignLoc :: SrcLoc
+</span><a href="Ast.Types.html#assignLoc"><span class="hs-identifier hs-var">AT.assignLoc</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SrcLoc
+</span><a href="#local-6989586621679076125"><span class="hs-identifier hs-var">srcLoc</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">assignTarget :: Expr
+</span><a href="Ast.Types.html#assignTarget"><span class="hs-identifier hs-var">AT.assignTarget</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679076122"><span class="hs-identifier hs-var">target</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">assignValue :: Expr
+</span><a href="Ast.Types.html#assignValue"><span class="hs-identifier hs-var">AT.assignValue</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679076124"><span class="hs-identifier hs-var">value</span></a></span><span class="hs-special">}</span><span>
+</span><span id="line-62"></span><span>
+</span><span id="line-63"></span><span class="annot"><a href="Ast.Parser.Expr.html#parseCall"><span class="hs-identifier hs-type">parseCall</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ast.Parser.Utils.html#Parser"><span class="hs-identifier hs-type">PU.Parser</span></a></span><span> </span><span class="annot"><a href="Ast.Types.html#Expr"><span class="hs-identifier hs-type">AT.Expr</span></a></span><span>
+</span><span id="line-64"></span><span id="parseCall"><span class="annot"><span class="annottext">parseCall :: Parser Expr
+</span><a href="Ast.Parser.Expr.html#parseCall"><span class="hs-identifier hs-var hs-var">parseCall</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-65"></span><span>  </span><span id="local-6989586621679076130"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679076130"><span class="hs-identifier hs-var">name</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parser String
+</span><a href="Ast.Parser.Utils.html#identifier"><span class="hs-identifier hs-var">PU.identifier</span></a></span><span>
+</span><span id="line-66"></span><span>  </span><span id="local-6989586621679076131"><span class="annot"><span class="annottext">[Expr]
+</span><a href="#local-6989586621679076131"><span class="hs-identifier hs-var">args</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parser String
+-&gt; Parser String
+-&gt; ParsecT ParseErrorCustom String (State Env) [Expr]
+-&gt; ParsecT ParseErrorCustom String (State Env) [Expr]
+forall (m :: * -&gt; *) open close a.
+Applicative m =&gt;
+m open -&gt; m close -&gt; m a -&gt; m a
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/parser-combinators-1.3.0-feda1c3b6159dd36c6ce34750cc148945f7b0112be9cb2b4f4804b1854519f15/share/doc/html/src/Control.Applicative.Combinators.html#between"><span class="hs-identifier hs-var">M.between</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String -&gt; Parser String
+</span><a href="Ast.Parser.Utils.html#symbol"><span class="hs-identifier hs-var">PU.symbol</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;(&quot;</span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String -&gt; Parser String
+</span><a href="Ast.Parser.Utils.html#symbol"><span class="hs-identifier hs-var">PU.symbol</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;)&quot;</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(ParsecT ParseErrorCustom String (State Env) [Expr]
+ -&gt; ParsecT ParseErrorCustom String (State Env) [Expr])
+-&gt; ParsecT ParseErrorCustom String (State Env) [Expr]
+-&gt; ParsecT ParseErrorCustom String (State Env) [Expr]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Parser Expr -&gt; ParsecT ParseErrorCustom String (State Env) [Expr]
+forall (m :: * -&gt; *) a. MonadPlus m =&gt; m a -&gt; m [a]
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/parser-combinators-1.3.0-feda1c3b6159dd36c6ce34750cc148945f7b0112be9cb2b4f4804b1854519f15/share/doc/html/src/Control.Monad.Combinators.html#many"><span class="hs-identifier hs-var">M.many</span></a></span><span> </span><span class="annot"><span class="annottext">Parser Expr
+</span><a href="Ast.Parser.Expr.html#parseExpr"><span class="hs-identifier hs-var">parseExpr</span></a></span><span>
+</span><span id="line-67"></span><span>  </span><span id="local-6989586621679076133"><span class="annot"><span class="annottext">SrcLoc
+</span><a href="#local-6989586621679076133"><span class="hs-identifier hs-var">srcLoc</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parser SrcLoc
+</span><a href="Ast.Parser.Expr.html#parseSrcLoc"><span class="hs-identifier hs-var">parseSrcLoc</span></a></span><span>
+</span><span id="line-68"></span><span>  </span><span id="local-6989586621679076134"><span class="annot"><span class="annottext">Env
+</span><a href="#local-6989586621679076134"><span class="hs-identifier hs-var">env</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">ParsecT ParseErrorCustom String (State Env) Env
+forall s (m :: * -&gt; *). MonadState s m =&gt; m s
+</span><span class="hs-identifier hs-var">S.get</span></span><span>
+</span><span id="line-69"></span><span>  </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">String -&gt; Env -&gt; Maybe Type
+</span><a href="Ast.Parser.Env.html#lookupVar"><span class="hs-identifier hs-var">E.lookupVar</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679076130"><span class="hs-identifier hs-var">name</span></a></span><span> </span><span class="annot"><span class="annottext">Env
+</span><a href="#local-6989586621679076134"><span class="hs-identifier hs-var">env</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-70"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span id="local-6989586621679076135"><span class="annot"><span class="annottext">t :: Type
+</span><a href="#local-6989586621679076135"><span class="hs-identifier hs-var">t</span></a></span></span><span class="hs-glyph">@</span><span class="hs-special">(</span><span class="annot"><a href="Ast.Types.html#TFunction"><span class="hs-identifier hs-type">AT.TFunction</span></a></span><span> </span><span class="hs-special">{</span><span class="hs-special">}</span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Expr -&gt; Parser Expr
+forall a. a -&gt; ParsecT ParseErrorCustom String (State Env) a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(Expr -&gt; Parser Expr) -&gt; Expr -&gt; Parser Expr
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><a href="Ast.Types.html#Call"><span class="hs-identifier hs-type">AT.Call</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">callLoc :: SrcLoc
+</span><a href="Ast.Types.html#callLoc"><span class="hs-identifier hs-var">AT.callLoc</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SrcLoc
+</span><a href="#local-6989586621679076133"><span class="hs-identifier hs-var">srcLoc</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">callFunc :: Expr
+</span><a href="Ast.Types.html#callFunc"><span class="hs-identifier hs-var">AT.callFunc</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SrcLoc -&gt; String -&gt; Type -&gt; Expr
+</span><a href="Ast.Types.html#Var"><span class="hs-identifier hs-var">AT.Var</span></a></span><span> </span><span class="annot"><span class="annottext">SrcLoc
+</span><a href="#local-6989586621679076133"><span class="hs-identifier hs-var">srcLoc</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679076130"><span class="hs-identifier hs-var">name</span></a></span><span> </span><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679076135"><span class="hs-identifier hs-var">t</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">callArgs :: [Expr]
+</span><a href="Ast.Types.html#callArgs"><span class="hs-identifier hs-var">AT.callArgs</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[Expr]
+</span><a href="#local-6989586621679076131"><span class="hs-identifier hs-var">args</span></a></span><span class="hs-special">}</span><span>
+</span><span id="line-71"></span><span>    </span><span class="annot"><span class="annottext">Maybe Type
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">ParseErrorCustom -&gt; Parser Expr
+forall e s (m :: * -&gt; *) a. MonadParsec e s m =&gt; e -&gt; m a
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-817db0b2e2b3288129ebf9aa2d88a46b2ffe29add993d761d62a18e444ece278/share/doc/html/src/Text.Megaparsec.html#customFailure"><span class="hs-identifier hs-var">M.customFailure</span></a></span><span> </span><span class="annot"><span class="annottext">(ParseErrorCustom -&gt; Parser Expr)
+-&gt; ParseErrorCustom -&gt; Parser Expr
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ParseErrorCustom
+</span><a href="Ast.Parser.Utils.html#UndefinedFunction"><span class="hs-identifier hs-var">PU.UndefinedFunction</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679076130"><span class="hs-identifier hs-var">name</span></a></span><span>
+</span><span id="line-72"></span><span>
+</span><span id="line-73"></span><span class="annot"><a href="Ast.Parser.Expr.html#parseIf"><span class="hs-identifier hs-type">parseIf</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ast.Parser.Utils.html#Parser"><span class="hs-identifier hs-type">PU.Parser</span></a></span><span> </span><span class="annot"><a href="Ast.Types.html#Expr"><span class="hs-identifier hs-type">AT.Expr</span></a></span><span>
+</span><span id="line-74"></span><span id="parseIf"><span class="annot"><span class="annottext">parseIf :: Parser Expr
+</span><a href="Ast.Parser.Expr.html#parseIf"><span class="hs-identifier hs-var hs-var">parseIf</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-75"></span><span>  </span><span id="local-6989586621679076142"><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679076142"><span class="hs-identifier hs-var">cond</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">String -&gt; Parser String
+</span><a href="Ast.Parser.Utils.html#symbol"><span class="hs-identifier hs-var">PU.symbol</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;if&quot;</span></span><span> </span><span class="annot"><span class="annottext">Parser String -&gt; Parser Expr -&gt; Parser Expr
+forall a b.
+ParsecT ParseErrorCustom String (State Env) a
+-&gt; ParsecT ParseErrorCustom String (State Env) b
+-&gt; ParsecT ParseErrorCustom String (State Env) b
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f a -&gt; f b -&gt; f b
+</span><span class="hs-operator hs-var">*&gt;</span></span><span> </span><span class="annot"><span class="annottext">Parser Expr
+</span><a href="Ast.Parser.Expr.html#parseExpr"><span class="hs-identifier hs-var">parseExpr</span></a></span><span>
+</span><span id="line-76"></span><span>  </span><span id="local-6989586621679076143"><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679076143"><span class="hs-identifier hs-var">then'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parser Expr
+</span><a href="Ast.Parser.Expr.html#parseBlock"><span class="hs-identifier hs-var">parseBlock</span></a></span><span>
+</span><span id="line-77"></span><span>  </span><span id="local-6989586621679076144"><span class="annot"><span class="annottext">Maybe Expr
+</span><a href="#local-6989586621679076144"><span class="hs-identifier hs-var">else'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parser Expr
+-&gt; ParsecT ParseErrorCustom String (State Env) (Maybe Expr)
+forall (f :: * -&gt; *) a. Alternative f =&gt; f a -&gt; f (Maybe a)
+</span><span class="hs-identifier hs-var">M.optional</span></span><span> </span><span class="annot"><span class="annottext">(Parser Expr
+ -&gt; ParsecT ParseErrorCustom String (State Env) (Maybe Expr))
+-&gt; Parser Expr
+-&gt; ParsecT ParseErrorCustom String (State Env) (Maybe Expr)
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; Parser String
+</span><a href="Ast.Parser.Utils.html#symbol"><span class="hs-identifier hs-var">PU.symbol</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;else&quot;</span></span><span> </span><span class="annot"><span class="annottext">Parser String -&gt; Parser Expr -&gt; Parser Expr
+forall a b.
+ParsecT ParseErrorCustom String (State Env) a
+-&gt; ParsecT ParseErrorCustom String (State Env) b
+-&gt; ParsecT ParseErrorCustom String (State Env) b
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f a -&gt; f b -&gt; f b
+</span><span class="hs-operator hs-var">*&gt;</span></span><span> </span><span class="annot"><span class="annottext">Parser Expr
+</span><a href="Ast.Parser.Expr.html#parseBlock"><span class="hs-identifier hs-var">parseBlock</span></a></span><span>
+</span><span id="line-78"></span><span>  </span><span id="local-6989586621679076145"><span class="annot"><span class="annottext">SrcLoc
+</span><a href="#local-6989586621679076145"><span class="hs-identifier hs-var">srcLoc</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parser SrcLoc
+</span><a href="Ast.Parser.Expr.html#parseSrcLoc"><span class="hs-identifier hs-var">parseSrcLoc</span></a></span><span>
+</span><span id="line-79"></span><span>  </span><span class="annot"><span class="annottext">Expr -&gt; Parser Expr
+forall a. a -&gt; ParsecT ParseErrorCustom String (State Env) a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(Expr -&gt; Parser Expr) -&gt; Expr -&gt; Parser Expr
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><a href="Ast.Types.html#If"><span class="hs-identifier hs-type">AT.If</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">ifLoc :: SrcLoc
+</span><a href="Ast.Types.html#ifLoc"><span class="hs-identifier hs-var">AT.ifLoc</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">SrcLoc
+</span><a href="#local-6989586621679076145"><span class="hs-identifier hs-var">srcLoc</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">ifCond :: Expr
+</span><a href="Ast.Types.html#ifCond"><span class="hs-identifier hs-var">AT.ifCond</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679076142"><span class="hs-identifier hs-var">cond</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">ifThen :: Expr
+</span><a href="Ast.Types.html#ifThen"><span class="hs-identifier hs-var">AT.ifThen</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679076143"><span class="hs-identifier hs-var">then'</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">ifElse :: Maybe Expr
+</span><a href="Ast.Types.html#ifElse"><span class="hs-identifier hs-var">AT.ifElse</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Maybe Expr
+</span><a href="#local-6989586621679076144"><span class="hs-identifier hs-var">else'</span></a></span><span class="hs-special">}</span><span>
+</span><span id="line-80"></span><span>
+</span><span id="line-81"></span><span class="annot"><a href="Ast.Parser.Expr.html#parseBlock"><span class="hs-identifier hs-type">parseBlock</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ast.Parser.Utils.html#Parser"><span class="hs-identifier hs-type">PU.Parser</span></a></span><span> </span><span class="annot"><a href="Ast.Types.html#Expr"><span class="hs-identifier hs-type">AT.Expr</span></a></span><span>
+</span><span id="line-82"></span><span id="parseBlock"><span class="annot"><span class="annottext">parseBlock :: Parser Expr
+</span><a href="Ast.Parser.Expr.html#parseBlock"><span class="hs-identifier hs-var hs-var">parseBlock</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-83"></span><span>  </span><span id="local-6989586621679076151"><span class="annot"><span class="annottext">[Expr]
+</span><a href="#local-6989586621679076151"><span class="hs-identifier hs-var">es</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parser String
+-&gt; Parser String
+-&gt; ParsecT ParseErrorCustom String (State Env) [Expr]
+-&gt; ParsecT ParseErrorCustom String (State Env) [Expr]
+forall (m :: * -&gt; *) open close a.
+Applicative m =&gt;
+m open -&gt; m close -&gt; m a -&gt; m a
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/parser-combinators-1.3.0-feda1c3b6159dd36c6ce34750cc148945f7b0112be9cb2b4f4804b1854519f15/share/doc/html/src/Control.Applicative.Combinators.html#between"><span class="hs-identifier hs-var">M.between</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String -&gt; Parser String
+</span><a href="Ast.Parser.Utils.html#symbol"><span class="hs-identifier hs-var">PU.symbol</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;{&quot;</span></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String -&gt; Parser String
+</span><a href="Ast.Parser.Utils.html#symbol"><span class="hs-identifier hs-var">PU.symbol</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;}&quot;</span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(ParsecT ParseErrorCustom String (State Env) [Expr]
+ -&gt; ParsecT ParseErrorCustom String (State Env) [Expr])
+-&gt; ParsecT ParseErrorCustom String (State Env) [Expr]
+-&gt; ParsecT ParseErrorCustom String (State Env) [Expr]
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Parser Expr -&gt; ParsecT ParseErrorCustom String (State Env) [Expr]
+forall (m :: * -&gt; *) a. MonadPlus m =&gt; m a -&gt; m [a]
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/parser-combinators-1.3.0-feda1c3b6159dd36c6ce34750cc148945f7b0112be9cb2b4f4804b1854519f15/share/doc/html/src/Control.Monad.Combinators.html#many"><span class="hs-identifier hs-var">M.many</span></a></span><span> </span><span class="annot"><span class="annottext">Parser Expr
+</span><a href="Ast.Parser.Expr.html#parseExpr"><span class="hs-identifier hs-var">parseExpr</span></a></span><span>
+</span><span id="line-84"></span><span>  </span><span class="annot"><span class="annottext">Expr -&gt; Parser Expr
+forall a. a -&gt; ParsecT ParseErrorCustom String (State Env) a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(Expr -&gt; Parser Expr) -&gt; Expr -&gt; Parser Expr
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[Expr] -&gt; Expr
+</span><a href="Ast.Types.html#Block"><span class="hs-identifier hs-var">AT.Block</span></a></span><span> </span><span class="annot"><span class="annottext">[Expr]
+</span><a href="#local-6989586621679076151"><span class="hs-identifier hs-var">es</span></a></span><span>
+</span><span id="line-85"></span><span>
+</span><span id="line-86"></span><span class="annot"><a href="Ast.Parser.Expr.html#parseReturn"><span class="hs-identifier hs-type">parseReturn</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ast.Parser.Utils.html#Parser"><span class="hs-identifier hs-type">PU.Parser</span></a></span><span> </span><span class="annot"><a href="Ast.Types.html#Expr"><span class="hs-identifier hs-type">AT.Expr</span></a></span><span>
+</span><span id="line-87"></span><span id="parseReturn"><span class="annot"><span class="annottext">parseReturn :: Parser Expr
+</span><a href="Ast.Parser.Expr.html#parseReturn"><span class="hs-identifier hs-var hs-var">parseReturn</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-88"></span><span>  </span><span class="annot"><span class="annottext">String
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">String -&gt; Parser String
+</span><a href="Ast.Parser.Utils.html#symbol"><span class="hs-identifier hs-var">PU.symbol</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;return&quot;</span></span><span>
+</span><span id="line-89"></span><span>  </span><span id="local-6989586621679076153"><span class="annot"><span class="annottext">SrcLoc
+</span><a href="#local-6989586621679076153"><span class="hs-identifier hs-var">srcLoc</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parser SrcLoc
+</span><a href="Ast.Parser.Expr.html#parseSrcLoc"><span class="hs-identifier hs-var">parseSrcLoc</span></a></span><span>
+</span><span id="line-90"></span><span>  </span><span class="annot"><span class="annottext">SrcLoc -&gt; Maybe Expr -&gt; Expr
+</span><a href="Ast.Types.html#Return"><span class="hs-identifier hs-var">AT.Return</span></a></span><span> </span><span class="annot"><span class="annottext">SrcLoc
+</span><a href="#local-6989586621679076153"><span class="hs-identifier hs-var">srcLoc</span></a></span><span> </span><span class="annot"><span class="annottext">(Maybe Expr -&gt; Expr)
+-&gt; ParsecT ParseErrorCustom String (State Env) (Maybe Expr)
+-&gt; Parser Expr
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">Parser Expr
+-&gt; ParsecT ParseErrorCustom String (State Env) (Maybe Expr)
+forall (f :: * -&gt; *) a. Alternative f =&gt; f a -&gt; f (Maybe a)
+</span><span class="hs-identifier hs-var">M.optional</span></span><span> </span><span class="annot"><span class="annottext">Parser Expr
+</span><a href="Ast.Parser.Expr.html#parseExpr"><span class="hs-identifier hs-var">parseExpr</span></a></span><span>
+</span><span id="line-91"></span><span>
+</span><span id="line-92"></span><span class="annot"><a href="Ast.Parser.Expr.html#parseOp"><span class="hs-identifier hs-type">parseOp</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ast.Parser.Utils.html#Parser"><span class="hs-identifier hs-type">PU.Parser</span></a></span><span> </span><span class="annot"><a href="Ast.Types.html#Expr"><span class="hs-identifier hs-type">AT.Expr</span></a></span><span>
+</span><span id="line-93"></span><span id="parseOp"><span class="annot"><span class="annottext">parseOp :: Parser Expr
+</span><a href="Ast.Parser.Expr.html#parseOp"><span class="hs-identifier hs-var hs-var">parseOp</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-94"></span><span>  </span><span id="local-6989586621679076155"><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679076155"><span class="hs-identifier hs-var">e1</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parser Expr
+</span><a href="Ast.Parser.Expr.html#parseExpr"><span class="hs-identifier hs-var">parseExpr</span></a></span><span>
+</span><span id="line-95"></span><span>  </span><span id="local-6989586621679076156"><span class="annot"><span class="annottext">Operation
+</span><a href="#local-6989586621679076156"><span class="hs-identifier hs-var">op</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parser Operation
+</span><a href="Ast.Parser.Operation.html#parseOperation"><span class="hs-identifier hs-var">PO.parseOperation</span></a></span><span>
+</span><span id="line-96"></span><span>  </span><span id="local-6989586621679076158"><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679076158"><span class="hs-identifier hs-var">e2</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parser Expr
+</span><a href="Ast.Parser.Expr.html#parseExpr"><span class="hs-identifier hs-var">parseExpr</span></a></span><span>
+</span><span id="line-97"></span><span>  </span><span id="local-6989586621679076159"><span class="annot"><span class="annottext">SrcLoc
+</span><a href="#local-6989586621679076159"><span class="hs-identifier hs-var">srcLoc</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parser SrcLoc
+</span><a href="Ast.Parser.Expr.html#parseSrcLoc"><span class="hs-identifier hs-var">parseSrcLoc</span></a></span><span>
+</span><span id="line-98"></span><span>  </span><span class="annot"><span class="annottext">Expr -&gt; Parser Expr
+forall a. a -&gt; ParsecT ParseErrorCustom String (State Env) a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(Expr -&gt; Parser Expr) -&gt; Expr -&gt; Parser Expr
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">SrcLoc -&gt; Operation -&gt; Expr -&gt; Expr -&gt; Expr
+</span><a href="Ast.Types.html#Op"><span class="hs-identifier hs-var">AT.Op</span></a></span><span> </span><span class="annot"><span class="annottext">SrcLoc
+</span><a href="#local-6989586621679076159"><span class="hs-identifier hs-var">srcLoc</span></a></span><span> </span><span class="annot"><span class="annottext">Operation
+</span><a href="#local-6989586621679076156"><span class="hs-identifier hs-var">op</span></a></span><span> </span><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679076155"><span class="hs-identifier hs-var">e1</span></a></span><span> </span><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679076158"><span class="hs-identifier hs-var">e2</span></a></span><span>
+</span><span id="line-99"></span><span>
+</span><span id="line-100"></span><span class="annot"><a href="Ast.Parser.Expr.html#parseUnaryOp"><span class="hs-identifier hs-type">parseUnaryOp</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ast.Parser.Utils.html#Parser"><span class="hs-identifier hs-type">PU.Parser</span></a></span><span> </span><span class="annot"><a href="Ast.Types.html#Expr"><span class="hs-identifier hs-type">AT.Expr</span></a></span><span>
+</span><span id="line-101"></span><span id="parseUnaryOp"><span class="annot"><span class="annottext">parseUnaryOp :: Parser Expr
+</span><a href="Ast.Parser.Expr.html#parseUnaryOp"><span class="hs-identifier hs-var hs-var">parseUnaryOp</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-102"></span><span>  </span><span id="local-6989586621679076162"><span class="annot"><span class="annottext">UnaryOperationType
+</span><a href="#local-6989586621679076162"><span class="hs-identifier hs-var">uoType</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parser Expr -&gt; Parser UnaryOperationType
+forall a. Parser a -&gt; Parser UnaryOperationType
+</span><a href="Ast.Parser.UnaryOperation.html#unaryOperationType"><span class="hs-identifier hs-var">PUO.unaryOperationType</span></a></span><span> </span><span class="annot"><span class="annottext">Parser Expr
+</span><a href="Ast.Parser.Expr.html#parseExpr"><span class="hs-identifier hs-var">parseExpr</span></a></span><span>
+</span><span id="line-103"></span><span>  </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">UnaryOperationType
+</span><a href="#local-6989586621679076162"><span class="hs-identifier hs-var">uoType</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-104"></span><span>    </span><span class="annot"><span class="annottext">UnaryOperationType
+</span><a href="Ast.Parser.UnaryOperation.html#Pre"><span class="hs-identifier hs-var">PUO.Pre</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-105"></span><span>      </span><span id="local-6989586621679076165"><span class="annot"><span class="annottext">UnaryOperation
+</span><a href="#local-6989586621679076165"><span class="hs-identifier hs-var">uo</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">UnaryOperationType -&gt; Parser UnaryOperation
+</span><a href="Ast.Parser.UnaryOperation.html#parseUnaryOperation"><span class="hs-identifier hs-var">PUO.parseUnaryOperation</span></a></span><span> </span><span class="annot"><span class="annottext">UnaryOperationType
+</span><a href="#local-6989586621679076162"><span class="hs-identifier hs-var">uoType</span></a></span><span>
+</span><span id="line-106"></span><span>      </span><span id="local-6989586621679076167"><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679076167"><span class="hs-identifier hs-var">e</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parser Expr
+</span><a href="Ast.Parser.Expr.html#parseExpr"><span class="hs-identifier hs-var">parseExpr</span></a></span><span>
+</span><span id="line-107"></span><span>      </span><span id="local-6989586621679076168"><span class="annot"><span class="annottext">SrcLoc
+</span><a href="#local-6989586621679076168"><span class="hs-identifier hs-var">srcLoc</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parser SrcLoc
+</span><a href="Ast.Parser.Expr.html#parseSrcLoc"><span class="hs-identifier hs-var">parseSrcLoc</span></a></span><span>
+</span><span id="line-108"></span><span>      </span><span class="annot"><span class="annottext">Expr -&gt; Parser Expr
+forall a. a -&gt; ParsecT ParseErrorCustom String (State Env) a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(Expr -&gt; Parser Expr) -&gt; Expr -&gt; Parser Expr
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">SrcLoc -&gt; UnaryOperation -&gt; Expr -&gt; Expr
+</span><a href="Ast.Types.html#UnaryOp"><span class="hs-identifier hs-var">AT.UnaryOp</span></a></span><span> </span><span class="annot"><span class="annottext">SrcLoc
+</span><a href="#local-6989586621679076168"><span class="hs-identifier hs-var">srcLoc</span></a></span><span> </span><span class="annot"><span class="annottext">UnaryOperation
+</span><a href="#local-6989586621679076165"><span class="hs-identifier hs-var">uo</span></a></span><span> </span><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679076167"><span class="hs-identifier hs-var">e</span></a></span><span>
+</span><span id="line-109"></span><span>    </span><span class="annot"><span class="annottext">UnaryOperationType
+</span><a href="Ast.Parser.UnaryOperation.html#Post"><span class="hs-identifier hs-var">PUO.Post</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-110"></span><span>      </span><span id="local-6989586621679076171"><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679076171"><span class="hs-identifier hs-var">e</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parser Expr
+</span><a href="Ast.Parser.Expr.html#parseExpr"><span class="hs-identifier hs-var">parseExpr</span></a></span><span>
+</span><span id="line-111"></span><span>      </span><span id="local-6989586621679076172"><span class="annot"><span class="annottext">UnaryOperation
+</span><a href="#local-6989586621679076172"><span class="hs-identifier hs-var">uo</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">UnaryOperationType -&gt; Parser UnaryOperation
+</span><a href="Ast.Parser.UnaryOperation.html#parseUnaryOperation"><span class="hs-identifier hs-var">PUO.parseUnaryOperation</span></a></span><span> </span><span class="annot"><span class="annottext">UnaryOperationType
+</span><a href="#local-6989586621679076162"><span class="hs-identifier hs-var">uoType</span></a></span><span>
+</span><span id="line-112"></span><span>      </span><span id="local-6989586621679076173"><span class="annot"><span class="annottext">SrcLoc
+</span><a href="#local-6989586621679076173"><span class="hs-identifier hs-var">srcLoc</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parser SrcLoc
+</span><a href="Ast.Parser.Expr.html#parseSrcLoc"><span class="hs-identifier hs-var">parseSrcLoc</span></a></span><span>
+</span><span id="line-113"></span><span>      </span><span class="annot"><span class="annottext">Expr -&gt; Parser Expr
+forall a. a -&gt; ParsecT ParseErrorCustom String (State Env) a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(Expr -&gt; Parser Expr) -&gt; Expr -&gt; Parser Expr
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">SrcLoc -&gt; UnaryOperation -&gt; Expr -&gt; Expr
+</span><a href="Ast.Types.html#UnaryOp"><span class="hs-identifier hs-var">AT.UnaryOp</span></a></span><span> </span><span class="annot"><span class="annottext">SrcLoc
+</span><a href="#local-6989586621679076173"><span class="hs-identifier hs-var">srcLoc</span></a></span><span> </span><span class="annot"><span class="annottext">UnaryOperation
+</span><a href="#local-6989586621679076172"><span class="hs-identifier hs-var">uo</span></a></span><span> </span><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679076171"><span class="hs-identifier hs-var">e</span></a></span><span>
+</span><span id="line-114"></span><span>
+</span><span id="line-115"></span><span class="annot"><a href="Ast.Parser.Expr.html#parseSrcLoc"><span class="hs-identifier hs-type">parseSrcLoc</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ast.Parser.Utils.html#Parser"><span class="hs-identifier hs-type">PU.Parser</span></a></span><span> </span><span class="annot"><a href="Ast.Types.html#SrcLoc"><span class="hs-identifier hs-type">AT.SrcLoc</span></a></span><span>
+</span><span id="line-116"></span><span id="parseSrcLoc"><span class="annot"><span class="annottext">parseSrcLoc :: Parser SrcLoc
+</span><a href="Ast.Parser.Expr.html#parseSrcLoc"><span class="hs-identifier hs-var hs-var">parseSrcLoc</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-117"></span><span>  </span><span class="hs-special">(</span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-817db0b2e2b3288129ebf9aa2d88a46b2ffe29add993d761d62a18e444ece278/share/doc/html/src/Text.Megaparsec.Pos.html#SourcePos"><span class="hs-identifier hs-type">MP.SourcePos</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">sourceName :: SourcePos -&gt; String
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-817db0b2e2b3288129ebf9aa2d88a46b2ffe29add993d761d62a18e444ece278/share/doc/html/src/Text.Megaparsec.Pos.html#sourceName"><span class="hs-identifier hs-var">MP.sourceName</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679076176"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679076176"><span class="hs-identifier hs-var">_sourceName</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">sourceLine :: SourcePos -&gt; Pos
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-817db0b2e2b3288129ebf9aa2d88a46b2ffe29add993d761d62a18e444ece278/share/doc/html/src/Text.Megaparsec.Pos.html#sourceLine"><span class="hs-identifier hs-var">MP.sourceLine</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679076178"><span class="annot"><span class="annottext">Pos
+</span><a href="#local-6989586621679076178"><span class="hs-identifier hs-var">_sourceLine</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">sourceColumn :: SourcePos -&gt; Pos
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-817db0b2e2b3288129ebf9aa2d88a46b2ffe29add993d761d62a18e444ece278/share/doc/html/src/Text.Megaparsec.Pos.html#sourceColumn"><span class="hs-identifier hs-var">MP.sourceColumn</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="local-6989586621679076180"><span class="annot"><span class="annottext">Pos
+</span><a href="#local-6989586621679076180"><span class="hs-identifier hs-var">_sourceColumn</span></a></span></span><span class="hs-special">}</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">ParsecT ParseErrorCustom String (State Env) SourcePos
+forall s e (m :: * -&gt; *).
+(TraversableStream s, MonadParsec e s m) =&gt;
+m SourcePos
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-817db0b2e2b3288129ebf9aa2d88a46b2ffe29add993d761d62a18e444ece278/share/doc/html/src/Text.Megaparsec.html#getSourcePos"><span class="hs-identifier hs-var">M.getSourcePos</span></a></span><span>
+</span><span id="line-118"></span><span>  </span><span class="annot"><span class="annottext">SrcLoc -&gt; Parser SrcLoc
+forall a. a -&gt; ParsecT ParseErrorCustom String (State Env) a
+forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
+</span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(SrcLoc -&gt; Parser SrcLoc) -&gt; SrcLoc -&gt; Parser SrcLoc
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><a href="Ast.Types.html#SrcLoc"><span class="hs-identifier hs-type">AT.SrcLoc</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">srcFile :: String
+</span><a href="#local-6989586621679076183"><span class="hs-identifier hs-var">AT.srcFile</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679076176"><span class="hs-identifier hs-var">_sourceName</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">srcLine :: Int
+</span><a href="#local-6989586621679076184"><span class="hs-identifier hs-var">AT.srcLine</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Pos -&gt; Int
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-817db0b2e2b3288129ebf9aa2d88a46b2ffe29add993d761d62a18e444ece278/share/doc/html/src/Text.Megaparsec.Pos.html#unPos"><span class="hs-identifier hs-var">MP.unPos</span></a></span><span> </span><span class="annot"><span class="annottext">Pos
+</span><a href="#local-6989586621679076178"><span class="hs-identifier hs-var">_sourceLine</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">srcCol :: Int
+</span><a href="#local-6989586621679076186"><span class="hs-identifier hs-var">AT.srcCol</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Pos -&gt; Int
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-817db0b2e2b3288129ebf9aa2d88a46b2ffe29add993d761d62a18e444ece278/share/doc/html/src/Text.Megaparsec.Pos.html#unPos"><span class="hs-identifier hs-var">MP.unPos</span></a></span><span> </span><span class="annot"><span class="annottext">Pos
+</span><a href="#local-6989586621679076180"><span class="hs-identifier hs-var">_sourceColumn</span></a></span><span class="hs-special">}</span><span>
+</span><span id="line-119"></span></pre></body></html>

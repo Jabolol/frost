@@ -1,0 +1,169 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Ast.Parser.UnaryOperation</span><span> </span><span class="hs-keyword">where</span><span>
+</span><span id="line-2"></span><span>
+</span><span id="line-3"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="Ast.Parser.Utils.html"><span class="hs-identifier">Ast.Parser.Utils</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">PU</span></span><span>
+</span><span id="line-4"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="Ast.Types.html"><span class="hs-identifier">Ast.Types</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">AT</span></span><span>
+</span><span id="line-5"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-817db0b2e2b3288129ebf9aa2d88a46b2ffe29add993d761d62a18e444ece278/share/doc/html/src/Text.Megaparsec.html"><span class="hs-identifier">Text.Megaparsec</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">M</span></span><span>
+</span><span id="line-6"></span><span>
+</span><span id="line-7"></span><span class="hs-keyword">data</span><span> </span><span id="UnaryOperationType"><span class="annot"><a href="Ast.Parser.UnaryOperation.html#UnaryOperationType"><span class="hs-identifier hs-var">UnaryOperationType</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Pre"><span class="annot"><a href="Ast.Parser.UnaryOperation.html#Pre"><span class="hs-identifier hs-var">Pre</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="Post"><span class="annot"><a href="Ast.Parser.UnaryOperation.html#Post"><span class="hs-identifier hs-var">Post</span></a></span></span><span>
+</span><span id="line-8"></span><span>
+</span><span id="line-9"></span><span class="hs-comment">-- | Defines unary operator symbols that precede the operand, mapped to their AST representation.</span><span>
+</span><span id="line-10"></span><span class="hs-comment">-- Examples: `++x`, `--x`, `!x`.</span><span>
+</span><span id="line-11"></span><span class="annot"><a href="Ast.Parser.UnaryOperation.html#preUnaryOperations"><span class="hs-identifier hs-type">preUnaryOperations</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ast.Types.html#UnaryOperation"><span class="hs-identifier hs-type">AT.UnaryOperation</span></a></span><span class="hs-special">)</span><span class="hs-special">]</span><span>
+</span><span id="line-12"></span><span id="preUnaryOperations"><span class="annot"><span class="annottext">preUnaryOperations :: [(String, UnaryOperation)]
+</span><a href="Ast.Parser.UnaryOperation.html#preUnaryOperations"><span class="hs-identifier hs-var hs-var">preUnaryOperations</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-13"></span><span>  </span><span class="hs-special">[</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;!&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">UnaryOperation
+</span><a href="Ast.Types.html#Not"><span class="hs-identifier hs-var">AT.Not</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-14"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;not&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">UnaryOperation
+</span><a href="Ast.Types.html#Not"><span class="hs-identifier hs-var">AT.Not</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-15"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;~&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">UnaryOperation
+</span><a href="Ast.Types.html#BitNot"><span class="hs-identifier hs-var">AT.BitNot</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-16"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;&amp;&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">UnaryOperation
+</span><a href="Ast.Types.html#AddrOf"><span class="hs-identifier hs-var">AT.AddrOf</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-17"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;++&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">UnaryOperation
+</span><a href="Ast.Types.html#PreInc"><span class="hs-identifier hs-var">AT.PreInc</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-18"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;--&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">UnaryOperation
+</span><a href="Ast.Types.html#PreDec"><span class="hs-identifier hs-var">AT.PreDec</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-19"></span><span>  </span><span class="hs-special">]</span><span>
+</span><span id="line-20"></span><span>
+</span><span id="line-21"></span><span class="hs-comment">-- | Defines unary operator symbols that follow the operand, mapped to their AST representation.</span><span>
+</span><span id="line-22"></span><span class="hs-comment">-- Examples: `x++`, `x--`.</span><span>
+</span><span id="line-23"></span><span class="annot"><a href="Ast.Parser.UnaryOperation.html#postUnaryOperations"><span class="hs-identifier hs-type">postUnaryOperations</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ast.Types.html#UnaryOperation"><span class="hs-identifier hs-type">AT.UnaryOperation</span></a></span><span class="hs-special">)</span><span class="hs-special">]</span><span>
+</span><span id="line-24"></span><span id="postUnaryOperations"><span class="annot"><span class="annottext">postUnaryOperations :: [(String, UnaryOperation)]
+</span><a href="Ast.Parser.UnaryOperation.html#postUnaryOperations"><span class="hs-identifier hs-var hs-var">postUnaryOperations</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-25"></span><span>  </span><span class="hs-special">[</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;.&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">UnaryOperation
+</span><a href="Ast.Types.html#Deref"><span class="hs-identifier hs-var">AT.Deref</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-26"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;++&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">UnaryOperation
+</span><a href="Ast.Types.html#PostInc"><span class="hs-identifier hs-var">AT.PostInc</span></a></span><span class="hs-special">)</span><span class="hs-special">,</span><span>
+</span><span id="line-27"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String
+</span><span class="hs-string">&quot;--&quot;</span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">UnaryOperation
+</span><a href="Ast.Types.html#PostDec"><span class="hs-identifier hs-var">AT.PostDec</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-28"></span><span>  </span><span class="hs-special">]</span><span>
+</span><span id="line-29"></span><span>
+</span><span id="line-30"></span><span id="local-6989586621679075246"><span class="annot"><a href="Ast.Parser.UnaryOperation.html#unaryOperationType"><span class="hs-identifier hs-type">unaryOperationType</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ast.Parser.Utils.html#Parser"><span class="hs-identifier hs-type">PU.Parser</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679075246"><span class="hs-identifier hs-type">a</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ast.Parser.Utils.html#Parser"><span class="hs-identifier hs-type">PU.Parser</span></a></span><span> </span><span class="annot"><a href="Ast.Parser.UnaryOperation.html#UnaryOperationType"><span class="hs-identifier hs-type">UnaryOperationType</span></a></span></span><span>
+</span><span id="line-31"></span><span id="unaryOperationType"><span class="annot"><span class="annottext">unaryOperationType :: forall a. Parser a -&gt; Parser UnaryOperationType
+</span><a href="Ast.Parser.UnaryOperation.html#unaryOperationType"><span class="hs-identifier hs-var hs-var">unaryOperationType</span></a></span></span><span> </span><span id="local-6989586621679075315"><span class="annot"><span class="annottext">Parser a
+</span><a href="#local-6989586621679075315"><span class="hs-identifier hs-var">operandParser</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><span id="line-32"></span><span>  </span><span class="annot"><span class="annottext">[Parser UnaryOperationType] -&gt; Parser UnaryOperationType
+forall (f :: * -&gt; *) (m :: * -&gt; *) a.
+(Foldable f, Alternative m) =&gt;
+f (m a) -&gt; m a
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/parser-combinators-1.3.0-feda1c3b6159dd36c6ce34750cc148945f7b0112be9cb2b4f4804b1854519f15/share/doc/html/src/Control.Applicative.Combinators.html#choice"><span class="hs-identifier hs-var">M.choice</span></a></span><span>
+</span><span id="line-33"></span><span>    </span><span class="hs-special">[</span><span> </span><span class="annot"><span class="annottext">UnaryOperationType
+</span><a href="Ast.Parser.UnaryOperation.html#Pre"><span class="hs-identifier hs-var">Pre</span></a></span><span> </span><span class="annot"><span class="annottext">UnaryOperationType
+-&gt; ParsecT ParseErrorCustom String (State Env) UnaryOperation
+-&gt; Parser UnaryOperationType
+forall a b.
+a
+-&gt; ParsecT ParseErrorCustom String (State Env) b
+-&gt; ParsecT ParseErrorCustom String (State Env) a
+forall (f :: * -&gt; *) a b. Functor f =&gt; a -&gt; f b -&gt; f a
+</span><span class="hs-operator hs-var">&lt;$</span></span><span> </span><span class="annot"><span class="annottext">[(String, UnaryOperation)]
+-&gt; ParsecT ParseErrorCustom String (State Env) UnaryOperation
+</span><a href="Ast.Parser.UnaryOperation.html#parseUnaryOperation%27"><span class="hs-identifier hs-var">parseUnaryOperation'</span></a></span><span> </span><span class="annot"><span class="annottext">[(String, UnaryOperation)]
+</span><a href="Ast.Parser.UnaryOperation.html#preUnaryOperations"><span class="hs-identifier hs-var">preUnaryOperations</span></a></span><span> </span><span class="annot"><span class="annottext">Parser UnaryOperationType -&gt; Parser a -&gt; Parser UnaryOperationType
+forall a b.
+ParsecT ParseErrorCustom String (State Env) a
+-&gt; ParsecT ParseErrorCustom String (State Env) b
+-&gt; ParsecT ParseErrorCustom String (State Env) a
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f a -&gt; f b -&gt; f a
+</span><span class="hs-operator hs-var">&lt;*</span></span><span> </span><span class="annot"><span class="annottext">Parser a -&gt; Parser a
+forall a.
+ParsecT ParseErrorCustom String (State Env) a
+-&gt; ParsecT ParseErrorCustom String (State Env) a
+forall e s (m :: * -&gt; *) a. MonadParsec e s m =&gt; m a -&gt; m a
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-817db0b2e2b3288129ebf9aa2d88a46b2ffe29add993d761d62a18e444ece278/share/doc/html/src/Text.Megaparsec.Class.html#lookAhead"><span class="hs-identifier hs-var">M.lookAhead</span></a></span><span> </span><span class="annot"><span class="annottext">Parser a
+</span><a href="#local-6989586621679075315"><span class="hs-identifier hs-var">operandParser</span></a></span><span class="hs-special">,</span><span>
+</span><span id="line-34"></span><span>      </span><span class="annot"><span class="annottext">UnaryOperationType
+</span><a href="Ast.Parser.UnaryOperation.html#Post"><span class="hs-identifier hs-var">Post</span></a></span><span> </span><span class="annot"><span class="annottext">UnaryOperationType
+-&gt; ParsecT ParseErrorCustom String (State Env) UnaryOperation
+-&gt; Parser UnaryOperationType
+forall a b.
+a
+-&gt; ParsecT ParseErrorCustom String (State Env) b
+-&gt; ParsecT ParseErrorCustom String (State Env) a
+forall (f :: * -&gt; *) a b. Functor f =&gt; a -&gt; f b -&gt; f a
+</span><span class="hs-operator hs-var">&lt;$</span></span><span> </span><span class="annot"><span class="annottext">ParsecT ParseErrorCustom String (State Env) UnaryOperation
+-&gt; ParsecT ParseErrorCustom String (State Env) UnaryOperation
+forall a.
+ParsecT ParseErrorCustom String (State Env) a
+-&gt; ParsecT ParseErrorCustom String (State Env) a
+forall e s (m :: * -&gt; *) a. MonadParsec e s m =&gt; m a -&gt; m a
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-817db0b2e2b3288129ebf9aa2d88a46b2ffe29add993d761d62a18e444ece278/share/doc/html/src/Text.Megaparsec.Class.html#lookAhead"><span class="hs-identifier hs-var">M.lookAhead</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Parser a
+</span><a href="#local-6989586621679075315"><span class="hs-identifier hs-var">operandParser</span></a></span><span> </span><span class="annot"><span class="annottext">Parser a
+-&gt; ParsecT ParseErrorCustom String (State Env) UnaryOperation
+-&gt; ParsecT ParseErrorCustom String (State Env) UnaryOperation
+forall a b.
+ParsecT ParseErrorCustom String (State Env) a
+-&gt; ParsecT ParseErrorCustom String (State Env) b
+-&gt; ParsecT ParseErrorCustom String (State Env) b
+forall (f :: * -&gt; *) a b. Applicative f =&gt; f a -&gt; f b -&gt; f b
+</span><span class="hs-operator hs-var">*&gt;</span></span><span> </span><span class="annot"><span class="annottext">[(String, UnaryOperation)]
+-&gt; ParsecT ParseErrorCustom String (State Env) UnaryOperation
+</span><a href="Ast.Parser.UnaryOperation.html#parseUnaryOperation%27"><span class="hs-identifier hs-var">parseUnaryOperation'</span></a></span><span> </span><span class="annot"><span class="annottext">[(String, UnaryOperation)]
+</span><a href="Ast.Parser.UnaryOperation.html#postUnaryOperations"><span class="hs-identifier hs-var">postUnaryOperations</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-35"></span><span>    </span><span class="hs-special">]</span><span>
+</span><span id="line-36"></span><span>
+</span><span id="line-37"></span><span class="hs-comment">-- | Parses a unary operator and determines whether it appears before or after the operand.</span><span>
+</span><span id="line-38"></span><span class="hs-comment">--</span><span>
+</span><span id="line-39"></span><span class="hs-comment">-- The function uses lookahead to avoid consuming the operand during parsing.</span><span>
+</span><span id="line-40"></span><span class="hs-comment">-- - Pre-unary operators are parsed if they appear before the operand.</span><span>
+</span><span id="line-41"></span><span class="hs-comment">-- - Post-unary operators are parsed if they appear after the operand.</span><span>
+</span><span id="line-42"></span><span class="hs-comment">--</span><span>
+</span><span id="line-43"></span><span class="hs-comment">-- `operandParser`: A parser for the operand, used to determine the position of the operator.</span><span>
+</span><span id="line-44"></span><span class="annot"><a href="Ast.Parser.UnaryOperation.html#parseUnaryOperation"><span class="hs-identifier hs-type">parseUnaryOperation</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ast.Parser.UnaryOperation.html#UnaryOperationType"><span class="hs-identifier hs-type">UnaryOperationType</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ast.Parser.Utils.html#Parser"><span class="hs-identifier hs-type">PU.Parser</span></a></span><span> </span><span class="annot"><a href="Ast.Types.html#UnaryOperation"><span class="hs-identifier hs-type">AT.UnaryOperation</span></a></span><span>
+</span><span id="line-45"></span><span id="parseUnaryOperation"><span class="annot"><span class="annottext">parseUnaryOperation :: UnaryOperationType
+-&gt; ParsecT ParseErrorCustom String (State Env) UnaryOperation
+</span><a href="Ast.Parser.UnaryOperation.html#parseUnaryOperation"><span class="hs-identifier hs-var hs-var">parseUnaryOperation</span></a></span></span><span> </span><span class="annot"><span class="annottext">UnaryOperationType
+</span><a href="Ast.Parser.UnaryOperation.html#Pre"><span class="hs-identifier hs-var">Pre</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[(String, UnaryOperation)]
+-&gt; ParsecT ParseErrorCustom String (State Env) UnaryOperation
+</span><a href="Ast.Parser.UnaryOperation.html#parseUnaryOperation%27"><span class="hs-identifier hs-var">parseUnaryOperation'</span></a></span><span> </span><span class="annot"><span class="annottext">[(String, UnaryOperation)]
+</span><a href="Ast.Parser.UnaryOperation.html#preUnaryOperations"><span class="hs-identifier hs-var">preUnaryOperations</span></a></span><span>
+</span><span id="line-46"></span><span class="annot"><a href="Ast.Parser.UnaryOperation.html#parseUnaryOperation"><span class="hs-identifier hs-var">parseUnaryOperation</span></a></span><span> </span><span class="annot"><span class="annottext">UnaryOperationType
+</span><a href="Ast.Parser.UnaryOperation.html#Post"><span class="hs-identifier hs-var">Post</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[(String, UnaryOperation)]
+-&gt; ParsecT ParseErrorCustom String (State Env) UnaryOperation
+</span><a href="Ast.Parser.UnaryOperation.html#parseUnaryOperation%27"><span class="hs-identifier hs-var">parseUnaryOperation'</span></a></span><span> </span><span class="annot"><span class="annottext">[(String, UnaryOperation)]
+</span><a href="Ast.Parser.UnaryOperation.html#postUnaryOperations"><span class="hs-identifier hs-var">postUnaryOperations</span></a></span><span>
+</span><span id="line-47"></span><span>
+</span><span id="line-48"></span><span class="annot"><a href="Ast.Parser.UnaryOperation.html#parseUnaryOperation%27"><span class="hs-identifier hs-type">parseUnaryOperation'</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ast.Types.html#UnaryOperation"><span class="hs-identifier hs-type">AT.UnaryOperation</span></a></span><span class="hs-special">)</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ast.Parser.Utils.html#Parser"><span class="hs-identifier hs-type">PU.Parser</span></a></span><span> </span><span class="annot"><a href="Ast.Types.html#UnaryOperation"><span class="hs-identifier hs-type">AT.UnaryOperation</span></a></span><span>
+</span><span id="line-49"></span><span id="parseUnaryOperation%27"><span class="annot"><span class="annottext">parseUnaryOperation' :: [(String, UnaryOperation)]
+-&gt; ParsecT ParseErrorCustom String (State Env) UnaryOperation
+</span><a href="Ast.Parser.UnaryOperation.html#parseUnaryOperation%27"><span class="hs-identifier hs-var hs-var">parseUnaryOperation'</span></a></span></span><span> </span><span id="local-6989586621679075322"><span class="annot"><span class="annottext">[(String, UnaryOperation)]
+</span><a href="#local-6989586621679075322"><span class="hs-identifier hs-var">ops</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">[ParsecT ParseErrorCustom String (State Env) UnaryOperation]
+-&gt; ParsecT ParseErrorCustom String (State Env) UnaryOperation
+forall (f :: * -&gt; *) (m :: * -&gt; *) a.
+(Foldable f, Alternative m) =&gt;
+f (m a) -&gt; m a
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/parser-combinators-1.3.0-feda1c3b6159dd36c6ce34750cc148945f7b0112be9cb2b4f4804b1854519f15/share/doc/html/src/Control.Applicative.Combinators.html#choice"><span class="hs-identifier hs-var">M.choice</span></a></span><span> </span><span class="annot"><span class="annottext">([ParsecT ParseErrorCustom String (State Env) UnaryOperation]
+ -&gt; ParsecT ParseErrorCustom String (State Env) UnaryOperation)
+-&gt; [ParsecT ParseErrorCustom String (State Env) UnaryOperation]
+-&gt; ParsecT ParseErrorCustom String (State Env) UnaryOperation
+forall a b. (a -&gt; b) -&gt; a -&gt; b
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span class="hs-special">(</span><span id="local-6989586621679075323"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679075323"><span class="hs-identifier hs-var">o</span></a></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679075324"><span class="annot"><span class="annottext">UnaryOperation
+</span><a href="#local-6989586621679075324"><span class="hs-identifier hs-var">c</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">UnaryOperation
+</span><a href="#local-6989586621679075324"><span class="hs-identifier hs-var">c</span></a></span><span> </span><span class="annot"><span class="annottext">UnaryOperation
+-&gt; ParsecT ParseErrorCustom String (State Env) String
+-&gt; ParsecT ParseErrorCustom String (State Env) UnaryOperation
+forall a b.
+a
+-&gt; ParsecT ParseErrorCustom String (State Env) b
+-&gt; ParsecT ParseErrorCustom String (State Env) a
+forall (f :: * -&gt; *) a b. Functor f =&gt; a -&gt; f b -&gt; f a
+</span><span class="hs-operator hs-var">&lt;$</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ParsecT ParseErrorCustom String (State Env) String
+</span><a href="Ast.Parser.Utils.html#symbol"><span class="hs-identifier hs-var">PU.symbol</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679075323"><span class="hs-identifier hs-var">o</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">((String, UnaryOperation)
+ -&gt; ParsecT ParseErrorCustom String (State Env) UnaryOperation)
+-&gt; [(String, UnaryOperation)]
+-&gt; [ParsecT ParseErrorCustom String (State Env) UnaryOperation]
+forall (f :: * -&gt; *) a b. Functor f =&gt; (a -&gt; b) -&gt; f a -&gt; f b
+</span><span class="hs-operator hs-var">&lt;$&gt;</span></span><span> </span><span class="annot"><span class="annottext">[(String, UnaryOperation)]
+</span><a href="#local-6989586621679075322"><span class="hs-identifier hs-var">ops</span></a></span><span>
+</span><span id="line-50"></span></pre></body></html>
