@@ -10,9 +10,9 @@
 </span><span id="line-10"></span><span class="hs-comment">-- The `parse` function takes a filename `String`, and an input `String` as a parameter and returns either an AST or an error message.</span><span>
 </span><span id="line-11"></span><span class="annot"><a href="Ast.Parser.html#parse"><span class="hs-identifier hs-type">parse</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Either</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="annot"><a href="Ast.Types.html#Program"><span class="hs-identifier hs-type">AT.Program</span></a></span><span>
 </span><span id="line-12"></span><span id="parse"><span class="annot"><span class="annottext">parse :: String -&gt; String -&gt; Either String Program
-</span><a href="Ast.Parser.html#parse"><span class="hs-identifier hs-var hs-var">parse</span></a></span></span><span> </span><span id="local-6989586621679076306"><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679076306"><span class="hs-identifier hs-var">sourceFile</span></a></span></span><span> </span><span id="local-6989586621679076307"><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679076307"><span class="hs-identifier hs-var">input</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><a href="Ast.Parser.html#parse"><span class="hs-identifier hs-var hs-var">parse</span></a></span></span><span> </span><span id="local-6989586621679076583"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679076583"><span class="hs-identifier hs-var">sourceFile</span></a></span></span><span> </span><span id="local-6989586621679076584"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679076584"><span class="hs-identifier hs-var">input</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-13"></span><span>  </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">State
   Env (Either (ParseErrorBundle String ParseErrorCustom) Program)
 -&gt; Env
@@ -30,12 +30,12 @@ ParsecT e s m a
 </span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-817db0b2e2b3288129ebf9aa2d88a46b2ffe29add993d761d62a18e444ece278/share/doc/html/src/Text.Megaparsec.html#runParserT"><span class="hs-identifier hs-var">M.runParserT</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String
 -&gt; ParsecT ParseErrorCustom String (StateT Env Identity) Program
 </span><a href="Ast.Parser.Program.html#parseProgram"><span class="hs-identifier hs-var">PP.parseProgram</span></a></span><span> </span><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679076306"><span class="hs-identifier hs-var">sourceFile</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679076306"><span class="hs-identifier hs-var">sourceFile</span></a></span><span> </span><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679076307"><span class="hs-identifier hs-var">input</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Env
+</span><a href="#local-6989586621679076583"><span class="hs-identifier hs-var">sourceFile</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679076583"><span class="hs-identifier hs-var">sourceFile</span></a></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679076584"><span class="hs-identifier hs-var">input</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Env
 </span><a href="Ast.Parser.Env.html#emptyEnv"><span class="hs-identifier hs-var">E.emptyEnv</span></a></span><span> </span><span class="hs-keyword">of</span><span>
-</span><span id="line-14"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Left</span></span><span> </span><span id="local-6989586621679076312"><span class="annot"><span class="annottext">ParseErrorBundle String ParseErrorCustom
-</span><a href="#local-6989586621679076312"><span class="hs-identifier hs-var">err</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Env
+</span><span id="line-14"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Left</span></span><span> </span><span id="local-6989586621679076589"><span class="annot"><span class="annottext">ParseErrorBundle String ParseErrorCustom
+</span><a href="#local-6989586621679076589"><span class="hs-identifier hs-var">err</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Env
 </span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String -&gt; Either String Program
 forall a b. a -&gt; Either a b
 </span><span class="hs-identifier hs-var">Left</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">ParseErrorBundle String ParseErrorCustom -&gt; String
@@ -43,11 +43,11 @@ forall s e.
 (VisualStream s, TraversableStream s, ShowErrorComponent e) =&gt;
 ParseErrorBundle s e -&gt; String
 </span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-817db0b2e2b3288129ebf9aa2d88a46b2ffe29add993d761d62a18e444ece278/share/doc/html/src/Text.Megaparsec.Error.html#errorBundlePretty"><span class="hs-identifier hs-var">M.errorBundlePretty</span></a></span><span> </span><span class="annot"><span class="annottext">ParseErrorBundle String ParseErrorCustom
-</span><a href="#local-6989586621679076312"><span class="hs-identifier hs-var">err</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-15"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Right</span></span><span> </span><span id="local-6989586621679076314"><span class="annot"><span class="annottext">Program
-</span><a href="#local-6989586621679076314"><span class="hs-identifier hs-var">program</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Env
+</span><a href="#local-6989586621679076589"><span class="hs-identifier hs-var">err</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-15"></span><span>    </span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">Right</span></span><span> </span><span id="local-6989586621679076591"><span class="annot"><span class="annottext">Program
+</span><a href="#local-6989586621679076591"><span class="hs-identifier hs-var">program</span></a></span></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Env
 </span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Program -&gt; Either String Program
 forall a b. b -&gt; Either a b
 </span><span class="hs-identifier hs-var">Right</span></span><span> </span><span class="annot"><span class="annottext">Program
-</span><a href="#local-6989586621679076314"><span class="hs-identifier hs-var">program</span></a></span><span>
+</span><a href="#local-6989586621679076591"><span class="hs-identifier hs-var">program</span></a></span><span>
 </span><span id="line-16"></span></pre></body></html>
