@@ -4,15 +4,16 @@
 </span><span id="line-4"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="Ast.Parser.Utils.html"><span class="hs-identifier">Ast.Parser.Utils</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">PU</span></span><span>
 </span><span id="line-5"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Control.Monad.IO.Class</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">IO</span></span><span>
 </span><span id="line-6"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><span class="hs-identifier">Control.Monad.State</span></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">S</span></span><span>
-</span><span id="line-7"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/http-conduit-2.3.9.1-2b7f8932f33213cb9b29541921aeb04001daa27ad97c9ebd254f7aa61c77708a/share/doc/html/src/Network.HTTP.Simple.html"><span class="hs-identifier">Network.HTTP.Simple</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">N</span></span><span>
-</span><span id="line-8"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-d8a0c012ddf662693dbb6a450221a42e2964b086355e8769750af5ccc130289d/share/doc/html/src/Text.Megaparsec.html"><span class="hs-identifier">Text.Megaparsec</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">M</span></span><span>
-</span><span id="line-9"></span><span>
-</span><span id="line-10"></span><span class="annot"><a href="Ast.Parser.Import.html#parseImport"><span class="hs-identifier hs-type">parseImport</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ast.Parser.Utils.html#Parser"><span class="hs-identifier hs-type">PU.Parser</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ast.Parser.Utils.html#Parser"><span class="hs-identifier hs-type">PU.Parser</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
-</span><span id="line-11"></span><span id="parseImport"><span class="annot"><span class="annottext">parseImport :: Parser String -&gt; Parser String
-</span><a href="Ast.Parser.Import.html#parseImport"><span class="hs-identifier hs-var hs-var">parseImport</span></a></span></span><span> </span><span id="local-6989586621679132730"><span class="annot"><span class="annottext">Parser String
-</span><a href="#local-6989586621679132730"><span class="hs-identifier hs-var">p</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-12"></span><span>  </span><span id="local-6989586621679132731"><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679132731"><span class="hs-identifier hs-var">import'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">String -&gt; Parser String
+</span><span id="line-7"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/bytestring-0.11.2.0-2120a92760d69c390cda5bd5351073267e84f0cf320f64416d0af58dbf5a8935/share/doc/html/src/Data.ByteString.Char8.html"><span class="hs-identifier">Data.ByteString.Char8</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">BS</span></span><span>
+</span><span id="line-8"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/http-conduit-2.3.9.1-2b7f8932f33213cb9b29541921aeb04001daa27ad97c9ebd254f7aa61c77708a/share/doc/html/src/Network.HTTP.Simple.html"><span class="hs-identifier">Network.HTTP.Simple</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">N</span></span><span>
+</span><span id="line-9"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-d8a0c012ddf662693dbb6a450221a42e2964b086355e8769750af5ccc130289d/share/doc/html/src/Text.Megaparsec.html"><span class="hs-identifier">Text.Megaparsec</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">M</span></span><span>
+</span><span id="line-10"></span><span>
+</span><span id="line-11"></span><span class="annot"><a href="Ast.Parser.Import.html#parseImport"><span class="hs-identifier hs-type">parseImport</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ast.Parser.Utils.html#Parser"><span class="hs-identifier hs-type">PU.Parser</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ast.Parser.Utils.html#Parser"><span class="hs-identifier hs-type">PU.Parser</span></a></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-12"></span><span id="parseImport"><span class="annot"><span class="annottext">parseImport :: Parser String -&gt; Parser String
+</span><a href="Ast.Parser.Import.html#parseImport"><span class="hs-identifier hs-var hs-var">parseImport</span></a></span></span><span> </span><span id="local-6989586621679134218"><span class="annot"><span class="annottext">Parser String
+</span><a href="#local-6989586621679134218"><span class="hs-identifier hs-var">p</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-13"></span><span>  </span><span id="local-6989586621679134219"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679134219"><span class="hs-identifier hs-var">import'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">String -&gt; Parser String
 </span><a href="Ast.Parser.Utils.html#symbol"><span class="hs-identifier hs-var">PU.symbol</span></a></span><span> </span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;import&quot;</span></span><span> </span><span class="annot"><span class="annottext">Parser String -&gt; Parser String -&gt; Parser String
 forall a b.
@@ -45,42 +46,42 @@ Token s -&gt; m (Token s)
 </span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-d8a0c012ddf662693dbb6a450221a42e2964b086355e8769750af5ccc130289d/share/doc/html/src/Text.Megaparsec.html#anySingleBut"><span class="hs-identifier hs-var">M.anySingleBut</span></a></span><span> </span><span class="annot"><span class="annottext">Char
 Token String
 </span><span class="hs-char">'\&quot;'</span></span><span class="hs-special">)</span><span>
-</span><span id="line-13"></span><span>  </span><span id="local-6989586621679132736"><span class="annot"><span class="annottext">ParserState
-</span><a href="#local-6989586621679132736"><span class="hs-identifier hs-var">state</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">ParsecT ParseErrorCustom String (StateT ParserState IO) ParserState
+</span><span id="line-14"></span><span>  </span><span id="local-6989586621679134224"><span class="annot"><span class="annottext">ParserState
+</span><a href="#local-6989586621679134224"><span class="hs-identifier hs-var">state</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">ParsecT ParseErrorCustom String (StateT ParserState IO) ParserState
 forall s (m :: * -&gt; *). MonadState s m =&gt; m s
 </span><span class="hs-identifier hs-var">S.get</span></span><span>
-</span><span id="line-14"></span><span>  </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679132738"><span class="annot"><span class="annottext">visited :: Bool
-</span><a href="#local-6989586621679132738"><span class="hs-identifier hs-var hs-var">visited</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; ParserState -&gt; Bool
+</span><span id="line-15"></span><span>  </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679134226"><span class="annot"><span class="annottext">visited :: Bool
+</span><a href="#local-6989586621679134226"><span class="hs-identifier hs-var hs-var">visited</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; ParserState -&gt; Bool
 </span><a href="Ast.Parser.State.html#lookupImport"><span class="hs-identifier hs-var">PS.lookupImport</span></a></span><span> </span><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679132731"><span class="hs-identifier hs-var">import'</span></a></span><span> </span><span class="annot"><span class="annottext">ParserState
-</span><a href="#local-6989586621679132736"><span class="hs-identifier hs-var">state</span></a></span><span>
-</span><span id="line-15"></span><span>      </span><span id="local-6989586621679132740"><span class="annot"><span class="annottext">depth :: Int
-</span><a href="#local-6989586621679132740"><span class="hs-identifier hs-var hs-var">depth</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ParserState -&gt; Int
+</span><a href="#local-6989586621679134219"><span class="hs-identifier hs-var">import'</span></a></span><span> </span><span class="annot"><span class="annottext">ParserState
+</span><a href="#local-6989586621679134224"><span class="hs-identifier hs-var">state</span></a></span><span>
+</span><span id="line-16"></span><span>      </span><span id="local-6989586621679134228"><span class="annot"><span class="annottext">depth :: Int
+</span><a href="#local-6989586621679134228"><span class="hs-identifier hs-var hs-var">depth</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ParserState -&gt; Int
 </span><a href="Ast.Parser.State.html#getImportDepth"><span class="hs-identifier hs-var">PS.getImportDepth</span></a></span><span> </span><span class="annot"><span class="annottext">ParserState
-</span><a href="#local-6989586621679132736"><span class="hs-identifier hs-var">state</span></a></span><span>
-</span><span id="line-16"></span><span>
-</span><span id="line-17"></span><span>  </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Bool
-</span><a href="#local-6989586621679132738"><span class="hs-identifier hs-var">visited</span></a></span><span>
-</span><span id="line-18"></span><span>    </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">String -&gt; Parser String
+</span><a href="#local-6989586621679134224"><span class="hs-identifier hs-var">state</span></a></span><span>
+</span><span id="line-17"></span><span>
+</span><span id="line-18"></span><span>  </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679134226"><span class="hs-identifier hs-var">visited</span></a></span><span>
+</span><span id="line-19"></span><span>    </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">String -&gt; Parser String
 forall a.
 a -&gt; ParsecT ParseErrorCustom String (StateT ParserState IO) a
 forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
 </span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;&quot;</span></span><span>
-</span><span id="line-19"></span><span>    </span><span class="hs-keyword">else</span><span>
-</span><span id="line-20"></span><span>      </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679132740"><span class="hs-identifier hs-var">depth</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
+</span><span id="line-20"></span><span>    </span><span class="hs-keyword">else</span><span>
+</span><span id="line-21"></span><span>      </span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679134228"><span class="hs-identifier hs-var">depth</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Bool
 forall a. Ord a =&gt; a -&gt; a -&gt; Bool
 </span><span class="hs-operator hs-var">&gt;=</span></span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679132742"><span class="hs-identifier hs-var">maxDepth</span></a></span><span>
-</span><span id="line-21"></span><span>        </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">String -&gt; Parser String
+</span><a href="#local-6989586621679134230"><span class="hs-identifier hs-var">maxDepth</span></a></span><span>
+</span><span id="line-22"></span><span>        </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">String -&gt; Parser String
 forall a.
 String -&gt; ParsecT ParseErrorCustom String (StateT ParserState IO) a
 forall (m :: * -&gt; *) a. MonadFail m =&gt; String -&gt; m a
 </span><span class="hs-identifier hs-var">fail</span></span><span> </span><span class="annot"><span class="annottext">String
 </span><span class="hs-string">&quot;Maximum depth exceeded&quot;</span></span><span>
-</span><span id="line-22"></span><span>        </span><span class="hs-keyword">else</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-23"></span><span>          </span><span class="annot"><span class="annottext">(ParserState -&gt; ParserState)
+</span><span id="line-23"></span><span>        </span><span class="hs-keyword">else</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-24"></span><span>          </span><span class="annot"><span class="annottext">(ParserState -&gt; ParserState)
 -&gt; ParsecT ParseErrorCustom String (StateT ParserState IO) ()
 forall s (m :: * -&gt; *). MonadState s m =&gt; (s -&gt; s) -&gt; m ()
 </span><span class="hs-identifier hs-var">S.modify</span></span><span> </span><span class="annot"><span class="annottext">((ParserState -&gt; ParserState)
@@ -90,8 +91,8 @@ forall s (m :: * -&gt; *). MonadState s m =&gt; (s -&gt; s) -&gt; m ()
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ParserState -&gt; ParserState
 </span><a href="Ast.Parser.State.html#insertImport"><span class="hs-identifier hs-var">PS.insertImport</span></a></span><span> </span><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679132731"><span class="hs-identifier hs-var">import'</span></a></span><span>
-</span><span id="line-24"></span><span>          </span><span class="annot"><span class="annottext">(ParserState -&gt; ParserState)
+</span><a href="#local-6989586621679134219"><span class="hs-identifier hs-var">import'</span></a></span><span>
+</span><span id="line-25"></span><span>          </span><span class="annot"><span class="annottext">(ParserState -&gt; ParserState)
 -&gt; ParsecT ParseErrorCustom String (StateT ParserState IO) ()
 forall s (m :: * -&gt; *). MonadState s m =&gt; (s -&gt; s) -&gt; m ()
 </span><span class="hs-identifier hs-var">S.modify</span></span><span> </span><span class="annot"><span class="annottext">((ParserState -&gt; ParserState)
@@ -104,14 +105,14 @@ forall a b. (a -&gt; b) -&gt; a -&gt; b
 -&gt; Int -&gt; ParserState -&gt; ParserState
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679132740"><span class="hs-identifier hs-var">depth</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
+</span><a href="#local-6989586621679134228"><span class="hs-identifier hs-var">depth</span></a></span><span> </span><span class="annot"><span class="annottext">Int -&gt; Int -&gt; Int
 forall a. Num a =&gt; a -&gt; a -&gt; a
 </span><span class="hs-operator hs-var">+</span></span><span> </span><span class="annot"><span class="annottext">Int
 </span><span class="hs-number">1</span></span><span>
-</span><span id="line-25"></span><span>          </span><span id="local-6989586621679132747"><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679132747"><span class="hs-identifier hs-var">source</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679132731"><span class="hs-identifier hs-var">import'</span></a></span><span> </span><span class="hs-keyword">of</span><span>
-</span><span id="line-26"></span><span>            </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Char
+</span><span id="line-26"></span><span>          </span><span id="local-6989586621679134235"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679134235"><span class="hs-identifier hs-var">source</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679134219"><span class="hs-identifier hs-var">import'</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-27"></span><span>            </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Char
 </span><span class="hs-char">'.'</span></span><span> </span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span> </span><span class="annot"><span class="annottext">Char
 </span><span class="hs-char">'/'</span></span><span> </span><span class="annot"><span class="hs-glyph hs-type">:</span></span><span> </span><span class="annot"><span class="annottext">String
 </span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">IO String -&gt; Parser String
@@ -122,8 +123,8 @@ forall (m :: * -&gt; *) a. MonadIO m =&gt; IO a -&gt; m a
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; IO String
 </span><a href="Ast.Parser.Import.html#localImport"><span class="hs-identifier hs-var">localImport</span></a></span><span> </span><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679132731"><span class="hs-identifier hs-var">import'</span></a></span><span>
-</span><span id="line-27"></span><span>            </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679134219"><span class="hs-identifier hs-var">import'</span></a></span><span>
+</span><span id="line-28"></span><span>            </span><span class="annot"><span class="annottext">String
 </span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">IO String -&gt; Parser String
 forall a.
 IO a -&gt; ParsecT ParseErrorCustom String (StateT ParserState IO) a
@@ -132,12 +133,12 @@ forall (m :: * -&gt; *) a. MonadIO m =&gt; IO a -&gt; m a
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; IO String
 </span><a href="Ast.Parser.Import.html#externalImport"><span class="hs-identifier hs-var">externalImport</span></a></span><span> </span><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679132731"><span class="hs-identifier hs-var">import'</span></a></span><span>
-</span><span id="line-28"></span><span>          </span><span id="local-6989586621679132751"><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679132751"><span class="hs-identifier hs-var">input</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parser String
+</span><a href="#local-6989586621679134219"><span class="hs-identifier hs-var">import'</span></a></span><span>
+</span><span id="line-29"></span><span>          </span><span id="local-6989586621679134239"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679134239"><span class="hs-identifier hs-var">input</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parser String
 forall e s (m :: * -&gt; *). MonadParsec e s m =&gt; m s
 </span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-d8a0c012ddf662693dbb6a450221a42e2964b086355e8769750af5ccc130289d/share/doc/html/src/Text.Megaparsec.html#getInput"><span class="hs-identifier hs-var">M.getInput</span></a></span><span>
-</span><span id="line-29"></span><span>          </span><span class="annot"><span class="annottext">String
+</span><span id="line-30"></span><span>          </span><span class="annot"><span class="annottext">String
 -&gt; ParsecT ParseErrorCustom String (StateT ParserState IO) ()
 forall e s (m :: * -&gt; *). MonadParsec e s m =&gt; s -&gt; m ()
 </span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/megaparsec-9.7.0-d8a0c012ddf662693dbb6a450221a42e2964b086355e8769750af5ccc130289d/share/doc/html/src/Text.Megaparsec.html#setInput"><span class="hs-identifier hs-var">M.setInput</span></a></span><span> </span><span class="annot"><span class="annottext">(String
@@ -146,14 +147,14 @@ forall e s (m :: * -&gt; *). MonadParsec e s m =&gt; s -&gt; m ()
 -&gt; ParsecT ParseErrorCustom String (StateT ParserState IO) ()
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679132747"><span class="hs-identifier hs-var">source</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
+</span><a href="#local-6989586621679134235"><span class="hs-identifier hs-var">source</span></a></span><span> </span><span class="annot"><span class="annottext">String -&gt; String -&gt; String
 forall a. [a] -&gt; [a] -&gt; [a]
 </span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679132751"><span class="hs-identifier hs-var">input</span></a></span><span>
-</span><span id="line-30"></span><span>          </span><span id="local-6989586621679132754"><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679132754"><span class="hs-identifier hs-var">source'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parser String
-</span><a href="#local-6989586621679132730"><span class="hs-identifier hs-var">p</span></a></span><span>
-</span><span id="line-31"></span><span>          </span><span class="annot"><span class="annottext">(ParserState -&gt; ParserState)
+</span><a href="#local-6989586621679134239"><span class="hs-identifier hs-var">input</span></a></span><span>
+</span><span id="line-31"></span><span>          </span><span id="local-6989586621679134242"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679134242"><span class="hs-identifier hs-var">source'</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Parser String
+</span><a href="#local-6989586621679134218"><span class="hs-identifier hs-var">p</span></a></span><span>
+</span><span id="line-32"></span><span>          </span><span class="annot"><span class="annottext">(ParserState -&gt; ParserState)
 -&gt; ParsecT ParseErrorCustom String (StateT ParserState IO) ()
 forall s (m :: * -&gt; *). MonadState s m =&gt; (s -&gt; s) -&gt; m ()
 </span><span class="hs-identifier hs-var">S.modify</span></span><span> </span><span class="annot"><span class="annottext">((ParserState -&gt; ParserState)
@@ -163,34 +164,34 @@ forall s (m :: * -&gt; *). MonadState s m =&gt; (s -&gt; s) -&gt; m ()
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Int -&gt; ParserState -&gt; ParserState
 </span><a href="Ast.Parser.State.html#setImportDepth"><span class="hs-identifier hs-var">PS.setImportDepth</span></a></span><span> </span><span class="annot"><span class="annottext">Int
-</span><a href="#local-6989586621679132740"><span class="hs-identifier hs-var">depth</span></a></span><span>
-</span><span id="line-32"></span><span>          </span><span class="annot"><span class="annottext">String -&gt; Parser String
+</span><a href="#local-6989586621679134228"><span class="hs-identifier hs-var">depth</span></a></span><span>
+</span><span id="line-33"></span><span>          </span><span class="annot"><span class="annottext">String -&gt; Parser String
 forall a.
 a -&gt; ParsecT ParseErrorCustom String (StateT ParserState IO) a
 forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
 </span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679132754"><span class="hs-identifier hs-var">source'</span></a></span><span>
-</span><span id="line-33"></span><span>  </span><span class="hs-keyword">where</span><span>
-</span><span id="line-34"></span><span>    </span><span id="local-6989586621679132742"><span class="annot"><span class="annottext">maxDepth :: Int
-</span><a href="#local-6989586621679132742"><span class="hs-identifier hs-var hs-var">maxDepth</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int
+</span><a href="#local-6989586621679134242"><span class="hs-identifier hs-var">source'</span></a></span><span>
+</span><span id="line-34"></span><span>  </span><span class="hs-keyword">where</span><span>
+</span><span id="line-35"></span><span>    </span><span id="local-6989586621679134230"><span class="annot"><span class="annottext">maxDepth :: Int
+</span><a href="#local-6989586621679134230"><span class="hs-identifier hs-var hs-var">maxDepth</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Int
 </span><span class="hs-number">25</span></span><span>
-</span><span id="line-35"></span><span>
-</span><span id="line-36"></span><span class="annot"><a href="Ast.Parser.Import.html#localImport"><span class="hs-identifier hs-type">localImport</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
-</span><span id="line-37"></span><span id="localImport"><span class="annot"><span class="annottext">localImport :: String -&gt; IO String
+</span><span id="line-36"></span><span>
+</span><span id="line-37"></span><span class="annot"><a href="Ast.Parser.Import.html#localImport"><span class="hs-identifier hs-type">localImport</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-38"></span><span id="localImport"><span class="annot"><span class="annottext">localImport :: String -&gt; IO String
 </span><a href="Ast.Parser.Import.html#localImport"><span class="hs-identifier hs-var hs-var">localImport</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">String -&gt; IO String
 </span><span class="hs-identifier hs-var">readFile</span></span><span>
-</span><span id="line-38"></span><span>
-</span><span id="line-39"></span><span class="annot"><a href="Ast.Parser.Import.html#externalImport"><span class="hs-identifier hs-type">externalImport</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
-</span><span id="line-40"></span><span id="externalImport"><span class="annot"><span class="annottext">externalImport :: String -&gt; IO String
-</span><a href="Ast.Parser.Import.html#externalImport"><span class="hs-identifier hs-var hs-var">externalImport</span></a></span></span><span> </span><span id="local-6989586621679132757"><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679132757"><span class="hs-identifier hs-var">url</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-41"></span><span>  </span><span id="local-6989586621679132758"><span class="annot"><span class="annottext">Request
-</span><a href="#local-6989586621679132758"><span class="hs-identifier hs-var">req</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">String -&gt; Either SomeException Request
+</span><span id="line-39"></span><span>
+</span><span id="line-40"></span><span class="annot"><a href="Ast.Parser.Import.html#externalImport"><span class="hs-identifier hs-type">externalImport</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="hs-identifier hs-type">IO</span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
+</span><span id="line-41"></span><span id="externalImport"><span class="annot"><span class="annottext">externalImport :: String -&gt; IO String
+</span><a href="Ast.Parser.Import.html#externalImport"><span class="hs-identifier hs-var hs-var">externalImport</span></a></span></span><span> </span><span id="local-6989586621679134245"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679134245"><span class="hs-identifier hs-var">url</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-42"></span><span>  </span><span id="local-6989586621679134246"><span class="annot"><span class="annottext">Request
+</span><a href="#local-6989586621679134246"><span class="hs-identifier hs-var">req</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">String -&gt; Either SomeException Request
 forall (m :: * -&gt; *). MonadThrow m =&gt; String -&gt; m Request
 </span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/http-client-0.7.18-c0739f05dc845fac65acc083f9de413e87adec922a47370510b84b519b2229f1/share/doc/html/src/Network.HTTP.Client.Request.html#parseRequest"><span class="hs-identifier hs-var">N.parseRequest</span></a></span><span> </span><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679132757"><span class="hs-identifier hs-var">url</span></a></span><span> </span><span class="hs-keyword">of</span><span>
-</span><span id="line-42"></span><span>    </span><span class="annot"><span class="hs-identifier hs-type">Left</span></span><span> </span><span id="local-6989586621679132760"><span class="annot"><span class="annottext">SomeException
-</span><a href="#local-6989586621679132760"><span class="hs-identifier hs-var">err</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String -&gt; IO Request
+</span><a href="#local-6989586621679134245"><span class="hs-identifier hs-var">url</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-43"></span><span>    </span><span class="annot"><span class="hs-identifier hs-type">Left</span></span><span> </span><span id="local-6989586621679134248"><span class="annot"><span class="annottext">SomeException
+</span><a href="#local-6989586621679134248"><span class="hs-identifier hs-var">err</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">String -&gt; IO Request
 forall a. String -&gt; IO a
 forall (m :: * -&gt; *) a. MonadFail m =&gt; String -&gt; m a
 </span><span class="hs-identifier hs-var">fail</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String
@@ -199,31 +200,30 @@ forall a. [a] -&gt; [a] -&gt; [a]
 </span><span class="hs-operator hs-var">++</span></span><span> </span><span class="annot"><span class="annottext">SomeException -&gt; String
 forall a. Show a =&gt; a -&gt; String
 </span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">SomeException
-</span><a href="#local-6989586621679132760"><span class="hs-identifier hs-var">err</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-43"></span><span>    </span><span class="annot"><span class="hs-identifier hs-type">Right</span></span><span> </span><span id="local-6989586621679132762"><span class="annot"><span class="annottext">Request
-</span><a href="#local-6989586621679132762"><span class="hs-identifier hs-var">req</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Request -&gt; IO Request
+</span><a href="#local-6989586621679134248"><span class="hs-identifier hs-var">err</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-44"></span><span>    </span><span class="annot"><span class="hs-identifier hs-type">Right</span></span><span> </span><span id="local-6989586621679134250"><span class="annot"><span class="annottext">Request
+</span><a href="#local-6989586621679134250"><span class="hs-identifier hs-var">req</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Request -&gt; IO Request
 forall a. a -&gt; IO a
 forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
 </span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">Request
-</span><a href="#local-6989586621679132762"><span class="hs-identifier hs-var">req</span></a></span><span>
-</span><span id="line-44"></span><span>  </span><span id="local-6989586621679132763"><span class="annot"><span class="annottext">Response ByteString
-</span><a href="#local-6989586621679132763"><span class="hs-identifier hs-var">res</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Request -&gt; IO (Response ByteString)
+</span><a href="#local-6989586621679134250"><span class="hs-identifier hs-var">req</span></a></span><span>
+</span><span id="line-45"></span><span>  </span><span id="local-6989586621679134251"><span class="annot"><span class="annottext">Response ByteString
+</span><a href="#local-6989586621679134251"><span class="hs-identifier hs-var">res</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Request -&gt; IO (Response ByteString)
 forall (m :: * -&gt; *).
 MonadIO m =&gt;
 Request -&gt; m (Response ByteString)
 </span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/http-conduit-2.3.9.1-2b7f8932f33213cb9b29541921aeb04001daa27ad97c9ebd254f7aa61c77708a/share/doc/html/src/Network.HTTP.Simple.html#httpBS"><span class="hs-identifier hs-var">N.httpBS</span></a></span><span> </span><span class="annot"><span class="annottext">Request
-</span><a href="#local-6989586621679132758"><span class="hs-identifier hs-var">req</span></a></span><span>
-</span><span id="line-45"></span><span>  </span><span class="annot"><span class="annottext">String -&gt; IO String
+</span><a href="#local-6989586621679134246"><span class="hs-identifier hs-var">req</span></a></span><span>
+</span><span id="line-46"></span><span>  </span><span class="annot"><span class="annottext">String -&gt; IO String
 forall a. a -&gt; IO a
 forall (m :: * -&gt; *) a. Monad m =&gt; a -&gt; m a
 </span><span class="hs-identifier hs-var">return</span></span><span> </span><span class="annot"><span class="annottext">(String -&gt; IO String) -&gt; String -&gt; IO String
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">ByteString -&gt; String
-forall a. Show a =&gt; a -&gt; String
-</span><span class="hs-identifier hs-var">show</span></span><span> </span><span class="annot"><span class="annottext">(ByteString -&gt; String) -&gt; ByteString -&gt; String
+</span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/bytestring-0.11.2.0-2120a92760d69c390cda5bd5351073267e84f0cf320f64416d0af58dbf5a8935/share/doc/html/src/Data.ByteString.Char8.html#unpack"><span class="hs-identifier hs-var">BS.unpack</span></a></span><span> </span><span class="annot"><span class="annottext">(ByteString -&gt; String) -&gt; ByteString -&gt; String
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Response ByteString -&gt; ByteString
 forall a. Response a -&gt; a
 </span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/http-conduit-2.3.9.1-2b7f8932f33213cb9b29541921aeb04001daa27ad97c9ebd254f7aa61c77708a/share/doc/html/src/Network.HTTP.Simple.html#getResponseBody"><span class="hs-identifier hs-var">N.getResponseBody</span></a></span><span> </span><span class="annot"><span class="annottext">Response ByteString
-</span><a href="#local-6989586621679132763"><span class="hs-identifier hs-var">res</span></a></span><span>
-</span><span id="line-46"></span></pre></body></html>
+</span><a href="#local-6989586621679134251"><span class="hs-identifier hs-var">res</span></a></span><span>
+</span><span id="line-47"></span></pre></body></html>
