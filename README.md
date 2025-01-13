@@ -1,96 +1,36 @@
-# glados
+# Frost
 
-```
- __________________________
-< what is an s-expression? >
- --------------------------
-        \   ^__^
-         \  (oo)\_______
-            (__)\       )\/\
-                ||----w |
-                ||     ||
-```
+**Frost** is a modern systems programming language that combines the speed of C
+with modern language features. It offers static typing and compiles to
+[LLVM IR](https://llvm.org/docs/LangRef.html), delivering high performance while
+remaining accessible and easy to learn. Whether you're building system tools or
+performance-critical applications, Frost provides the low-level control you need
+with the convenience of contemporary programming practices.
 
-# setup
+## Features
 
-> [!NOTE]
-> You only need to run this command once. You also need to have
-> [`pre-commit`](https://pre-commit.com/#installation) installed.
+- **Static Typing**: Catch type errors at compile time, improving safety and
+  efficiency.
+- **LLVM Backend**: Generates optimized code, leveraging the powerful LLVM
+  ecosystem.
+- **Low-Level Control**: Access hardware resources and memory directly, similar
+  to C/C++.
+- **Modern Syntax**: Designed to be more readable and maintainable compared to
+  traditional low-level languages.
 
-This repository uses pre-commit hooks to ensure code quality. To install the
-hooks, run the following command:
+## Getting Started
 
-```bash
-pre-commit install
-```
+To get started with Frost, download the latest release from the
+[releases page](README.md) or build from source. You will need to have
+[Haskell](https://www.haskell.org/) and [LLVM 19](https://llvm.org/) or newer
+installed on your system.
 
-Hooks for code formatting and linting will run automatically when you commit
-changes. These hooks are `ormolu` and `hlint`. Please make sure to fix any
-errors before committing.
+## Examples
 
-## devcontainer
+For examples and sample code, check the [examples](examples) directory. These
+demonstrate the key features of the language, including basic syntax, data
+structures, and how to interact with the system.
 
-This project includes a `devcontainer` configuration for Visual Studio Code. To
-use the devcontainer, you need to have
-[Docker](https://docs.docker.com/get-docker/),
-[Visual Studio Code](https://code.visualstudio.com/) and the
-[Remote - Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
-extension installed.
+## License
 
-To open the project in the devcontainer, open the command palette
-(`Ctrl+Shift+P`) and run the command `Remote-Containers: Reopen in Container`.
-All the necessary tools and dependencies will be installed in the container.
-
-# development
-
-To build the project, run the following command:
-
-```bash
-cabal build
-```
-
-To run the project, run the following command:
-
-```bash
-cabal run
-```
-
-# testing
-
-After adding a new feature or fixing a bug, please add tests to cover the new
-code. To run the tests, run the following command:
-
-```bash
-cabal test
-```
-
-Follow the test spec to ensure that the tests are correct. We use
-[`hspec`](https://hspec.github.io/) and
-[`quickcheck`](https://hackage.haskell.org/package/QuickCheck) for testing.
-
-## adding a new test
-
-The test folder, `test`, contains a folder for each logical module in the
-project. Inside each module folder, there are files that contain the tests for
-that module.
-
-> [!WARNING]
-> Test files must end in `Spec.hs` to be picked up by the test runner. For
-> example, `ModuleSpec.hs` is a valid test file name.
-
-To add a new test, create a new file in the appropriate module folder. The file
-should have the following structure:
-
-```haskell
--- test/ModuleName/ModuleSpec.hs
-module ModuleName.ModuleSpec (spec) where
-
-import Test.Hspec (Spec, describe, it)
-import Test.QuickCheck (property)
-
-spec :: Spec
-spec = do
-  describe "ModuleName.Module" $ do
-    it "should do something" $ do
-      property $ \x y -> x + y == y + x
-```
+Frost is licensed under the MIT License. See [LICENSE](LICENSE) for details.
