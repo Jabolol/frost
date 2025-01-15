@@ -9,7 +9,7 @@
 </span><span id="line-7"></span><span>    </span><span id="srcCol"><span class="annot"><span class="annottext">SrcLoc -&gt; Int
 </span><a href="Ast.Types.html#srcCol"><span class="hs-identifier hs-var hs-var">srcCol</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">Int</span></span><span>
 </span><span id="line-8"></span><span>  </span><span class="hs-special">}</span><span>
-</span><span id="line-9"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679134918"><span id="local-6989586621679134928"><span id="local-6989586621679134932"><span class="annot"><span class="annottext">Int -&gt; SrcLoc -&gt; ShowS
+</span><span id="line-9"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679136652"><span id="local-6989586621679136662"><span id="local-6989586621679136666"><span class="annot"><span class="annottext">Int -&gt; SrcLoc -&gt; ShowS
 [SrcLoc] -&gt; ShowS
 SrcLoc -&gt; String
 (Int -&gt; SrcLoc -&gt; ShowS)
@@ -22,7 +22,7 @@ $cshow :: SrcLoc -&gt; String
 show :: SrcLoc -&gt; String
 $cshowList :: [SrcLoc] -&gt; ShowS
 showList :: [SrcLoc] -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679134937"><span id="local-6989586621679134945"><span class="annot"><span class="annottext">SrcLoc -&gt; SrcLoc -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679136671"><span id="local-6989586621679136679"><span class="annot"><span class="annottext">SrcLoc -&gt; SrcLoc -&gt; Bool
 (SrcLoc -&gt; SrcLoc -&gt; Bool)
 -&gt; (SrcLoc -&gt; SrcLoc -&gt; Bool) -&gt; Eq SrcLoc
 forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
@@ -30,7 +30,7 @@ $c== :: SrcLoc -&gt; SrcLoc -&gt; Bool
 == :: SrcLoc -&gt; SrcLoc -&gt; Bool
 $c/= :: SrcLoc -&gt; SrcLoc -&gt; Bool
 /= :: SrcLoc -&gt; SrcLoc -&gt; Bool
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679134953"><span id="local-6989586621679134960"><span id="local-6989586621679134966"><span id="local-6989586621679134970"><span id="local-6989586621679134973"><span id="local-6989586621679134976"><span id="local-6989586621679134979"><span class="annot"><span class="annottext">Eq SrcLoc
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679136687"><span id="local-6989586621679136694"><span id="local-6989586621679136700"><span id="local-6989586621679136704"><span id="local-6989586621679136707"><span id="local-6989586621679136710"><span id="local-6989586621679136713"><span class="annot"><span class="annottext">Eq SrcLoc
 Eq SrcLoc
 -&gt; (SrcLoc -&gt; SrcLoc -&gt; Ordering)
 -&gt; (SrcLoc -&gt; SrcLoc -&gt; Bool)
@@ -78,7 +78,7 @@ min :: SrcLoc -&gt; SrcLoc -&gt; SrcLoc
 </span><span id="line-17"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="LArray"><span class="annot"><a href="Ast.Types.html#LArray"><span class="hs-identifier hs-var">LArray</span></a></span></span><span> </span><span class="hs-special">[</span><span class="annot"><a href="Ast.Types.html#Literal"><span class="hs-identifier hs-type">Literal</span></a></span><span class="hs-special">]</span><span>
 </span><span id="line-18"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="LNull"><span class="annot"><a href="Ast.Types.html#LNull"><span class="hs-identifier hs-var">LNull</span></a></span></span><span>
 </span><span id="line-19"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="LStruct"><span class="annot"><a href="Ast.Types.html#LStruct"><span class="hs-identifier hs-var">LStruct</span></a></span></span><span> </span><span class="hs-special">[</span><span class="hs-special">(</span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Ast.Types.html#Literal"><span class="hs-identifier hs-type">Literal</span></a></span><span class="hs-special">)</span><span class="hs-special">]</span><span>
-</span><span id="line-20"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679134991"><span id="local-6989586621679135010"><span id="local-6989586621679135014"><span class="annot"><span class="annottext">Int -&gt; Literal -&gt; ShowS
+</span><span id="line-20"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679136725"><span id="local-6989586621679136744"><span id="local-6989586621679136748"><span class="annot"><span class="annottext">Int -&gt; Literal -&gt; ShowS
 [Literal] -&gt; ShowS
 Literal -&gt; String
 (Int -&gt; Literal -&gt; ShowS)
@@ -91,7 +91,7 @@ $cshow :: Literal -&gt; String
 show :: Literal -&gt; String
 $cshowList :: [Literal] -&gt; ShowS
 showList :: [Literal] -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679135019"><span id="local-6989586621679135032"><span class="annot"><span class="annottext">Literal -&gt; Literal -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679136753"><span id="local-6989586621679136766"><span class="annot"><span class="annottext">Literal -&gt; Literal -&gt; Bool
 (Literal -&gt; Literal -&gt; Bool)
 -&gt; (Literal -&gt; Literal -&gt; Bool) -&gt; Eq Literal
 forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
@@ -99,7 +99,7 @@ $c== :: Literal -&gt; Literal -&gt; Bool
 == :: Literal -&gt; Literal -&gt; Bool
 $c/= :: Literal -&gt; Literal -&gt; Bool
 /= :: Literal -&gt; Literal -&gt; Bool
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679135040"><span id="local-6989586621679135053"><span id="local-6989586621679135057"><span id="local-6989586621679135060"><span id="local-6989586621679135063"><span id="local-6989586621679135066"><span id="local-6989586621679135069"><span class="annot"><span class="annottext">Eq Literal
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679136774"><span id="local-6989586621679136787"><span id="local-6989586621679136791"><span id="local-6989586621679136794"><span id="local-6989586621679136797"><span id="local-6989586621679136800"><span id="local-6989586621679136803"><span class="annot"><span class="annottext">Eq Literal
 Eq Literal
 -&gt; (Literal -&gt; Literal -&gt; Ordering)
 -&gt; (Literal -&gt; Literal -&gt; Bool)
@@ -176,7 +176,7 @@ min :: Literal -&gt; Literal -&gt; Literal
 </span><span id="line-50"></span><span>      </span><span class="hs-special">}</span><span>
 </span><span id="line-51"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="TTypedef"><span class="annot"><a href="Ast.Types.html#TTypedef"><span class="hs-identifier hs-var">TTypedef</span></a></span></span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span> </span><span class="annot"><a href="Ast.Types.html#Type"><span class="hs-identifier hs-type">Type</span></a></span><span>
 </span><span id="line-52"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="TUnknown"><span class="annot"><a href="Ast.Types.html#TUnknown"><span class="hs-identifier hs-var">TUnknown</span></a></span></span><span>
-</span><span id="line-53"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679135095"><span id="local-6989586621679135123"><span id="local-6989586621679135126"><span class="annot"><span class="annottext">Int -&gt; Type -&gt; ShowS
+</span><span id="line-53"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679136829"><span id="local-6989586621679136857"><span id="local-6989586621679136860"><span class="annot"><span class="annottext">Int -&gt; Type -&gt; ShowS
 [Type] -&gt; ShowS
 Type -&gt; String
 (Int -&gt; Type -&gt; ShowS)
@@ -189,14 +189,14 @@ $cshow :: Type -&gt; String
 show :: Type -&gt; String
 $cshowList :: [Type] -&gt; ShowS
 showList :: [Type] -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679135129"><span id="local-6989586621679135149"><span class="annot"><span class="annottext">Type -&gt; Type -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679136863"><span id="local-6989586621679136883"><span class="annot"><span class="annottext">Type -&gt; Type -&gt; Bool
 (Type -&gt; Type -&gt; Bool) -&gt; (Type -&gt; Type -&gt; Bool) -&gt; Eq Type
 forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
 $c== :: Type -&gt; Type -&gt; Bool
 == :: Type -&gt; Type -&gt; Bool
 $c/= :: Type -&gt; Type -&gt; Bool
 /= :: Type -&gt; Type -&gt; Bool
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679135154"><span id="local-6989586621679135174"><span id="local-6989586621679135177"><span id="local-6989586621679135180"><span id="local-6989586621679135183"><span id="local-6989586621679135186"><span id="local-6989586621679135189"><span class="annot"><span class="annottext">Eq Type
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679136888"><span id="local-6989586621679136908"><span id="local-6989586621679136911"><span id="local-6989586621679136914"><span id="local-6989586621679136917"><span id="local-6989586621679136920"><span id="local-6989586621679136923"><span class="annot"><span class="annottext">Eq Type
 Eq Type
 -&gt; (Type -&gt; Type -&gt; Ordering)
 -&gt; (Type -&gt; Type -&gt; Bool)
@@ -242,7 +242,7 @@ min :: Type -&gt; Type -&gt; Type
 </span><span id="line-58"></span><span>    </span><span id="inputConstraints"><span class="annot"><span class="annottext">AsmConstraint -&gt; [String]
 </span><a href="Ast.Types.html#inputConstraints"><span class="hs-identifier hs-var hs-var">inputConstraints</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span class="hs-special">]</span><span>
 </span><span id="line-59"></span><span>  </span><span class="hs-special">}</span><span>
-</span><span id="line-60"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679135195"><span id="local-6989586621679135201"><span id="local-6989586621679135205"><span class="annot"><span class="annottext">Int -&gt; AsmConstraint -&gt; ShowS
+</span><span id="line-60"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679136929"><span id="local-6989586621679136935"><span id="local-6989586621679136939"><span class="annot"><span class="annottext">Int -&gt; AsmConstraint -&gt; ShowS
 [AsmConstraint] -&gt; ShowS
 AsmConstraint -&gt; String
 (Int -&gt; AsmConstraint -&gt; ShowS)
@@ -257,7 +257,7 @@ $cshow :: AsmConstraint -&gt; String
 show :: AsmConstraint -&gt; String
 $cshowList :: [AsmConstraint] -&gt; ShowS
 showList :: [AsmConstraint] -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679135208"><span id="local-6989586621679135213"><span class="annot"><span class="annottext">AsmConstraint -&gt; AsmConstraint -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679136942"><span id="local-6989586621679136947"><span class="annot"><span class="annottext">AsmConstraint -&gt; AsmConstraint -&gt; Bool
 (AsmConstraint -&gt; AsmConstraint -&gt; Bool)
 -&gt; (AsmConstraint -&gt; AsmConstraint -&gt; Bool) -&gt; Eq AsmConstraint
 forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
@@ -265,7 +265,7 @@ $c== :: AsmConstraint -&gt; AsmConstraint -&gt; Bool
 == :: AsmConstraint -&gt; AsmConstraint -&gt; Bool
 $c/= :: AsmConstraint -&gt; AsmConstraint -&gt; Bool
 /= :: AsmConstraint -&gt; AsmConstraint -&gt; Bool
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679135219"><span id="local-6989586621679135224"><span id="local-6989586621679135229"><span id="local-6989586621679135233"><span id="local-6989586621679135236"><span id="local-6989586621679135239"><span id="local-6989586621679135242"><span class="annot"><span class="annottext">Eq AsmConstraint
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679136953"><span id="local-6989586621679136958"><span id="local-6989586621679136963"><span id="local-6989586621679136967"><span id="local-6989586621679136970"><span id="local-6989586621679136973"><span id="local-6989586621679136976"><span class="annot"><span class="annottext">Eq AsmConstraint
 Eq AsmConstraint
 -&gt; (AsmConstraint -&gt; AsmConstraint -&gt; Ordering)
 -&gt; (AsmConstraint -&gt; AsmConstraint -&gt; Bool)
@@ -305,7 +305,7 @@ min :: AsmConstraint -&gt; AsmConstraint -&gt; AsmConstraint
 </span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Ord</span></span></span></span></span></span></span></span></span><span class="hs-special">)</span><span>
 </span><span id="line-61"></span><span>
 </span><span id="line-62"></span><span class="annot"><span class="hs-comment">-- | Assembly dialect</span></span><span>
-</span><span id="line-63"></span><span class="hs-keyword">data</span><span> </span><span id="AsmDialect"><span class="annot"><a href="Ast.Types.html#AsmDialect"><span class="hs-identifier hs-var">AsmDialect</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Intel"><span class="annot"><a href="Ast.Types.html#Intel"><span class="hs-identifier hs-var">Intel</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="ATT"><span class="annot"><a href="Ast.Types.html#ATT"><span class="hs-identifier hs-var">ATT</span></a></span></span><span> </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679135247"><span id="local-6989586621679135249"><span id="local-6989586621679135253"><span class="annot"><span class="annottext">Int -&gt; AsmDialect -&gt; ShowS
+</span><span id="line-63"></span><span class="hs-keyword">data</span><span> </span><span id="AsmDialect"><span class="annot"><a href="Ast.Types.html#AsmDialect"><span class="hs-identifier hs-var">AsmDialect</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span id="Intel"><span class="annot"><a href="Ast.Types.html#Intel"><span class="hs-identifier hs-var">Intel</span></a></span></span><span> </span><span class="hs-glyph">|</span><span> </span><span id="ATT"><span class="annot"><a href="Ast.Types.html#ATT"><span class="hs-identifier hs-var">ATT</span></a></span></span><span> </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679136981"><span id="local-6989586621679136983"><span id="local-6989586621679136987"><span class="annot"><span class="annottext">Int -&gt; AsmDialect -&gt; ShowS
 [AsmDialect] -&gt; ShowS
 AsmDialect -&gt; String
 (Int -&gt; AsmDialect -&gt; ShowS)
@@ -320,7 +320,7 @@ $cshow :: AsmDialect -&gt; String
 show :: AsmDialect -&gt; String
 $cshowList :: [AsmDialect] -&gt; ShowS
 showList :: [AsmDialect] -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679135256"><span id="local-6989586621679135258"><span class="annot"><span class="annottext">AsmDialect -&gt; AsmDialect -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679136990"><span id="local-6989586621679136992"><span class="annot"><span class="annottext">AsmDialect -&gt; AsmDialect -&gt; Bool
 (AsmDialect -&gt; AsmDialect -&gt; Bool)
 -&gt; (AsmDialect -&gt; AsmDialect -&gt; Bool) -&gt; Eq AsmDialect
 forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
@@ -328,7 +328,7 @@ $c== :: AsmDialect -&gt; AsmDialect -&gt; Bool
 == :: AsmDialect -&gt; AsmDialect -&gt; Bool
 $c/= :: AsmDialect -&gt; AsmDialect -&gt; Bool
 /= :: AsmDialect -&gt; AsmDialect -&gt; Bool
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679135264"><span id="local-6989586621679135266"><span id="local-6989586621679135268"><span id="local-6989586621679135272"><span id="local-6989586621679135275"><span id="local-6989586621679135278"><span id="local-6989586621679135281"><span class="annot"><span class="annottext">Eq AsmDialect
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679136998"><span id="local-6989586621679137000"><span id="local-6989586621679137002"><span id="local-6989586621679137006"><span id="local-6989586621679137009"><span id="local-6989586621679137012"><span id="local-6989586621679137015"><span class="annot"><span class="annottext">Eq AsmDialect
 Eq AsmDialect
 -&gt; (AsmDialect -&gt; AsmDialect -&gt; Ordering)
 -&gt; (AsmDialect -&gt; AsmDialect -&gt; Bool)
@@ -386,7 +386,7 @@ min :: AsmDialect -&gt; AsmDialect -&gt; AsmDialect
 </span><span id="line-74"></span><span>    </span><span id="asmDialect"><span class="annot"><span class="annottext">AsmExpr -&gt; AsmDialect
 </span><a href="Ast.Types.html#asmDialect"><span class="hs-identifier hs-var hs-var">asmDialect</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ast.Types.html#AsmDialect"><span class="hs-identifier hs-type">AsmDialect</span></a></span><span>
 </span><span id="line-75"></span><span>  </span><span class="hs-special">}</span><span>
-</span><span id="line-76"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679135293"><span id="local-6989586621679135307"><span id="local-6989586621679135311"><span class="annot"><span class="annottext">Int -&gt; AsmExpr -&gt; ShowS
+</span><span id="line-76"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679137027"><span id="local-6989586621679137041"><span id="local-6989586621679137045"><span class="annot"><span class="annottext">Int -&gt; AsmExpr -&gt; ShowS
 [AsmExpr] -&gt; ShowS
 AsmExpr -&gt; String
 (Int -&gt; AsmExpr -&gt; ShowS)
@@ -399,7 +399,7 @@ $cshow :: AsmExpr -&gt; String
 show :: AsmExpr -&gt; String
 $cshowList :: [AsmExpr] -&gt; ShowS
 showList :: [AsmExpr] -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679135315"><span id="local-6989586621679135328"><span class="annot"><span class="annottext">AsmExpr -&gt; AsmExpr -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679137049"><span id="local-6989586621679137062"><span class="annot"><span class="annottext">AsmExpr -&gt; AsmExpr -&gt; Bool
 (AsmExpr -&gt; AsmExpr -&gt; Bool)
 -&gt; (AsmExpr -&gt; AsmExpr -&gt; Bool) -&gt; Eq AsmExpr
 forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
@@ -407,7 +407,7 @@ $c== :: AsmExpr -&gt; AsmExpr -&gt; Bool
 == :: AsmExpr -&gt; AsmExpr -&gt; Bool
 $c/= :: AsmExpr -&gt; AsmExpr -&gt; Bool
 /= :: AsmExpr -&gt; AsmExpr -&gt; Bool
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679135335"><span id="local-6989586621679135348"><span id="local-6989586621679135361"><span id="local-6989586621679135365"><span id="local-6989586621679135368"><span id="local-6989586621679135371"><span id="local-6989586621679135374"><span class="annot"><span class="annottext">Eq AsmExpr
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679137069"><span id="local-6989586621679137082"><span id="local-6989586621679137095"><span id="local-6989586621679137099"><span id="local-6989586621679137102"><span id="local-6989586621679137105"><span id="local-6989586621679137108"><span class="annot"><span class="annottext">Eq AsmExpr
 Eq AsmExpr
 -&gt; (AsmExpr -&gt; AsmExpr -&gt; Ordering)
 -&gt; (AsmExpr -&gt; AsmExpr -&gt; Bool)
@@ -540,7 +540,7 @@ min :: AsmExpr -&gt; AsmExpr -&gt; AsmExpr
 </span><span id="line-141"></span><span>        </span><span id="asmExpr"><span class="annot"><span class="annottext">Expr -&gt; AsmExpr
 </span><a href="Ast.Types.html#asmExpr"><span class="hs-identifier hs-var hs-var">asmExpr</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ast.Types.html#AsmExpr"><span class="hs-identifier hs-type">AsmExpr</span></a></span><span>
 </span><span id="line-142"></span><span>      </span><span class="hs-special">}</span><span>
-</span><span id="line-143"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679135427"><span id="local-6989586621679135510"><span id="local-6989586621679135513"><span class="annot"><span class="annottext">Int -&gt; Expr -&gt; ShowS
+</span><span id="line-143"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679137161"><span id="local-6989586621679137244"><span id="local-6989586621679137247"><span class="annot"><span class="annottext">Int -&gt; Expr -&gt; ShowS
 [Expr] -&gt; ShowS
 Expr -&gt; String
 (Int -&gt; Expr -&gt; ShowS)
@@ -553,14 +553,14 @@ $cshow :: Expr -&gt; String
 show :: Expr -&gt; String
 $cshowList :: [Expr] -&gt; ShowS
 showList :: [Expr] -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679135516"><span id="local-6989586621679135579"><span class="annot"><span class="annottext">Expr -&gt; Expr -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679137250"><span id="local-6989586621679137313"><span class="annot"><span class="annottext">Expr -&gt; Expr -&gt; Bool
 (Expr -&gt; Expr -&gt; Bool) -&gt; (Expr -&gt; Expr -&gt; Bool) -&gt; Eq Expr
 forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
 $c== :: Expr -&gt; Expr -&gt; Bool
 == :: Expr -&gt; Expr -&gt; Bool
 $c/= :: Expr -&gt; Expr -&gt; Bool
 /= :: Expr -&gt; Expr -&gt; Bool
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679135584"><span id="local-6989586621679135647"><span id="local-6989586621679135650"><span id="local-6989586621679135653"><span id="local-6989586621679135656"><span id="local-6989586621679135659"><span id="local-6989586621679135662"><span class="annot"><span class="annottext">Eq Expr
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679137318"><span id="local-6989586621679137381"><span id="local-6989586621679137384"><span id="local-6989586621679137387"><span id="local-6989586621679137390"><span id="local-6989586621679137393"><span id="local-6989586621679137396"><span class="annot"><span class="annottext">Eq Expr
 Eq Expr
 -&gt; (Expr -&gt; Expr -&gt; Ordering)
 -&gt; (Expr -&gt; Expr -&gt; Bool)
@@ -619,7 +619,7 @@ min :: Expr -&gt; Expr -&gt; Expr
 </span><span id="line-162"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Ne"><span class="annot"><a href="Ast.Types.html#Ne"><span class="hs-identifier hs-var">Ne</span></a></span></span><span>
 </span><span id="line-163"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="And"><span class="annot"><a href="Ast.Types.html#And"><span class="hs-identifier hs-var">And</span></a></span></span><span>
 </span><span id="line-164"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="Or"><span class="annot"><a href="Ast.Types.html#Or"><span class="hs-identifier hs-var">Or</span></a></span></span><span>
-</span><span id="line-165"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679135683"><span id="local-6989586621679135685"><span id="local-6989586621679135688"><span class="annot"><span class="annottext">Int -&gt; Operation -&gt; ShowS
+</span><span id="line-165"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679137417"><span id="local-6989586621679137419"><span id="local-6989586621679137422"><span class="annot"><span class="annottext">Int -&gt; Operation -&gt; ShowS
 [Operation] -&gt; ShowS
 Operation -&gt; String
 (Int -&gt; Operation -&gt; ShowS)
@@ -634,7 +634,7 @@ $cshow :: Operation -&gt; String
 show :: Operation -&gt; String
 $cshowList :: [Operation] -&gt; ShowS
 showList :: [Operation] -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679135691"><span id="local-6989586621679135693"><span class="annot"><span class="annottext">Operation -&gt; Operation -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679137425"><span id="local-6989586621679137427"><span class="annot"><span class="annottext">Operation -&gt; Operation -&gt; Bool
 (Operation -&gt; Operation -&gt; Bool)
 -&gt; (Operation -&gt; Operation -&gt; Bool) -&gt; Eq Operation
 forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
@@ -642,7 +642,7 @@ $c== :: Operation -&gt; Operation -&gt; Bool
 == :: Operation -&gt; Operation -&gt; Bool
 $c/= :: Operation -&gt; Operation -&gt; Bool
 /= :: Operation -&gt; Operation -&gt; Bool
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679135698"><span id="local-6989586621679135700"><span id="local-6989586621679135702"><span id="local-6989586621679135705"><span id="local-6989586621679135708"><span id="local-6989586621679135711"><span id="local-6989586621679135714"><span class="annot"><span class="annottext">Eq Operation
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679137432"><span id="local-6989586621679137434"><span id="local-6989586621679137436"><span id="local-6989586621679137439"><span id="local-6989586621679137442"><span id="local-6989586621679137445"><span id="local-6989586621679137448"><span class="annot"><span class="annottext">Eq Operation
 Eq Operation
 -&gt; (Operation -&gt; Operation -&gt; Ordering)
 -&gt; (Operation -&gt; Operation -&gt; Bool)
@@ -699,7 +699,7 @@ min :: Operation -&gt; Operation -&gt; Operation
 </span><span id="line-182"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="PreDec"><span class="annot"><a href="Ast.Types.html#PreDec"><span class="hs-identifier hs-var">PreDec</span></a></span></span><span>
 </span><span id="line-183"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="PostInc"><span class="annot"><a href="Ast.Types.html#PostInc"><span class="hs-identifier hs-var">PostInc</span></a></span></span><span>
 </span><span id="line-184"></span><span>  </span><span class="hs-glyph">|</span><span> </span><span id="PostDec"><span class="annot"><a href="Ast.Types.html#PostDec"><span class="hs-identifier hs-var">PostDec</span></a></span></span><span>
-</span><span id="line-185"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679135725"><span id="local-6989586621679135727"><span id="local-6989586621679135730"><span class="annot"><span class="annottext">Int -&gt; UnaryOperation -&gt; ShowS
+</span><span id="line-185"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679137459"><span id="local-6989586621679137461"><span id="local-6989586621679137464"><span class="annot"><span class="annottext">Int -&gt; UnaryOperation -&gt; ShowS
 [UnaryOperation] -&gt; ShowS
 UnaryOperation -&gt; String
 (Int -&gt; UnaryOperation -&gt; ShowS)
@@ -714,7 +714,7 @@ $cshow :: UnaryOperation -&gt; String
 show :: UnaryOperation -&gt; String
 $cshowList :: [UnaryOperation] -&gt; ShowS
 showList :: [UnaryOperation] -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679135733"><span id="local-6989586621679135735"><span class="annot"><span class="annottext">UnaryOperation -&gt; UnaryOperation -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679137467"><span id="local-6989586621679137469"><span class="annot"><span class="annottext">UnaryOperation -&gt; UnaryOperation -&gt; Bool
 (UnaryOperation -&gt; UnaryOperation -&gt; Bool)
 -&gt; (UnaryOperation -&gt; UnaryOperation -&gt; Bool) -&gt; Eq UnaryOperation
 forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
@@ -722,7 +722,7 @@ $c== :: UnaryOperation -&gt; UnaryOperation -&gt; Bool
 == :: UnaryOperation -&gt; UnaryOperation -&gt; Bool
 $c/= :: UnaryOperation -&gt; UnaryOperation -&gt; Bool
 /= :: UnaryOperation -&gt; UnaryOperation -&gt; Bool
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679135740"><span id="local-6989586621679135742"><span id="local-6989586621679135744"><span id="local-6989586621679135747"><span id="local-6989586621679135750"><span id="local-6989586621679135753"><span id="local-6989586621679135756"><span class="annot"><span class="annottext">Eq UnaryOperation
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var">Eq</span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679137474"><span id="local-6989586621679137476"><span id="local-6989586621679137478"><span id="local-6989586621679137481"><span id="local-6989586621679137484"><span id="local-6989586621679137487"><span id="local-6989586621679137490"><span class="annot"><span class="annottext">Eq UnaryOperation
 Eq UnaryOperation
 -&gt; (UnaryOperation -&gt; UnaryOperation -&gt; Ordering)
 -&gt; (UnaryOperation -&gt; UnaryOperation -&gt; Bool)
@@ -773,7 +773,7 @@ min :: UnaryOperation -&gt; UnaryOperation -&gt; UnaryOperation
 </span><span id="line-194"></span><span>    </span><span id="sourceFile"><span class="annot"><span class="annottext">Program -&gt; String
 </span><a href="Ast.Types.html#sourceFile"><span class="hs-identifier hs-var hs-var">sourceFile</span></a></span></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><span class="hs-identifier hs-type">String</span></span><span>
 </span><span id="line-195"></span><span>  </span><span class="hs-special">}</span><span>
-</span><span id="line-196"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679135763"><span id="local-6989586621679135772"><span id="local-6989586621679135776"><span class="annot"><span class="annottext">Int -&gt; Program -&gt; ShowS
+</span><span id="line-196"></span><span>  </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span id="local-6989586621679137497"><span id="local-6989586621679137506"><span id="local-6989586621679137510"><span class="annot"><span class="annottext">Int -&gt; Program -&gt; ShowS
 [Program] -&gt; ShowS
 Program -&gt; String
 (Int -&gt; Program -&gt; ShowS)
@@ -786,7 +786,7 @@ $cshow :: Program -&gt; String
 show :: Program -&gt; String
 $cshowList :: [Program] -&gt; ShowS
 showList :: [Program] -&gt; ShowS
-</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679135782"><span id="local-6989586621679135790"><span class="annot"><span class="annottext">Program -&gt; Program -&gt; Bool
+</span><span class="hs-identifier hs-var hs-var hs-var hs-var hs-var hs-var hs-var hs-var">Show</span></span></span></span></span><span class="hs-special">,</span><span> </span><span id="local-6989586621679137516"><span id="local-6989586621679137524"><span class="annot"><span class="annottext">Program -&gt; Program -&gt; Bool
 (Program -&gt; Program -&gt; Bool)
 -&gt; (Program -&gt; Program -&gt; Bool) -&gt; Eq Program
 forall a. (a -&gt; a -&gt; Bool) -&gt; (a -&gt; a -&gt; Bool) -&gt; Eq a
