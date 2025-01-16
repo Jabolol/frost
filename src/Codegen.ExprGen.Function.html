@@ -22,62 +22,62 @@
 </span><span id="line-22"></span><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="annot"><a href="Shared.Utils.html"><span class="hs-identifier">Shared.Utils</span></a></span><span> </span><span class="hs-keyword">as</span><span> </span><span class="annot"><span class="hs-identifier">SU</span></span><span>
 </span><span id="line-23"></span><span>
 </span><span id="line-24"></span><span class="annot"><span class="hs-comment">-- | Generate LLVM code for function definitions.</span></span><span>
-</span><span id="line-25"></span><span id="local-6989586621679140317"><span class="annot"><a href="Codegen.ExprGen.Function.html#generateFunction"><span class="hs-identifier hs-type">generateFunction</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Codegen.State.html#MonadCodegen"><span class="hs-identifier hs-type">CS.MonadCodegen</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140317"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Codegen.ExprGen.ExprGen.html#ExprGen"><span class="hs-identifier hs-type">ExprGen</span></a></span><span> </span><span class="annot"><a href="Ast.Types.html#Expr"><span class="hs-identifier hs-type">AT.Expr</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ast.Types.html#Expr"><span class="hs-identifier hs-type">AT.Expr</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679140317"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-fa471df52d3716a0e85719c6e80a0ba33bed96ea6243fcc08a4c5fd497574357/share/doc/html/src/LLVM.AST.Operand.html#Operand"><span class="hs-identifier hs-type">AST.Operand</span></a></span></span><span>
+</span><span id="line-25"></span><span id="local-6989586621679140326"><span class="annot"><a href="Codegen.ExprGen.Function.html#generateFunction"><span class="hs-identifier hs-type">generateFunction</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Codegen.State.html#MonadCodegen"><span class="hs-identifier hs-type">CS.MonadCodegen</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140326"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Codegen.ExprGen.ExprGen.html#ExprGen"><span class="hs-identifier hs-type">ExprGen</span></a></span><span> </span><span class="annot"><a href="Ast.Types.html#Expr"><span class="hs-identifier hs-type">AT.Expr</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ast.Types.html#Expr"><span class="hs-identifier hs-type">AT.Expr</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679140326"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-fa471df52d3716a0e85719c6e80a0ba33bed96ea6243fcc08a4c5fd497574357/share/doc/html/src/LLVM.AST.Operand.html#Operand"><span class="hs-identifier hs-type">AST.Operand</span></a></span></span><span>
 </span><span id="line-26"></span><span id="generateFunction"><span class="annot"><span class="annottext">generateFunction :: forall (m :: * -&gt; *).
 (MonadCodegen m, ExprGen Expr) =&gt;
 Expr -&gt; m Operand
 </span><a href="Codegen.ExprGen.Function.html#generateFunction"><span class="hs-identifier hs-var hs-var">generateFunction</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ast.Types.html#Function"><span class="hs-identifier hs-type">AT.Function</span></a></span><span> </span><span class="annot"><span class="annottext">SrcLoc
-</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679140464"><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679140464"><span class="hs-identifier hs-var">name</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ast.Types.html#TFunction"><span class="hs-identifier hs-type">AT.TFunction</span></a></span><span> </span><span id="local-6989586621679140466"><span class="annot"><span class="annottext">Type
-</span><a href="#local-6989586621679140466"><span class="hs-identifier hs-var">ret</span></a></span></span><span> </span><span id="local-6989586621679140467"><span class="annot"><span class="annottext">[Type]
-</span><a href="#local-6989586621679140467"><span class="hs-identifier hs-var">params</span></a></span></span><span> </span><span id="local-6989586621679140468"><span class="annot"><span class="annottext">Bool
-</span><a href="#local-6989586621679140468"><span class="hs-identifier hs-var">var</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679140469"><span class="annot"><span class="annottext">[String]
-</span><a href="#local-6989586621679140469"><span class="hs-identifier hs-var">paramNames</span></a></span></span><span> </span><span id="local-6989586621679140470"><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679140470"><span class="hs-identifier hs-var">body</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-27"></span><span>  </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679140471"><span class="annot"><span class="annottext">funcName :: Name
-</span><a href="#local-6989586621679140471"><span class="hs-identifier hs-var hs-var">funcName</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ShortByteString -&gt; Name
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679140473"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679140473"><span class="hs-identifier hs-var">name</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ast.Types.html#TFunction"><span class="hs-identifier hs-type">AT.TFunction</span></a></span><span> </span><span id="local-6989586621679140475"><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679140475"><span class="hs-identifier hs-var">ret</span></a></span></span><span> </span><span id="local-6989586621679140476"><span class="annot"><span class="annottext">[Type]
+</span><a href="#local-6989586621679140476"><span class="hs-identifier hs-var">params</span></a></span></span><span> </span><span id="local-6989586621679140477"><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679140477"><span class="hs-identifier hs-var">var</span></a></span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679140478"><span class="annot"><span class="annottext">[String]
+</span><a href="#local-6989586621679140478"><span class="hs-identifier hs-var">paramNames</span></a></span></span><span> </span><span id="local-6989586621679140479"><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679140479"><span class="hs-identifier hs-var">body</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-27"></span><span>  </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679140480"><span class="annot"><span class="annottext">funcName :: Name
+</span><a href="#local-6989586621679140480"><span class="hs-identifier hs-var hs-var">funcName</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ShortByteString -&gt; Name
 </span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-fa471df52d3716a0e85719c6e80a0ba33bed96ea6243fcc08a4c5fd497574357/share/doc/html/src/LLVM.AST.Name.html#Name"><span class="hs-identifier hs-var">AST.Name</span></a></span><span> </span><span class="annot"><span class="annottext">(ShortByteString -&gt; Name) -&gt; ShortByteString -&gt; Name
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShortByteString
 </span><a href="Codegen.Utils.html#stringToByteString"><span class="hs-identifier hs-var">U.stringToByteString</span></a></span><span> </span><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679140464"><span class="hs-identifier hs-var">name</span></a></span><span>
-</span><span id="line-28"></span><span>      </span><span id="local-6989586621679140475"><span class="annot"><span class="annottext">paramTypes :: [(Type, ParameterName)]
-</span><a href="#local-6989586621679140475"><span class="hs-identifier hs-var hs-var">paramTypes</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Type -&gt; String -&gt; (Type, ParameterName))
+</span><a href="#local-6989586621679140473"><span class="hs-identifier hs-var">name</span></a></span><span>
+</span><span id="line-28"></span><span>      </span><span id="local-6989586621679140484"><span class="annot"><span class="annottext">paramTypes :: [(Type, ParameterName)]
+</span><a href="#local-6989586621679140484"><span class="hs-identifier hs-var hs-var">paramTypes</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Type -&gt; String -&gt; (Type, ParameterName))
 -&gt; [Type] -&gt; [String] -&gt; [(Type, ParameterName)]
 forall a b c. (a -&gt; b -&gt; c) -&gt; [a] -&gt; [b] -&gt; [c]
 </span><span class="hs-identifier hs-var">zipWith</span></span><span> </span><span class="annot"><span class="annottext">Type -&gt; String -&gt; (Type, ParameterName)
 forall {a}. ToLLVM a =&gt; a -&gt; String -&gt; (Type, ParameterName)
-</span><a href="#local-6989586621679140477"><span class="hs-identifier hs-var">mkParam</span></a></span><span> </span><span class="annot"><span class="annottext">[Type]
-</span><a href="#local-6989586621679140467"><span class="hs-identifier hs-var">params</span></a></span><span> </span><span class="annot"><span class="annottext">[String]
-</span><a href="#local-6989586621679140469"><span class="hs-identifier hs-var">paramNames</span></a></span><span>
-</span><span id="line-29"></span><span>      </span><span id="local-6989586621679140479"><span class="annot"><span class="annottext">funcType :: Type
-</span><a href="#local-6989586621679140479"><span class="hs-identifier hs-var hs-var">funcType</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Type -&gt; Type
+</span><a href="#local-6989586621679140486"><span class="hs-identifier hs-var">mkParam</span></a></span><span> </span><span class="annot"><span class="annottext">[Type]
+</span><a href="#local-6989586621679140476"><span class="hs-identifier hs-var">params</span></a></span><span> </span><span class="annot"><span class="annottext">[String]
+</span><a href="#local-6989586621679140478"><span class="hs-identifier hs-var">paramNames</span></a></span><span>
+</span><span id="line-29"></span><span>      </span><span id="local-6989586621679140488"><span class="annot"><span class="annottext">funcType :: Type
+</span><a href="#local-6989586621679140488"><span class="hs-identifier hs-var hs-var">funcType</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Type -&gt; Type
 </span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-fa471df52d3716a0e85719c6e80a0ba33bed96ea6243fcc08a4c5fd497574357/share/doc/html/src/LLVM.AST.Type.html#ptr"><span class="hs-identifier hs-var">T.ptr</span></a></span><span> </span><span class="annot"><span class="annottext">(Type -&gt; Type) -&gt; Type -&gt; Type
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Type -&gt; [Type] -&gt; Bool -&gt; Type
 </span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-fa471df52d3716a0e85719c6e80a0ba33bed96ea6243fcc08a4c5fd497574357/share/doc/html/src/LLVM.AST.Type.html#FunctionType"><span class="hs-identifier hs-var">T.FunctionType</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Type -&gt; Type
 forall a. ToLLVM a =&gt; a -&gt; Type
 </span><a href="Codegen.ExprGen.Types.html#toLLVM"><span class="hs-identifier hs-var">ET.toLLVM</span></a></span><span> </span><span class="annot"><span class="annottext">Type
-</span><a href="#local-6989586621679140466"><span class="hs-identifier hs-var">ret</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">((Type, ParameterName) -&gt; Type)
+</span><a href="#local-6989586621679140475"><span class="hs-identifier hs-var">ret</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">((Type, ParameterName) -&gt; Type)
 -&gt; [(Type, ParameterName)] -&gt; [Type]
 forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
 </span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="annot"><span class="annottext">(Type, ParameterName) -&gt; Type
 forall a b. (a, b) -&gt; a
 </span><span class="hs-identifier hs-var">fst</span></span><span> </span><span class="annot"><span class="annottext">[(Type, ParameterName)]
-</span><a href="#local-6989586621679140475"><span class="hs-identifier hs-var">paramTypes</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Bool
-</span><a href="#local-6989586621679140468"><span class="hs-identifier hs-var">var</span></a></span><span>
+</span><a href="#local-6989586621679140484"><span class="hs-identifier hs-var">paramTypes</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679140477"><span class="hs-identifier hs-var">var</span></a></span><span>
 </span><span id="line-30"></span><span>  </span><span class="annot"><span class="annottext">String -&gt; Operand -&gt; m ()
 forall (m :: * -&gt; *). VarBinding m =&gt; String -&gt; Operand -&gt; m ()
 </span><a href="Codegen.State.html#addGlobalVar"><span class="hs-identifier hs-var">CS.addGlobalVar</span></a></span><span> </span><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679140464"><span class="hs-identifier hs-var">name</span></a></span><span> </span><span class="annot"><span class="annottext">(Operand -&gt; m ()) -&gt; Operand -&gt; m ()
+</span><a href="#local-6989586621679140473"><span class="hs-identifier hs-var">name</span></a></span><span> </span><span class="annot"><span class="annottext">(Operand -&gt; m ()) -&gt; Operand -&gt; m ()
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Constant -&gt; Operand
 </span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-fa471df52d3716a0e85719c6e80a0ba33bed96ea6243fcc08a4c5fd497574357/share/doc/html/src/LLVM.AST.Operand.html#ConstantOperand"><span class="hs-identifier hs-var">AST.ConstantOperand</span></a></span><span> </span><span class="annot"><span class="annottext">(Constant -&gt; Operand) -&gt; Constant -&gt; Operand
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Type -&gt; Name -&gt; Constant
 </span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-fa471df52d3716a0e85719c6e80a0ba33bed96ea6243fcc08a4c5fd497574357/share/doc/html/src/LLVM.AST.Constant.html#GlobalReference"><span class="hs-identifier hs-var">C.GlobalReference</span></a></span><span> </span><span class="annot"><span class="annottext">Type
-</span><a href="#local-6989586621679140479"><span class="hs-identifier hs-var">funcType</span></a></span><span> </span><span class="annot"><span class="annottext">Name
-</span><a href="#local-6989586621679140471"><span class="hs-identifier hs-var">funcName</span></a></span><span>
+</span><a href="#local-6989586621679140488"><span class="hs-identifier hs-var">funcType</span></a></span><span> </span><span class="annot"><span class="annottext">Name
+</span><a href="#local-6989586621679140480"><span class="hs-identifier hs-var">funcName</span></a></span><span>
 </span><span id="line-31"></span><span>  </span><span class="annot"><span class="annottext">Name
 -&gt; [(Type, ParameterName)]
 -&gt; Type
@@ -91,20 +91,20 @@ Name
 -&gt; ([Operand] -&gt; IRBuilderT m ())
 -&gt; m Operand
 </span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-fa471df52d3716a0e85719c6e80a0ba33bed96ea6243fcc08a4c5fd497574357/share/doc/html/src/LLVM.IRBuilder.Module.html#function"><span class="hs-identifier hs-var">M.function</span></a></span><span> </span><span class="annot"><span class="annottext">Name
-</span><a href="#local-6989586621679140471"><span class="hs-identifier hs-var">funcName</span></a></span><span> </span><span class="annot"><span class="annottext">[(Type, ParameterName)]
-</span><a href="#local-6989586621679140475"><span class="hs-identifier hs-var">paramTypes</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Type -&gt; Type
+</span><a href="#local-6989586621679140480"><span class="hs-identifier hs-var">funcName</span></a></span><span> </span><span class="annot"><span class="annottext">[(Type, ParameterName)]
+</span><a href="#local-6989586621679140484"><span class="hs-identifier hs-var">paramTypes</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Type -&gt; Type
 forall a. ToLLVM a =&gt; a -&gt; Type
 </span><a href="Codegen.ExprGen.Types.html#toLLVM"><span class="hs-identifier hs-var">ET.toLLVM</span></a></span><span> </span><span class="annot"><span class="annottext">Type
-</span><a href="#local-6989586621679140466"><span class="hs-identifier hs-var">ret</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(([Operand] -&gt; IRBuilderT m ()) -&gt; m Operand)
+</span><a href="#local-6989586621679140475"><span class="hs-identifier hs-var">ret</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(([Operand] -&gt; IRBuilderT m ()) -&gt; m Operand)
 -&gt; ([Operand] -&gt; IRBuilderT m ()) -&gt; m Operand
 forall a b. (a -&gt; b) -&gt; a -&gt; b
-</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679140488"><span class="annot"><span class="annottext">[Operand]
-</span><a href="#local-6989586621679140488"><span class="hs-identifier hs-var">ops</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-glyph">\</span><span id="local-6989586621679140497"><span class="annot"><span class="annottext">[Operand]
+</span><a href="#local-6989586621679140497"><span class="hs-identifier hs-var">ops</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
 </span><span id="line-32"></span><span>    </span><span class="annot"><span class="annottext">(CodegenState -&gt; CodegenState) -&gt; IRBuilderT m ()
 forall s (m :: * -&gt; *). MonadState s m =&gt; (s -&gt; s) -&gt; m ()
-</span><span class="hs-identifier hs-var">S.modify</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679140490"><span class="annot"><span class="annottext">CodegenState
-</span><a href="#local-6989586621679140490"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">CodegenState
-</span><a href="#local-6989586621679140490"><span class="hs-identifier hs-var">s</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">localState :: LocalState
+</span><span class="hs-identifier hs-var">S.modify</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679140499"><span class="annot"><span class="annottext">CodegenState
+</span><a href="#local-6989586621679140499"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">CodegenState
+</span><a href="#local-6989586621679140499"><span class="hs-identifier hs-var">s</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">localState :: LocalState
 </span><a href="Codegen.State.html#localState"><span class="hs-identifier hs-var">CS.localState</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span class="hs-special">}</span><span class="hs-special">)</span><span>
 </span><span id="line-33"></span><span>    </span><span class="annot"><span class="annottext">(String -&gt; Operand -&gt; IRBuilderT m ())
 -&gt; [String] -&gt; [Operand] -&gt; IRBuilderT m ()
@@ -114,10 +114,10 @@ Applicative m =&gt;
 </span><span class="hs-identifier hs-var">S.zipWithM_</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; Operand -&gt; IRBuilderT m ()
 forall (m :: * -&gt; *). VarBinding m =&gt; String -&gt; Operand -&gt; m ()
 </span><a href="Codegen.State.html#addVar"><span class="hs-identifier hs-var">CS.addVar</span></a></span><span> </span><span class="annot"><span class="annottext">[String]
-</span><a href="#local-6989586621679140469"><span class="hs-identifier hs-var">paramNames</span></a></span><span> </span><span class="annot"><span class="annottext">[Operand]
-</span><a href="#local-6989586621679140488"><span class="hs-identifier hs-var">ops</span></a></span><span>
-</span><span id="line-34"></span><span>    </span><span id="local-6989586621679140494"><span class="annot"><span class="annottext">LocalState
-</span><a href="#local-6989586621679140494"><span class="hs-identifier hs-var">oldAllocatedVars</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">(CodegenState -&gt; LocalState) -&gt; IRBuilderT m LocalState
+</span><a href="#local-6989586621679140478"><span class="hs-identifier hs-var">paramNames</span></a></span><span> </span><span class="annot"><span class="annottext">[Operand]
+</span><a href="#local-6989586621679140497"><span class="hs-identifier hs-var">ops</span></a></span><span>
+</span><span id="line-34"></span><span>    </span><span id="local-6989586621679140503"><span class="annot"><span class="annottext">LocalState
+</span><a href="#local-6989586621679140503"><span class="hs-identifier hs-var">oldAllocatedVars</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">(CodegenState -&gt; LocalState) -&gt; IRBuilderT m LocalState
 forall s (m :: * -&gt; *) a. MonadState s m =&gt; (s -&gt; a) -&gt; m a
 </span><span class="hs-identifier hs-var">S.gets</span></span><span> </span><span class="annot"><span class="annottext">CodegenState -&gt; LocalState
 </span><a href="Codegen.State.html#allocatedVars"><span class="hs-identifier hs-var">CS.allocatedVars</span></a></span><span>
@@ -126,17 +126,17 @@ forall (m :: * -&gt; *).
 (MonadCodegen m, ExprGen Expr) =&gt;
 Expr -&gt; m ()
 </span><a href="Codegen.ExprGen.Function.html#preAllocateVars"><span class="hs-identifier hs-var">preAllocateVars</span></a></span><span> </span><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679140470"><span class="hs-identifier hs-var">body</span></a></span><span>
-</span><span id="line-36"></span><span>    </span><span id="local-6989586621679140498"><span class="annot"><span class="annottext">Operand
-</span><a href="#local-6989586621679140498"><span class="hs-identifier hs-var">result</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Expr -&gt; IRBuilderT m Operand
+</span><a href="#local-6989586621679140479"><span class="hs-identifier hs-var">body</span></a></span><span>
+</span><span id="line-36"></span><span>    </span><span id="local-6989586621679140507"><span class="annot"><span class="annottext">Operand
+</span><a href="#local-6989586621679140507"><span class="hs-identifier hs-var">result</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Expr -&gt; IRBuilderT m Operand
 forall a (m :: * -&gt; *).
 (ExprGen a, MonadCodegen m) =&gt;
 a -&gt; m Operand
 forall (m :: * -&gt; *). MonadCodegen m =&gt; Expr -&gt; m Operand
 </span><a href="Codegen.ExprGen.ExprGen.html#generateExpr"><span class="hs-identifier hs-var">generateExpr</span></a></span><span> </span><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679140470"><span class="hs-identifier hs-var">body</span></a></span><span>
+</span><a href="#local-6989586621679140479"><span class="hs-identifier hs-var">body</span></a></span><span>
 </span><span id="line-37"></span><span>    </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Type
-</span><a href="#local-6989586621679140466"><span class="hs-identifier hs-var">ret</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><a href="#local-6989586621679140475"><span class="hs-identifier hs-var">ret</span></a></span><span> </span><span class="hs-keyword">of</span><span>
 </span><span id="line-38"></span><span>      </span><span class="annot"><span class="annottext">Type
 </span><a href="Ast.Types.html#TVoid"><span class="hs-identifier hs-var">AT.TVoid</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">IRBuilderT m ()
 forall (m :: * -&gt; *). MonadIRBuilder m =&gt; m ()
@@ -145,30 +145,30 @@ forall (m :: * -&gt; *). MonadIRBuilder m =&gt; m ()
 </span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Operand -&gt; IRBuilderT m ()
 forall (m :: * -&gt; *). MonadIRBuilder m =&gt; Operand -&gt; m ()
 </span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-fa471df52d3716a0e85719c6e80a0ba33bed96ea6243fcc08a4c5fd497574357/share/doc/html/src/LLVM.IRBuilder.Instruction.html#ret"><span class="hs-identifier hs-var">I.ret</span></a></span><span> </span><span class="annot"><span class="annottext">Operand
-</span><a href="#local-6989586621679140498"><span class="hs-identifier hs-var">result</span></a></span><span>
+</span><a href="#local-6989586621679140507"><span class="hs-identifier hs-var">result</span></a></span><span>
 </span><span id="line-40"></span><span>    </span><span class="annot"><span class="annottext">(CodegenState -&gt; CodegenState) -&gt; IRBuilderT m ()
 forall s (m :: * -&gt; *). MonadState s m =&gt; (s -&gt; s) -&gt; m ()
-</span><span class="hs-identifier hs-var">S.modify</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679140503"><span class="annot"><span class="annottext">CodegenState
-</span><a href="#local-6989586621679140503"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">CodegenState
-</span><a href="#local-6989586621679140503"><span class="hs-identifier hs-var">s</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">allocatedVars :: LocalState
+</span><span class="hs-identifier hs-var">S.modify</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679140512"><span class="annot"><span class="annottext">CodegenState
+</span><a href="#local-6989586621679140512"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">CodegenState
+</span><a href="#local-6989586621679140512"><span class="hs-identifier hs-var">s</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">allocatedVars :: LocalState
 </span><a href="Codegen.State.html#allocatedVars"><span class="hs-identifier hs-var">CS.allocatedVars</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">LocalState
-</span><a href="#local-6989586621679140494"><span class="hs-identifier hs-var">oldAllocatedVars</span></a></span><span class="hs-special">}</span><span class="hs-special">)</span><span>
+</span><a href="#local-6989586621679140503"><span class="hs-identifier hs-var">oldAllocatedVars</span></a></span><span class="hs-special">}</span><span class="hs-special">)</span><span>
 </span><span id="line-41"></span><span>  </span><span class="hs-keyword">where</span><span>
-</span><span id="line-42"></span><span>    </span><span id="local-6989586621679140477"><span class="annot"><span class="annottext">mkParam :: a -&gt; String -&gt; (Type, ParameterName)
-</span><a href="#local-6989586621679140477"><span class="hs-identifier hs-var hs-var">mkParam</span></a></span></span><span> </span><span id="local-6989586621679140506"><span class="annot"><span class="annottext">a
-</span><a href="#local-6989586621679140506"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span id="local-6989586621679140507"><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679140507"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a -&gt; Type
+</span><span id="line-42"></span><span>    </span><span id="local-6989586621679140486"><span class="annot"><span class="annottext">mkParam :: a -&gt; String -&gt; (Type, ParameterName)
+</span><a href="#local-6989586621679140486"><span class="hs-identifier hs-var hs-var">mkParam</span></a></span></span><span> </span><span id="local-6989586621679140515"><span class="annot"><span class="annottext">a
+</span><a href="#local-6989586621679140515"><span class="hs-identifier hs-var">t</span></a></span></span><span> </span><span id="local-6989586621679140516"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679140516"><span class="hs-identifier hs-var">n</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">a -&gt; Type
 forall a. ToLLVM a =&gt; a -&gt; Type
 </span><a href="Codegen.ExprGen.Types.html#toLLVM"><span class="hs-identifier hs-var">ET.toLLVM</span></a></span><span> </span><span class="annot"><span class="annottext">a
-</span><a href="#local-6989586621679140506"><span class="hs-identifier hs-var">t</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">ShortByteString -&gt; ParameterName
+</span><a href="#local-6989586621679140515"><span class="hs-identifier hs-var">t</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">ShortByteString -&gt; ParameterName
 </span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-fa471df52d3716a0e85719c6e80a0ba33bed96ea6243fcc08a4c5fd497574357/share/doc/html/src/LLVM.IRBuilder.Module.html#ParameterName"><span class="hs-identifier hs-var">M.ParameterName</span></a></span><span> </span><span class="annot"><span class="annottext">(ShortByteString -&gt; ParameterName)
 -&gt; ShortByteString -&gt; ParameterName
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShortByteString
 </span><a href="Codegen.Utils.html#stringToByteString"><span class="hs-identifier hs-var">U.stringToByteString</span></a></span><span> </span><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679140507"><span class="hs-identifier hs-var">n</span></a></span><span class="hs-special">)</span><span>
-</span><span id="line-43"></span><span class="annot"><a href="Codegen.ExprGen.Function.html#generateFunction"><span class="hs-identifier hs-var">generateFunction</span></a></span><span> </span><span id="local-6989586621679140509"><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679140509"><span class="hs-identifier hs-var">expr</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><a href="#local-6989586621679140516"><span class="hs-identifier hs-var">n</span></a></span><span class="hs-special">)</span><span>
+</span><span id="line-43"></span><span class="annot"><a href="Codegen.ExprGen.Function.html#generateFunction"><span class="hs-identifier hs-var">generateFunction</span></a></span><span> </span><span id="local-6989586621679140518"><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679140518"><span class="hs-identifier hs-var">expr</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-44"></span><span>  </span><span class="annot"><span class="annottext">CodegenError -&gt; m Operand
 forall a. CodegenError -&gt; m a
 forall e (m :: * -&gt; *) a. MonadError e m =&gt; e -&gt; m a
@@ -177,121 +177,121 @@ forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">SrcLoc -&gt; CodegenErrorType -&gt; CodegenError
 </span><a href="Codegen.Errors.html#CodegenError"><span class="hs-identifier hs-var">CC.CodegenError</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Expr -&gt; SrcLoc
 </span><a href="Shared.Utils.html#getLoc"><span class="hs-identifier hs-var">SU.getLoc</span></a></span><span> </span><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679140509"><span class="hs-identifier hs-var">expr</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(CodegenErrorType -&gt; CodegenError)
+</span><a href="#local-6989586621679140518"><span class="hs-identifier hs-var">expr</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(CodegenErrorType -&gt; CodegenError)
 -&gt; CodegenErrorType -&gt; CodegenError
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Expr -&gt; CodegenErrorType
 </span><a href="Codegen.Errors.html#UnsupportedDefinition"><span class="hs-identifier hs-var">CC.UnsupportedDefinition</span></a></span><span> </span><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679140509"><span class="hs-identifier hs-var">expr</span></a></span><span>
+</span><a href="#local-6989586621679140518"><span class="hs-identifier hs-var">expr</span></a></span><span>
 </span><span id="line-45"></span><span>
 </span><span id="line-46"></span><span class="annot"><span class="hs-comment">-- | Pre-allocate variables before generating code.</span></span><span>
-</span><span id="line-47"></span><span id="local-6989586621679140379"><span class="annot"><a href="Codegen.ExprGen.Function.html#preAllocateVars"><span class="hs-identifier hs-type">preAllocateVars</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Codegen.State.html#MonadCodegen"><span class="hs-identifier hs-type">CS.MonadCodegen</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140379"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Codegen.ExprGen.ExprGen.html#ExprGen"><span class="hs-identifier hs-type">ExprGen</span></a></span><span> </span><span class="annot"><a href="Ast.Types.html#Expr"><span class="hs-identifier hs-type">AT.Expr</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ast.Types.html#Expr"><span class="hs-identifier hs-type">AT.Expr</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679140379"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span></span><span>
+</span><span id="line-47"></span><span id="local-6989586621679140388"><span class="annot"><a href="Codegen.ExprGen.Function.html#preAllocateVars"><span class="hs-identifier hs-type">preAllocateVars</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Codegen.State.html#MonadCodegen"><span class="hs-identifier hs-type">CS.MonadCodegen</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140388"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Codegen.ExprGen.ExprGen.html#ExprGen"><span class="hs-identifier hs-type">ExprGen</span></a></span><span> </span><span class="annot"><a href="Ast.Types.html#Expr"><span class="hs-identifier hs-type">AT.Expr</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ast.Types.html#Expr"><span class="hs-identifier hs-type">AT.Expr</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679140388"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span></span><span>
 </span><span id="line-48"></span><span id="preAllocateVars"><span class="annot"><span class="annottext">preAllocateVars :: forall (m :: * -&gt; *).
 (MonadCodegen m, ExprGen Expr) =&gt;
 Expr -&gt; m ()
 </span><a href="Codegen.ExprGen.Function.html#preAllocateVars"><span class="hs-identifier hs-var hs-var">preAllocateVars</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ast.Types.html#Assignment"><span class="hs-identifier hs-type">AT.Assignment</span></a></span><span> </span><span class="annot"><span class="annottext">SrcLoc
 </span><span class="hs-identifier">_</span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ast.Types.html#Var"><span class="hs-identifier hs-type">AT.Var</span></a></span><span> </span><span class="annot"><span class="annottext">SrcLoc
-</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679140581"><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679140581"><span class="hs-identifier hs-var">name</span></a></span></span><span> </span><span id="local-6989586621679140582"><span class="annot"><span class="annottext">Type
-</span><a href="#local-6989586621679140582"><span class="hs-identifier hs-var">typ</span></a></span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Expr
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679140590"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679140590"><span class="hs-identifier hs-var">name</span></a></span></span><span> </span><span id="local-6989586621679140591"><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679140591"><span class="hs-identifier hs-var">typ</span></a></span></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Expr
 </span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-49"></span><span>  </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679140584"><span class="annot"><span class="annottext">llvmType :: Type
-</span><a href="#local-6989586621679140584"><span class="hs-identifier hs-var hs-var">llvmType</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Type -&gt; Type
+</span><span id="line-49"></span><span>  </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679140593"><span class="annot"><span class="annottext">llvmType :: Type
+</span><a href="#local-6989586621679140593"><span class="hs-identifier hs-var hs-var">llvmType</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Type -&gt; Type
 forall a. ToLLVM a =&gt; a -&gt; Type
 </span><a href="Codegen.ExprGen.Types.html#toLLVM"><span class="hs-identifier hs-var">ET.toLLVM</span></a></span><span> </span><span class="annot"><span class="annottext">Type
-</span><a href="#local-6989586621679140582"><span class="hs-identifier hs-var">typ</span></a></span><span>
-</span><span id="line-50"></span><span>  </span><span id="local-6989586621679140585"><span class="annot"><span class="annottext">Maybe Operand
-</span><a href="#local-6989586621679140585"><span class="hs-identifier hs-var">existingVar</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">String -&gt; m (Maybe Operand)
+</span><a href="#local-6989586621679140591"><span class="hs-identifier hs-var">typ</span></a></span><span>
+</span><span id="line-50"></span><span>  </span><span id="local-6989586621679140594"><span class="annot"><span class="annottext">Maybe Operand
+</span><a href="#local-6989586621679140594"><span class="hs-identifier hs-var">existingVar</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">String -&gt; m (Maybe Operand)
 forall (m :: * -&gt; *). VarBinding m =&gt; String -&gt; m (Maybe Operand)
 </span><a href="Codegen.State.html#getVar"><span class="hs-identifier hs-var">CS.getVar</span></a></span><span> </span><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679140581"><span class="hs-identifier hs-var">name</span></a></span><span>
+</span><a href="#local-6989586621679140590"><span class="hs-identifier hs-var">name</span></a></span><span>
 </span><span id="line-51"></span><span>  </span><span class="annot"><span class="annottext">Bool -&gt; m () -&gt; m ()
 forall (f :: * -&gt; *). Applicative f =&gt; Bool -&gt; f () -&gt; f ()
 </span><span class="hs-identifier hs-var">CM.when</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Maybe Operand -&gt; Bool
 forall a. Maybe a -&gt; Bool
 </span><span class="hs-identifier hs-var">M.isNothing</span></span><span> </span><span class="annot"><span class="annottext">Maybe Operand
-</span><a href="#local-6989586621679140585"><span class="hs-identifier hs-var">existingVar</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(m () -&gt; m ()) -&gt; m () -&gt; m ()
+</span><a href="#local-6989586621679140594"><span class="hs-identifier hs-var">existingVar</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(m () -&gt; m ()) -&gt; m () -&gt; m ()
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-52"></span><span>    </span><span id="local-6989586621679140589"><span class="annot"><span class="annottext">Operand
-</span><a href="#local-6989586621679140589"><span class="hs-identifier hs-var">ptr</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Type -&gt; Maybe Operand -&gt; Word32 -&gt; m Operand
+</span><span id="line-52"></span><span>    </span><span id="local-6989586621679140598"><span class="annot"><span class="annottext">Operand
+</span><a href="#local-6989586621679140598"><span class="hs-identifier hs-var">ptr</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Type -&gt; Maybe Operand -&gt; Word32 -&gt; m Operand
 forall (m :: * -&gt; *).
 MonadIRBuilder m =&gt;
 Type -&gt; Maybe Operand -&gt; Word32 -&gt; m Operand
 </span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-fa471df52d3716a0e85719c6e80a0ba33bed96ea6243fcc08a4c5fd497574357/share/doc/html/src/LLVM.IRBuilder.Instruction.html#alloca"><span class="hs-identifier hs-var">I.alloca</span></a></span><span> </span><span class="annot"><span class="annottext">Type
-</span><a href="#local-6989586621679140584"><span class="hs-identifier hs-var">llvmType</span></a></span><span> </span><span class="annot"><span class="annottext">Maybe Operand
+</span><a href="#local-6989586621679140593"><span class="hs-identifier hs-var">llvmType</span></a></span><span> </span><span class="annot"><span class="annottext">Maybe Operand
 forall a. Maybe a
 </span><span class="hs-identifier hs-var">Nothing</span></span><span> </span><span class="annot"><span class="annottext">Word32
 </span><span class="hs-number">0</span></span><span>
 </span><span id="line-53"></span><span>    </span><span class="annot"><span class="annottext">(CodegenState -&gt; CodegenState) -&gt; m ()
 forall s (m :: * -&gt; *). MonadState s m =&gt; (s -&gt; s) -&gt; m ()
-</span><span class="hs-identifier hs-var">S.modify</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679140591"><span class="annot"><span class="annottext">CodegenState
-</span><a href="#local-6989586621679140591"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">CodegenState
-</span><a href="#local-6989586621679140591"><span class="hs-identifier hs-var">s</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">allocatedVars :: LocalState
+</span><span class="hs-identifier hs-var">S.modify</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679140600"><span class="annot"><span class="annottext">CodegenState
+</span><a href="#local-6989586621679140600"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">CodegenState
+</span><a href="#local-6989586621679140600"><span class="hs-identifier hs-var">s</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">allocatedVars :: LocalState
 </span><a href="Codegen.State.html#allocatedVars"><span class="hs-identifier hs-var">CS.allocatedVars</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679140581"><span class="hs-identifier hs-var">name</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Operand
-</span><a href="#local-6989586621679140589"><span class="hs-identifier hs-var">ptr</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(String, Operand) -&gt; LocalState -&gt; LocalState
+</span><a href="#local-6989586621679140590"><span class="hs-identifier hs-var">name</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Operand
+</span><a href="#local-6989586621679140598"><span class="hs-identifier hs-var">ptr</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(String, Operand) -&gt; LocalState -&gt; LocalState
 forall a. a -&gt; [a] -&gt; [a]
 </span><span class="hs-glyph hs-var">:</span></span><span> </span><span class="annot"><span class="annottext">CodegenState -&gt; LocalState
 </span><a href="Codegen.State.html#allocatedVars"><span class="hs-identifier hs-var">CS.allocatedVars</span></a></span><span> </span><span class="annot"><span class="annottext">CodegenState
-</span><a href="#local-6989586621679140591"><span class="hs-identifier hs-var">s</span></a></span><span class="hs-special">}</span><span class="hs-special">)</span><span>
+</span><a href="#local-6989586621679140600"><span class="hs-identifier hs-var">s</span></a></span><span class="hs-special">}</span><span class="hs-special">)</span><span>
 </span><span id="line-54"></span><span class="annot"><a href="Codegen.ExprGen.Function.html#preAllocateVars"><span class="hs-identifier hs-var">preAllocateVars</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ast.Types.html#Declaration"><span class="hs-identifier hs-type">AT.Declaration</span></a></span><span> </span><span class="annot"><span class="annottext">SrcLoc
-</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679140593"><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679140593"><span class="hs-identifier hs-var">name</span></a></span></span><span> </span><span id="local-6989586621679140594"><span class="annot"><span class="annottext">Type
-</span><a href="#local-6989586621679140594"><span class="hs-identifier hs-var">typ</span></a></span></span><span> </span><span id="local-6989586621679140595"><span class="annot"><span class="annottext">Maybe Expr
-</span><a href="#local-6989586621679140595"><span class="hs-identifier hs-var">init'</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-55"></span><span>  </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679140597"><span class="annot"><span class="annottext">llvmType :: Type
-</span><a href="#local-6989586621679140597"><span class="hs-identifier hs-var hs-var">llvmType</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Type -&gt; Type
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679140602"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679140602"><span class="hs-identifier hs-var">name</span></a></span></span><span> </span><span id="local-6989586621679140603"><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679140603"><span class="hs-identifier hs-var">typ</span></a></span></span><span> </span><span id="local-6989586621679140604"><span class="annot"><span class="annottext">Maybe Expr
+</span><a href="#local-6989586621679140604"><span class="hs-identifier hs-var">init'</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-55"></span><span>  </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679140606"><span class="annot"><span class="annottext">llvmType :: Type
+</span><a href="#local-6989586621679140606"><span class="hs-identifier hs-var hs-var">llvmType</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Type -&gt; Type
 forall a. ToLLVM a =&gt; a -&gt; Type
 </span><a href="Codegen.ExprGen.Types.html#toLLVM"><span class="hs-identifier hs-var">ET.toLLVM</span></a></span><span> </span><span class="annot"><span class="annottext">Type
-</span><a href="#local-6989586621679140594"><span class="hs-identifier hs-var">typ</span></a></span><span>
-</span><span id="line-56"></span><span>  </span><span id="local-6989586621679140598"><span class="annot"><span class="annottext">Maybe Operand
-</span><a href="#local-6989586621679140598"><span class="hs-identifier hs-var">existingVar</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">String -&gt; m (Maybe Operand)
+</span><a href="#local-6989586621679140603"><span class="hs-identifier hs-var">typ</span></a></span><span>
+</span><span id="line-56"></span><span>  </span><span id="local-6989586621679140607"><span class="annot"><span class="annottext">Maybe Operand
+</span><a href="#local-6989586621679140607"><span class="hs-identifier hs-var">existingVar</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">String -&gt; m (Maybe Operand)
 forall (m :: * -&gt; *). VarBinding m =&gt; String -&gt; m (Maybe Operand)
 </span><a href="Codegen.State.html#getVar"><span class="hs-identifier hs-var">CS.getVar</span></a></span><span> </span><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679140593"><span class="hs-identifier hs-var">name</span></a></span><span>
+</span><a href="#local-6989586621679140602"><span class="hs-identifier hs-var">name</span></a></span><span>
 </span><span id="line-57"></span><span>  </span><span class="annot"><span class="annottext">Bool -&gt; m () -&gt; m ()
 forall (f :: * -&gt; *). Applicative f =&gt; Bool -&gt; f () -&gt; f ()
 </span><span class="hs-identifier hs-var">CM.when</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Maybe Operand -&gt; Bool
 forall a. Maybe a -&gt; Bool
 </span><span class="hs-identifier hs-var">M.isNothing</span></span><span> </span><span class="annot"><span class="annottext">Maybe Operand
-</span><a href="#local-6989586621679140598"><span class="hs-identifier hs-var">existingVar</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(m () -&gt; m ()) -&gt; m () -&gt; m ()
+</span><a href="#local-6989586621679140607"><span class="hs-identifier hs-var">existingVar</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(m () -&gt; m ()) -&gt; m () -&gt; m ()
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-58"></span><span>    </span><span id="local-6989586621679140599"><span class="annot"><span class="annottext">Operand
-</span><a href="#local-6989586621679140599"><span class="hs-identifier hs-var">ptr</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Type -&gt; Maybe Operand -&gt; Word32 -&gt; m Operand
+</span><span id="line-58"></span><span>    </span><span id="local-6989586621679140608"><span class="annot"><span class="annottext">Operand
+</span><a href="#local-6989586621679140608"><span class="hs-identifier hs-var">ptr</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">Type -&gt; Maybe Operand -&gt; Word32 -&gt; m Operand
 forall (m :: * -&gt; *).
 MonadIRBuilder m =&gt;
 Type -&gt; Maybe Operand -&gt; Word32 -&gt; m Operand
 </span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-fa471df52d3716a0e85719c6e80a0ba33bed96ea6243fcc08a4c5fd497574357/share/doc/html/src/LLVM.IRBuilder.Instruction.html#alloca"><span class="hs-identifier hs-var">I.alloca</span></a></span><span> </span><span class="annot"><span class="annottext">Type
-</span><a href="#local-6989586621679140597"><span class="hs-identifier hs-var">llvmType</span></a></span><span> </span><span class="annot"><span class="annottext">Maybe Operand
+</span><a href="#local-6989586621679140606"><span class="hs-identifier hs-var">llvmType</span></a></span><span> </span><span class="annot"><span class="annottext">Maybe Operand
 forall a. Maybe a
 </span><span class="hs-identifier hs-var">Nothing</span></span><span> </span><span class="annot"><span class="annottext">Word32
 </span><span class="hs-number">0</span></span><span>
 </span><span id="line-59"></span><span>    </span><span class="annot"><span class="annottext">(CodegenState -&gt; CodegenState) -&gt; m ()
 forall s (m :: * -&gt; *). MonadState s m =&gt; (s -&gt; s) -&gt; m ()
-</span><span class="hs-identifier hs-var">S.modify</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679140600"><span class="annot"><span class="annottext">CodegenState
-</span><a href="#local-6989586621679140600"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">CodegenState
-</span><a href="#local-6989586621679140600"><span class="hs-identifier hs-var">s</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">allocatedVars :: LocalState
+</span><span class="hs-identifier hs-var">S.modify</span></span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span id="local-6989586621679140609"><span class="annot"><span class="annottext">CodegenState
+</span><a href="#local-6989586621679140609"><span class="hs-identifier hs-var">s</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">CodegenState
+</span><a href="#local-6989586621679140609"><span class="hs-identifier hs-var">s</span></a></span><span> </span><span class="hs-special">{</span><span class="annot"><span class="annottext">allocatedVars :: LocalState
 </span><a href="Codegen.State.html#allocatedVars"><span class="hs-identifier hs-var">CS.allocatedVars</span></a></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679140593"><span class="hs-identifier hs-var">name</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Operand
-</span><a href="#local-6989586621679140599"><span class="hs-identifier hs-var">ptr</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(String, Operand) -&gt; LocalState -&gt; LocalState
+</span><a href="#local-6989586621679140602"><span class="hs-identifier hs-var">name</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><span class="annottext">Operand
+</span><a href="#local-6989586621679140608"><span class="hs-identifier hs-var">ptr</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(String, Operand) -&gt; LocalState -&gt; LocalState
 forall a. a -&gt; [a] -&gt; [a]
 </span><span class="hs-glyph hs-var">:</span></span><span> </span><span class="annot"><span class="annottext">CodegenState -&gt; LocalState
 </span><a href="Codegen.State.html#allocatedVars"><span class="hs-identifier hs-var">CS.allocatedVars</span></a></span><span> </span><span class="annot"><span class="annottext">CodegenState
-</span><a href="#local-6989586621679140600"><span class="hs-identifier hs-var">s</span></a></span><span class="hs-special">}</span><span class="hs-special">)</span><span>
+</span><a href="#local-6989586621679140609"><span class="hs-identifier hs-var">s</span></a></span><span class="hs-special">}</span><span class="hs-special">)</span><span>
 </span><span id="line-60"></span><span>    </span><span class="annot"><span class="annottext">Maybe Expr -&gt; (Expr -&gt; m ()) -&gt; m ()
 forall (t :: * -&gt; *) (f :: * -&gt; *) a b.
 (Foldable t, Applicative f) =&gt;
 t a -&gt; (a -&gt; f b) -&gt; f ()
 </span><span class="hs-identifier hs-var">FD.for_</span></span><span> </span><span class="annot"><span class="annottext">Maybe Expr
-</span><a href="#local-6989586621679140595"><span class="hs-identifier hs-var">init'</span></a></span><span> </span><span class="annot"><span class="annottext">Expr -&gt; m ()
+</span><a href="#local-6989586621679140604"><span class="hs-identifier hs-var">init'</span></a></span><span> </span><span class="annot"><span class="annottext">Expr -&gt; m ()
 forall (m :: * -&gt; *).
 (MonadCodegen m, ExprGen Expr) =&gt;
 Expr -&gt; m ()
 </span><a href="Codegen.ExprGen.Function.html#preAllocateVars"><span class="hs-identifier hs-var">preAllocateVars</span></a></span><span>
-</span><span id="line-61"></span><span class="annot"><a href="Codegen.ExprGen.Function.html#preAllocateVars"><span class="hs-identifier hs-var">preAllocateVars</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ast.Types.html#Block"><span class="hs-identifier hs-type">AT.Block</span></a></span><span> </span><span id="local-6989586621679140603"><span class="annot"><span class="annottext">[Expr]
-</span><a href="#local-6989586621679140603"><span class="hs-identifier hs-var">exprs</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Expr -&gt; m ()) -&gt; [Expr] -&gt; m ()
+</span><span id="line-61"></span><span class="annot"><a href="Codegen.ExprGen.Function.html#preAllocateVars"><span class="hs-identifier hs-var">preAllocateVars</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ast.Types.html#Block"><span class="hs-identifier hs-type">AT.Block</span></a></span><span> </span><span id="local-6989586621679140612"><span class="annot"><span class="annottext">[Expr]
+</span><a href="#local-6989586621679140612"><span class="hs-identifier hs-var">exprs</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">(Expr -&gt; m ()) -&gt; [Expr] -&gt; m ()
 forall (t :: * -&gt; *) (m :: * -&gt; *) a b.
 (Foldable t, Monad m) =&gt;
 (a -&gt; m b) -&gt; t a -&gt; m ()
@@ -300,24 +300,24 @@ forall (m :: * -&gt; *).
 (MonadCodegen m, ExprGen Expr) =&gt;
 Expr -&gt; m ()
 </span><a href="Codegen.ExprGen.Function.html#preAllocateVars"><span class="hs-identifier hs-var">preAllocateVars</span></a></span><span> </span><span class="annot"><span class="annottext">[Expr]
-</span><a href="#local-6989586621679140603"><span class="hs-identifier hs-var">exprs</span></a></span><span>
+</span><a href="#local-6989586621679140612"><span class="hs-identifier hs-var">exprs</span></a></span><span>
 </span><span id="line-62"></span><span class="annot"><a href="Codegen.ExprGen.Function.html#preAllocateVars"><span class="hs-identifier hs-var">preAllocateVars</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ast.Types.html#If"><span class="hs-identifier hs-type">AT.If</span></a></span><span> </span><span class="annot"><span class="annottext">SrcLoc
-</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679140606"><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679140606"><span class="hs-identifier hs-var">cond</span></a></span></span><span> </span><span id="local-6989586621679140607"><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679140607"><span class="hs-identifier hs-var">thenExpr</span></a></span></span><span> </span><span id="local-6989586621679140608"><span class="annot"><span class="annottext">Maybe Expr
-</span><a href="#local-6989586621679140608"><span class="hs-identifier hs-var">elseExpr</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679140615"><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679140615"><span class="hs-identifier hs-var">cond</span></a></span></span><span> </span><span id="local-6989586621679140616"><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679140616"><span class="hs-identifier hs-var">thenExpr</span></a></span></span><span> </span><span id="local-6989586621679140617"><span class="annot"><span class="annottext">Maybe Expr
+</span><a href="#local-6989586621679140617"><span class="hs-identifier hs-var">elseExpr</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
 </span><span id="line-63"></span><span>  </span><span class="annot"><span class="annottext">Expr -&gt; m ()
 forall (m :: * -&gt; *).
 (MonadCodegen m, ExprGen Expr) =&gt;
 Expr -&gt; m ()
 </span><a href="Codegen.ExprGen.Function.html#preAllocateVars"><span class="hs-identifier hs-var">preAllocateVars</span></a></span><span> </span><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679140606"><span class="hs-identifier hs-var">cond</span></a></span><span>
+</span><a href="#local-6989586621679140615"><span class="hs-identifier hs-var">cond</span></a></span><span>
 </span><span id="line-64"></span><span>  </span><span class="annot"><span class="annottext">Expr -&gt; m ()
 forall (m :: * -&gt; *).
 (MonadCodegen m, ExprGen Expr) =&gt;
 Expr -&gt; m ()
 </span><a href="Codegen.ExprGen.Function.html#preAllocateVars"><span class="hs-identifier hs-var">preAllocateVars</span></a></span><span> </span><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679140607"><span class="hs-identifier hs-var">thenExpr</span></a></span><span>
+</span><a href="#local-6989586621679140616"><span class="hs-identifier hs-var">thenExpr</span></a></span><span>
 </span><span id="line-65"></span><span>  </span><span class="annot"><span class="annottext">m () -&gt; (Expr -&gt; m ()) -&gt; Maybe Expr -&gt; m ()
 forall b a. b -&gt; (a -&gt; b) -&gt; Maybe a -&gt; b
 </span><span class="hs-identifier hs-var">maybe</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">() -&gt; m ()
@@ -328,53 +328,53 @@ forall (m :: * -&gt; *).
 (MonadCodegen m, ExprGen Expr) =&gt;
 Expr -&gt; m ()
 </span><a href="Codegen.ExprGen.Function.html#preAllocateVars"><span class="hs-identifier hs-var">preAllocateVars</span></a></span><span> </span><span class="annot"><span class="annottext">Maybe Expr
-</span><a href="#local-6989586621679140608"><span class="hs-identifier hs-var">elseExpr</span></a></span><span>
+</span><a href="#local-6989586621679140617"><span class="hs-identifier hs-var">elseExpr</span></a></span><span>
 </span><span id="line-66"></span><span class="annot"><a href="Codegen.ExprGen.Function.html#preAllocateVars"><span class="hs-identifier hs-var">preAllocateVars</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ast.Types.html#For"><span class="hs-identifier hs-type">AT.For</span></a></span><span> </span><span class="annot"><span class="annottext">SrcLoc
-</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679140611"><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679140611"><span class="hs-identifier hs-var">initExpr</span></a></span></span><span> </span><span id="local-6989586621679140612"><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679140612"><span class="hs-identifier hs-var">condExpr</span></a></span></span><span> </span><span id="local-6989586621679140613"><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679140613"><span class="hs-identifier hs-var">stepExpr</span></a></span></span><span> </span><span id="local-6989586621679140614"><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679140614"><span class="hs-identifier hs-var">bodyExpr</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679140620"><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679140620"><span class="hs-identifier hs-var">initExpr</span></a></span></span><span> </span><span id="local-6989586621679140621"><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679140621"><span class="hs-identifier hs-var">condExpr</span></a></span></span><span> </span><span id="local-6989586621679140622"><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679140622"><span class="hs-identifier hs-var">stepExpr</span></a></span></span><span> </span><span id="local-6989586621679140623"><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679140623"><span class="hs-identifier hs-var">bodyExpr</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
 </span><span id="line-67"></span><span>  </span><span class="annot"><span class="annottext">Expr -&gt; m ()
 forall (m :: * -&gt; *).
 (MonadCodegen m, ExprGen Expr) =&gt;
 Expr -&gt; m ()
 </span><a href="Codegen.ExprGen.Function.html#preAllocateVars"><span class="hs-identifier hs-var">preAllocateVars</span></a></span><span> </span><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679140611"><span class="hs-identifier hs-var">initExpr</span></a></span><span>
+</span><a href="#local-6989586621679140620"><span class="hs-identifier hs-var">initExpr</span></a></span><span>
 </span><span id="line-68"></span><span>  </span><span class="annot"><span class="annottext">Expr -&gt; m ()
 forall (m :: * -&gt; *).
 (MonadCodegen m, ExprGen Expr) =&gt;
 Expr -&gt; m ()
 </span><a href="Codegen.ExprGen.Function.html#preAllocateVars"><span class="hs-identifier hs-var">preAllocateVars</span></a></span><span> </span><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679140612"><span class="hs-identifier hs-var">condExpr</span></a></span><span>
+</span><a href="#local-6989586621679140621"><span class="hs-identifier hs-var">condExpr</span></a></span><span>
 </span><span id="line-69"></span><span>  </span><span class="annot"><span class="annottext">Expr -&gt; m ()
 forall (m :: * -&gt; *).
 (MonadCodegen m, ExprGen Expr) =&gt;
 Expr -&gt; m ()
 </span><a href="Codegen.ExprGen.Function.html#preAllocateVars"><span class="hs-identifier hs-var">preAllocateVars</span></a></span><span> </span><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679140613"><span class="hs-identifier hs-var">stepExpr</span></a></span><span>
+</span><a href="#local-6989586621679140622"><span class="hs-identifier hs-var">stepExpr</span></a></span><span>
 </span><span id="line-70"></span><span>  </span><span class="annot"><span class="annottext">Expr -&gt; m ()
 forall (m :: * -&gt; *).
 (MonadCodegen m, ExprGen Expr) =&gt;
 Expr -&gt; m ()
 </span><a href="Codegen.ExprGen.Function.html#preAllocateVars"><span class="hs-identifier hs-var">preAllocateVars</span></a></span><span> </span><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679140614"><span class="hs-identifier hs-var">bodyExpr</span></a></span><span>
+</span><a href="#local-6989586621679140623"><span class="hs-identifier hs-var">bodyExpr</span></a></span><span>
 </span><span id="line-71"></span><span class="annot"><a href="Codegen.ExprGen.Function.html#preAllocateVars"><span class="hs-identifier hs-var">preAllocateVars</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ast.Types.html#While"><span class="hs-identifier hs-type">AT.While</span></a></span><span> </span><span class="annot"><span class="annottext">SrcLoc
-</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679140616"><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679140616"><span class="hs-identifier hs-var">condExpr</span></a></span></span><span> </span><span id="local-6989586621679140617"><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679140617"><span class="hs-identifier hs-var">bodyExpr</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679140625"><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679140625"><span class="hs-identifier hs-var">condExpr</span></a></span></span><span> </span><span id="local-6989586621679140626"><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679140626"><span class="hs-identifier hs-var">bodyExpr</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
 </span><span id="line-72"></span><span>  </span><span class="annot"><span class="annottext">Expr -&gt; m ()
 forall (m :: * -&gt; *).
 (MonadCodegen m, ExprGen Expr) =&gt;
 Expr -&gt; m ()
 </span><a href="Codegen.ExprGen.Function.html#preAllocateVars"><span class="hs-identifier hs-var">preAllocateVars</span></a></span><span> </span><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679140616"><span class="hs-identifier hs-var">condExpr</span></a></span><span>
+</span><a href="#local-6989586621679140625"><span class="hs-identifier hs-var">condExpr</span></a></span><span>
 </span><span id="line-73"></span><span>  </span><span class="annot"><span class="annottext">Expr -&gt; m ()
 forall (m :: * -&gt; *).
 (MonadCodegen m, ExprGen Expr) =&gt;
 Expr -&gt; m ()
 </span><a href="Codegen.ExprGen.Function.html#preAllocateVars"><span class="hs-identifier hs-var">preAllocateVars</span></a></span><span> </span><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679140617"><span class="hs-identifier hs-var">bodyExpr</span></a></span><span>
+</span><a href="#local-6989586621679140626"><span class="hs-identifier hs-var">bodyExpr</span></a></span><span>
 </span><span id="line-74"></span><span class="annot"><a href="Codegen.ExprGen.Function.html#preAllocateVars"><span class="hs-identifier hs-var">preAllocateVars</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ast.Types.html#Break"><span class="hs-identifier hs-type">AT.Break</span></a></span><span> </span><span class="annot"><span class="annottext">SrcLoc
 </span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">() -&gt; m ()
 forall a. a -&gt; m a
@@ -387,24 +387,24 @@ forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
 </span><span class="hs-identifier hs-var">pure</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
 </span><span id="line-76"></span><span class="annot"><a href="Codegen.ExprGen.Function.html#preAllocateVars"><span class="hs-identifier hs-var">preAllocateVars</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ast.Types.html#Assignment"><span class="hs-identifier hs-type">AT.Assignment</span></a></span><span> </span><span class="annot"><span class="annottext">SrcLoc
 </span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">Expr
-</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679140620"><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679140620"><span class="hs-identifier hs-var">valueExpr</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Expr -&gt; m ()
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679140629"><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679140629"><span class="hs-identifier hs-var">valueExpr</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Expr -&gt; m ()
 forall (m :: * -&gt; *).
 (MonadCodegen m, ExprGen Expr) =&gt;
 Expr -&gt; m ()
 </span><a href="Codegen.ExprGen.Function.html#preAllocateVars"><span class="hs-identifier hs-var">preAllocateVars</span></a></span><span> </span><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679140620"><span class="hs-identifier hs-var">valueExpr</span></a></span><span>
+</span><a href="#local-6989586621679140629"><span class="hs-identifier hs-var">valueExpr</span></a></span><span>
 </span><span id="line-77"></span><span class="annot"><a href="Codegen.ExprGen.Function.html#preAllocateVars"><span class="hs-identifier hs-var">preAllocateVars</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ast.Types.html#Function"><span class="hs-identifier hs-type">AT.Function</span></a></span><span> </span><span class="annot"><span class="annottext">SrcLoc
 </span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">String
 </span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">Type
 </span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">[String]
-</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679140621"><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679140621"><span class="hs-identifier hs-var">bodyExpr</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Expr -&gt; m ()
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679140630"><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679140630"><span class="hs-identifier hs-var">bodyExpr</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Expr -&gt; m ()
 forall (m :: * -&gt; *).
 (MonadCodegen m, ExprGen Expr) =&gt;
 Expr -&gt; m ()
 </span><a href="Codegen.ExprGen.Function.html#preAllocateVars"><span class="hs-identifier hs-var">preAllocateVars</span></a></span><span> </span><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679140621"><span class="hs-identifier hs-var">bodyExpr</span></a></span><span>
+</span><a href="#local-6989586621679140630"><span class="hs-identifier hs-var">bodyExpr</span></a></span><span>
 </span><span id="line-78"></span><span class="annot"><a href="Codegen.ExprGen.Function.html#preAllocateVars"><span class="hs-identifier hs-var">preAllocateVars</span></a></span><span> </span><span class="annot"><span class="annottext">Expr
 </span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">() -&gt; m ()
 forall a. a -&gt; m a
@@ -412,43 +412,43 @@ forall (f :: * -&gt; *) a. Applicative f =&gt; a -&gt; f a
 </span><span class="hs-identifier hs-var">pure</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">)</span><span>
 </span><span id="line-79"></span><span>
 </span><span id="line-80"></span><span class="annot"><span class="hs-comment">-- | Generate LLVM code for foreign function definitions.</span></span><span>
-</span><span id="line-81"></span><span id="local-6989586621679140622"><span class="annot"><a href="Codegen.ExprGen.Function.html#generateForeignFunction"><span class="hs-identifier hs-type">generateForeignFunction</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Codegen.State.html#MonadCodegen"><span class="hs-identifier hs-type">CS.MonadCodegen</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140622"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Codegen.ExprGen.ExprGen.html#ExprGen"><span class="hs-identifier hs-type">ExprGen</span></a></span><span> </span><span class="annot"><a href="Ast.Types.html#Expr"><span class="hs-identifier hs-type">AT.Expr</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ast.Types.html#Expr"><span class="hs-identifier hs-type">AT.Expr</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679140622"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-fa471df52d3716a0e85719c6e80a0ba33bed96ea6243fcc08a4c5fd497574357/share/doc/html/src/LLVM.AST.Operand.html#Operand"><span class="hs-identifier hs-type">AST.Operand</span></a></span></span><span>
+</span><span id="line-81"></span><span id="local-6989586621679140631"><span class="annot"><a href="Codegen.ExprGen.Function.html#generateForeignFunction"><span class="hs-identifier hs-type">generateForeignFunction</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Codegen.State.html#MonadCodegen"><span class="hs-identifier hs-type">CS.MonadCodegen</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140631"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Codegen.ExprGen.ExprGen.html#ExprGen"><span class="hs-identifier hs-type">ExprGen</span></a></span><span> </span><span class="annot"><a href="Ast.Types.html#Expr"><span class="hs-identifier hs-type">AT.Expr</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ast.Types.html#Expr"><span class="hs-identifier hs-type">AT.Expr</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679140631"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-fa471df52d3716a0e85719c6e80a0ba33bed96ea6243fcc08a4c5fd497574357/share/doc/html/src/LLVM.AST.Operand.html#Operand"><span class="hs-identifier hs-type">AST.Operand</span></a></span></span><span>
 </span><span id="line-82"></span><span id="generateForeignFunction"><span class="annot"><span class="annottext">generateForeignFunction :: forall (m :: * -&gt; *).
 (MonadCodegen m, ExprGen Expr) =&gt;
 Expr -&gt; m Operand
 </span><a href="Codegen.ExprGen.Function.html#generateForeignFunction"><span class="hs-identifier hs-var hs-var">generateForeignFunction</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ast.Types.html#ForeignFunction"><span class="hs-identifier hs-type">AT.ForeignFunction</span></a></span><span> </span><span class="annot"><span class="annottext">SrcLoc
-</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679140643"><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679140643"><span class="hs-identifier hs-var">name</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ast.Types.html#TFunction"><span class="hs-identifier hs-type">AT.TFunction</span></a></span><span> </span><span id="local-6989586621679140644"><span class="annot"><span class="annottext">Type
-</span><a href="#local-6989586621679140644"><span class="hs-identifier hs-var">ret</span></a></span></span><span> </span><span id="local-6989586621679140645"><span class="annot"><span class="annottext">[Type]
-</span><a href="#local-6989586621679140645"><span class="hs-identifier hs-var">params</span></a></span></span><span> </span><span id="local-6989586621679140646"><span class="annot"><span class="annottext">Bool
-</span><a href="#local-6989586621679140646"><span class="hs-identifier hs-var">var</span></a></span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-83"></span><span>  </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679140649"><span class="annot"><span class="annottext">funcType :: Type
-</span><a href="#local-6989586621679140649"><span class="hs-identifier hs-var hs-var">funcType</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Type -&gt; Type
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679140652"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679140652"><span class="hs-identifier hs-var">name</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ast.Types.html#TFunction"><span class="hs-identifier hs-type">AT.TFunction</span></a></span><span> </span><span id="local-6989586621679140653"><span class="annot"><span class="annottext">Type
+</span><a href="#local-6989586621679140653"><span class="hs-identifier hs-var">ret</span></a></span></span><span> </span><span id="local-6989586621679140654"><span class="annot"><span class="annottext">[Type]
+</span><a href="#local-6989586621679140654"><span class="hs-identifier hs-var">params</span></a></span></span><span> </span><span id="local-6989586621679140655"><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679140655"><span class="hs-identifier hs-var">var</span></a></span></span><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-83"></span><span>  </span><span class="hs-keyword">let</span><span> </span><span id="local-6989586621679140658"><span class="annot"><span class="annottext">funcType :: Type
+</span><a href="#local-6989586621679140658"><span class="hs-identifier hs-var hs-var">funcType</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">Type -&gt; Type
 </span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-fa471df52d3716a0e85719c6e80a0ba33bed96ea6243fcc08a4c5fd497574357/share/doc/html/src/LLVM.AST.Type.html#ptr"><span class="hs-identifier hs-var">T.ptr</span></a></span><span> </span><span class="annot"><span class="annottext">(Type -&gt; Type) -&gt; Type -&gt; Type
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Type -&gt; [Type] -&gt; Bool -&gt; Type
 </span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-fa471df52d3716a0e85719c6e80a0ba33bed96ea6243fcc08a4c5fd497574357/share/doc/html/src/LLVM.AST.Type.html#FunctionType"><span class="hs-identifier hs-var">T.FunctionType</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Type -&gt; Type
 forall a. ToLLVM a =&gt; a -&gt; Type
 </span><a href="Codegen.ExprGen.Types.html#toLLVM"><span class="hs-identifier hs-var">ET.toLLVM</span></a></span><span> </span><span class="annot"><span class="annottext">Type
-</span><a href="#local-6989586621679140644"><span class="hs-identifier hs-var">ret</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Type -&gt; Type) -&gt; [Type] -&gt; [Type]
+</span><a href="#local-6989586621679140653"><span class="hs-identifier hs-var">ret</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Type -&gt; Type) -&gt; [Type] -&gt; [Type]
 forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
 </span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="annot"><span class="annottext">Type -&gt; Type
 forall a. ToLLVM a =&gt; a -&gt; Type
 </span><a href="Codegen.ExprGen.Types.html#toLLVM"><span class="hs-identifier hs-var">ET.toLLVM</span></a></span><span> </span><span class="annot"><span class="annottext">[Type]
-</span><a href="#local-6989586621679140645"><span class="hs-identifier hs-var">params</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Bool
-</span><a href="#local-6989586621679140646"><span class="hs-identifier hs-var">var</span></a></span><span>
-</span><span id="line-84"></span><span>      </span><span id="local-6989586621679140650"><span class="annot"><span class="annottext">funcName :: Name
-</span><a href="#local-6989586621679140650"><span class="hs-identifier hs-var hs-var">funcName</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ShortByteString -&gt; Name
+</span><a href="#local-6989586621679140654"><span class="hs-identifier hs-var">params</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">Bool
+</span><a href="#local-6989586621679140655"><span class="hs-identifier hs-var">var</span></a></span><span>
+</span><span id="line-84"></span><span>      </span><span id="local-6989586621679140659"><span class="annot"><span class="annottext">funcName :: Name
+</span><a href="#local-6989586621679140659"><span class="hs-identifier hs-var hs-var">funcName</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="annot"><span class="annottext">ShortByteString -&gt; Name
 </span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-fa471df52d3716a0e85719c6e80a0ba33bed96ea6243fcc08a4c5fd497574357/share/doc/html/src/LLVM.AST.Name.html#Name"><span class="hs-identifier hs-var">AST.Name</span></a></span><span> </span><span class="annot"><span class="annottext">(ShortByteString -&gt; Name) -&gt; ShortByteString -&gt; Name
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; ShortByteString
 </span><a href="Codegen.Utils.html#stringToByteString"><span class="hs-identifier hs-var">U.stringToByteString</span></a></span><span> </span><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679140643"><span class="hs-identifier hs-var">name</span></a></span><span>
+</span><a href="#local-6989586621679140652"><span class="hs-identifier hs-var">name</span></a></span><span>
 </span><span id="line-85"></span><span>
 </span><span id="line-86"></span><span>  </span><span class="annot"><span class="annottext">Operand
 </span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">&lt;-</span><span>
 </span><span id="line-87"></span><span>    </span><span class="hs-special">(</span><span class="hs-keyword">if</span><span> </span><span class="annot"><span class="annottext">Bool
-</span><a href="#local-6989586621679140646"><span class="hs-identifier hs-var">var</span></a></span><span> </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">Name -&gt; [Type] -&gt; Type -&gt; m Operand
+</span><a href="#local-6989586621679140655"><span class="hs-identifier hs-var">var</span></a></span><span> </span><span class="hs-keyword">then</span><span> </span><span class="annot"><span class="annottext">Name -&gt; [Type] -&gt; Type -&gt; m Operand
 forall (m :: * -&gt; *).
 MonadModuleBuilder m =&gt;
 Name -&gt; [Type] -&gt; Type -&gt; m Operand
@@ -458,7 +458,7 @@ MonadModuleBuilder m =&gt;
 Name -&gt; [Type] -&gt; Type -&gt; m Operand
 </span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-fa471df52d3716a0e85719c6e80a0ba33bed96ea6243fcc08a4c5fd497574357/share/doc/html/src/LLVM.IRBuilder.Module.html#extern"><span class="hs-identifier hs-var">M.extern</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-88"></span><span>      </span><span class="annot"><span class="annottext">Name
-</span><a href="#local-6989586621679140650"><span class="hs-identifier hs-var">funcName</span></a></span><span>
+</span><a href="#local-6989586621679140659"><span class="hs-identifier hs-var">funcName</span></a></span><span>
 </span><span id="line-89"></span><span>      </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Type -&gt; Bool) -&gt; [Type] -&gt; [Type]
 forall a. (a -&gt; Bool) -&gt; [a] -&gt; [a]
 </span><span class="hs-identifier hs-var">filter</span></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Type -&gt; Type -&gt; Bool
@@ -471,24 +471,24 @@ forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
 </span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="annot"><span class="annottext">Type -&gt; Type
 forall a. ToLLVM a =&gt; a -&gt; Type
 </span><a href="Codegen.ExprGen.Types.html#toLLVM"><span class="hs-identifier hs-var">ET.toLLVM</span></a></span><span> </span><span class="annot"><span class="annottext">[Type]
-</span><a href="#local-6989586621679140645"><span class="hs-identifier hs-var">params</span></a></span><span class="hs-special">)</span><span>
+</span><a href="#local-6989586621679140654"><span class="hs-identifier hs-var">params</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-90"></span><span>      </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Type -&gt; Type
 forall a. ToLLVM a =&gt; a -&gt; Type
 </span><a href="Codegen.ExprGen.Types.html#toLLVM"><span class="hs-identifier hs-var">ET.toLLVM</span></a></span><span> </span><span class="annot"><span class="annottext">Type
-</span><a href="#local-6989586621679140644"><span class="hs-identifier hs-var">ret</span></a></span><span class="hs-special">)</span><span>
+</span><a href="#local-6989586621679140653"><span class="hs-identifier hs-var">ret</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-91"></span><span>
 </span><span id="line-92"></span><span>  </span><span class="annot"><span class="annottext">String -&gt; Operand -&gt; m ()
 forall (m :: * -&gt; *). VarBinding m =&gt; String -&gt; Operand -&gt; m ()
 </span><a href="Codegen.State.html#addGlobalVar"><span class="hs-identifier hs-var">CS.addGlobalVar</span></a></span><span> </span><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679140643"><span class="hs-identifier hs-var">name</span></a></span><span> </span><span class="annot"><span class="annottext">(Operand -&gt; m ()) -&gt; Operand -&gt; m ()
+</span><a href="#local-6989586621679140652"><span class="hs-identifier hs-var">name</span></a></span><span> </span><span class="annot"><span class="annottext">(Operand -&gt; m ()) -&gt; Operand -&gt; m ()
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Constant -&gt; Operand
 </span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-fa471df52d3716a0e85719c6e80a0ba33bed96ea6243fcc08a4c5fd497574357/share/doc/html/src/LLVM.AST.Operand.html#ConstantOperand"><span class="hs-identifier hs-var">AST.ConstantOperand</span></a></span><span> </span><span class="annot"><span class="annottext">(Constant -&gt; Operand) -&gt; Constant -&gt; Operand
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Type -&gt; Name -&gt; Constant
 </span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-fa471df52d3716a0e85719c6e80a0ba33bed96ea6243fcc08a4c5fd497574357/share/doc/html/src/LLVM.AST.Constant.html#GlobalReference"><span class="hs-identifier hs-var">C.GlobalReference</span></a></span><span> </span><span class="annot"><span class="annottext">Type
-</span><a href="#local-6989586621679140649"><span class="hs-identifier hs-var">funcType</span></a></span><span> </span><span class="annot"><span class="annottext">Name
-</span><a href="#local-6989586621679140650"><span class="hs-identifier hs-var">funcName</span></a></span><span>
+</span><a href="#local-6989586621679140658"><span class="hs-identifier hs-var">funcType</span></a></span><span> </span><span class="annot"><span class="annottext">Name
+</span><a href="#local-6989586621679140659"><span class="hs-identifier hs-var">funcName</span></a></span><span>
 </span><span id="line-93"></span><span>
 </span><span id="line-94"></span><span>  </span><span class="annot"><span class="annottext">Operand -&gt; m Operand
 forall a. a -&gt; m a
@@ -500,10 +500,10 @@ forall a b. (a -&gt; b) -&gt; a -&gt; b
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Type -&gt; Name -&gt; Constant
 </span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-fa471df52d3716a0e85719c6e80a0ba33bed96ea6243fcc08a4c5fd497574357/share/doc/html/src/LLVM.AST.Constant.html#GlobalReference"><span class="hs-identifier hs-var">C.GlobalReference</span></a></span><span> </span><span class="annot"><span class="annottext">Type
-</span><a href="#local-6989586621679140649"><span class="hs-identifier hs-var">funcType</span></a></span><span> </span><span class="annot"><span class="annottext">Name
-</span><a href="#local-6989586621679140650"><span class="hs-identifier hs-var">funcName</span></a></span><span>
-</span><span id="line-95"></span><span class="annot"><a href="Codegen.ExprGen.Function.html#generateForeignFunction"><span class="hs-identifier hs-var">generateForeignFunction</span></a></span><span> </span><span id="local-6989586621679140655"><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679140655"><span class="hs-identifier hs-var">expr</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><a href="#local-6989586621679140658"><span class="hs-identifier hs-var">funcType</span></a></span><span> </span><span class="annot"><span class="annottext">Name
+</span><a href="#local-6989586621679140659"><span class="hs-identifier hs-var">funcName</span></a></span><span>
+</span><span id="line-95"></span><span class="annot"><a href="Codegen.ExprGen.Function.html#generateForeignFunction"><span class="hs-identifier hs-var">generateForeignFunction</span></a></span><span> </span><span id="local-6989586621679140664"><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679140664"><span class="hs-identifier hs-var">expr</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-96"></span><span>  </span><span class="annot"><span class="annottext">CodegenError -&gt; m Operand
 forall a. CodegenError -&gt; m a
 forall e (m :: * -&gt; *) a. MonadError e m =&gt; e -&gt; m a
@@ -512,35 +512,35 @@ forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">SrcLoc -&gt; CodegenErrorType -&gt; CodegenError
 </span><a href="Codegen.Errors.html#CodegenError"><span class="hs-identifier hs-var">CC.CodegenError</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Expr -&gt; SrcLoc
 </span><a href="Shared.Utils.html#getLoc"><span class="hs-identifier hs-var">SU.getLoc</span></a></span><span> </span><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679140655"><span class="hs-identifier hs-var">expr</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(CodegenErrorType -&gt; CodegenError)
+</span><a href="#local-6989586621679140664"><span class="hs-identifier hs-var">expr</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(CodegenErrorType -&gt; CodegenError)
 -&gt; CodegenErrorType -&gt; CodegenError
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Expr -&gt; CodegenErrorType
 </span><a href="Codegen.Errors.html#UnsupportedDefinition"><span class="hs-identifier hs-var">CC.UnsupportedDefinition</span></a></span><span> </span><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679140655"><span class="hs-identifier hs-var">expr</span></a></span><span>
+</span><a href="#local-6989586621679140664"><span class="hs-identifier hs-var">expr</span></a></span><span>
 </span><span id="line-97"></span><span>
 </span><span id="line-98"></span><span class="annot"><span class="hs-comment">-- | Generate LLVM code for function calls.</span></span><span>
-</span><span id="line-99"></span><span id="local-6989586621679140656"><span class="annot"><a href="Codegen.ExprGen.Function.html#generateFunctionCall"><span class="hs-identifier hs-type">generateFunctionCall</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Codegen.State.html#MonadCodegen"><span class="hs-identifier hs-type">CS.MonadCodegen</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140656"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Codegen.ExprGen.ExprGen.html#ExprGen"><span class="hs-identifier hs-type">ExprGen</span></a></span><span> </span><span class="annot"><a href="Ast.Types.html#Expr"><span class="hs-identifier hs-type">AT.Expr</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ast.Types.html#Expr"><span class="hs-identifier hs-type">AT.Expr</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679140656"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-fa471df52d3716a0e85719c6e80a0ba33bed96ea6243fcc08a4c5fd497574357/share/doc/html/src/LLVM.AST.Operand.html#Operand"><span class="hs-identifier hs-type">AST.Operand</span></a></span></span><span>
+</span><span id="line-99"></span><span id="local-6989586621679140665"><span class="annot"><a href="Codegen.ExprGen.Function.html#generateFunctionCall"><span class="hs-identifier hs-type">generateFunctionCall</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Codegen.State.html#MonadCodegen"><span class="hs-identifier hs-type">CS.MonadCodegen</span></a></span><span> </span><span class="annot"><a href="#local-6989586621679140665"><span class="hs-identifier hs-type">m</span></a></span><span class="hs-special">,</span><span> </span><span class="annot"><a href="Codegen.ExprGen.ExprGen.html#ExprGen"><span class="hs-identifier hs-type">ExprGen</span></a></span><span> </span><span class="annot"><a href="Ast.Types.html#Expr"><span class="hs-identifier hs-type">AT.Expr</span></a></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="annot"><a href="Ast.Types.html#Expr"><span class="hs-identifier hs-type">AT.Expr</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="#local-6989586621679140665"><span class="hs-identifier hs-type">m</span></a></span><span> </span><span class="annot"><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-fa471df52d3716a0e85719c6e80a0ba33bed96ea6243fcc08a4c5fd497574357/share/doc/html/src/LLVM.AST.Operand.html#Operand"><span class="hs-identifier hs-type">AST.Operand</span></a></span></span><span>
 </span><span id="line-100"></span><span id="generateFunctionCall"><span class="annot"><span class="annottext">generateFunctionCall :: forall (m :: * -&gt; *).
 (MonadCodegen m, ExprGen Expr) =&gt;
 Expr -&gt; m Operand
-</span><a href="Codegen.ExprGen.Function.html#generateFunctionCall"><span class="hs-identifier hs-var hs-var">generateFunctionCall</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ast.Types.html#Call"><span class="hs-identifier hs-type">AT.Call</span></a></span><span> </span><span id="local-6989586621679140675"><span class="annot"><span class="annottext">SrcLoc
-</span><a href="#local-6989586621679140675"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ast.Types.html#Var"><span class="hs-identifier hs-type">AT.Var</span></a></span><span> </span><span class="annot"><span class="annottext">SrcLoc
-</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679140676"><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679140676"><span class="hs-identifier hs-var">funcName</span></a></span></span><span> </span><span class="annot"><span class="annottext">Type
-</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679140677"><span class="annot"><span class="annottext">[Expr]
-</span><a href="#local-6989586621679140677"><span class="hs-identifier hs-var">args</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-101"></span><span>  </span><span id="local-6989586621679140678"><span class="annot"><span class="annottext">Maybe Operand
-</span><a href="#local-6989586621679140678"><span class="hs-identifier hs-var">maybeFunc</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">String -&gt; m (Maybe Operand)
+</span><a href="Codegen.ExprGen.Function.html#generateFunctionCall"><span class="hs-identifier hs-var hs-var">generateFunctionCall</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ast.Types.html#Call"><span class="hs-identifier hs-type">AT.Call</span></a></span><span> </span><span id="local-6989586621679140684"><span class="annot"><span class="annottext">SrcLoc
+</span><a href="#local-6989586621679140684"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span class="hs-special">(</span><span class="annot"><a href="Ast.Types.html#Var"><span class="hs-identifier hs-type">AT.Var</span></a></span><span> </span><span class="annot"><span class="annottext">SrcLoc
+</span><span class="hs-identifier">_</span></span><span> </span><span id="local-6989586621679140685"><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679140685"><span class="hs-identifier hs-var">funcName</span></a></span></span><span> </span><span class="annot"><span class="annottext">Type
+</span><span class="hs-identifier">_</span></span><span class="hs-special">)</span><span> </span><span id="local-6989586621679140686"><span class="annot"><span class="annottext">[Expr]
+</span><a href="#local-6989586621679140686"><span class="hs-identifier hs-var">args</span></a></span></span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-101"></span><span>  </span><span id="local-6989586621679140687"><span class="annot"><span class="annottext">Maybe Operand
+</span><a href="#local-6989586621679140687"><span class="hs-identifier hs-var">maybeFunc</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">String -&gt; m (Maybe Operand)
 forall (m :: * -&gt; *). VarBinding m =&gt; String -&gt; m (Maybe Operand)
 </span><a href="Codegen.State.html#getVar"><span class="hs-identifier hs-var">CS.getVar</span></a></span><span> </span><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679140676"><span class="hs-identifier hs-var">funcName</span></a></span><span>
+</span><a href="#local-6989586621679140685"><span class="hs-identifier hs-var">funcName</span></a></span><span>
 </span><span id="line-102"></span><span>  </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Maybe Operand
-</span><a href="#local-6989586621679140678"><span class="hs-identifier hs-var">maybeFunc</span></a></span><span> </span><span class="hs-keyword">of</span><span>
-</span><span id="line-103"></span><span>    </span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span id="local-6989586621679140679"><span class="annot"><span class="annottext">Operand
-</span><a href="#local-6989586621679140679"><span class="hs-identifier hs-var">funcOperand</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
-</span><span id="line-104"></span><span>      </span><span id="local-6989586621679140680"><span class="annot"><span class="annottext">[Operand]
-</span><a href="#local-6989586621679140680"><span class="hs-identifier hs-var">argOperands</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">(Expr -&gt; m Operand) -&gt; [Expr] -&gt; m [Operand]
+</span><a href="#local-6989586621679140687"><span class="hs-identifier hs-var">maybeFunc</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-103"></span><span>    </span><span class="annot"><span class="hs-identifier hs-type">Just</span></span><span> </span><span id="local-6989586621679140688"><span class="annot"><span class="annottext">Operand
+</span><a href="#local-6989586621679140688"><span class="hs-identifier hs-var">funcOperand</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">do</span><span>
+</span><span id="line-104"></span><span>      </span><span id="local-6989586621679140689"><span class="annot"><span class="annottext">[Operand]
+</span><a href="#local-6989586621679140689"><span class="hs-identifier hs-var">argOperands</span></a></span></span><span> </span><span class="hs-glyph">&lt;-</span><span> </span><span class="annot"><span class="annottext">(Expr -&gt; m Operand) -&gt; [Expr] -&gt; m [Operand]
 forall (t :: * -&gt; *) (m :: * -&gt; *) a b.
 (Traversable t, Monad m) =&gt;
 (a -&gt; m b) -&gt; t a -&gt; m (t b)
@@ -551,17 +551,17 @@ forall a (m :: * -&gt; *).
 a -&gt; m Operand
 forall (m :: * -&gt; *). MonadCodegen m =&gt; Expr -&gt; m Operand
 </span><a href="Codegen.ExprGen.ExprGen.html#generateExpr"><span class="hs-identifier hs-var">generateExpr</span></a></span><span> </span><span class="annot"><span class="annottext">[Expr]
-</span><a href="#local-6989586621679140677"><span class="hs-identifier hs-var">args</span></a></span><span>
+</span><a href="#local-6989586621679140686"><span class="hs-identifier hs-var">args</span></a></span><span>
 </span><span id="line-105"></span><span>      </span><span class="annot"><span class="annottext">Operand -&gt; [(Operand, [ParameterAttribute])] -&gt; m Operand
 forall (m :: * -&gt; *).
 MonadIRBuilder m =&gt;
 Operand -&gt; [(Operand, [ParameterAttribute])] -&gt; m Operand
 </span><a href="file:///home/runner/.cabal/store/ghc-9.4.8/llvm-hs-pure-9.0.0-fa471df52d3716a0e85719c6e80a0ba33bed96ea6243fcc08a4c5fd497574357/share/doc/html/src/LLVM.IRBuilder.Instruction.html#call"><span class="hs-identifier hs-var">I.call</span></a></span><span> </span><span class="annot"><span class="annottext">Operand
-</span><a href="#local-6989586621679140679"><span class="hs-identifier hs-var">funcOperand</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Operand -&gt; (Operand, [ParameterAttribute]))
+</span><a href="#local-6989586621679140688"><span class="hs-identifier hs-var">funcOperand</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">(Operand -&gt; (Operand, [ParameterAttribute]))
 -&gt; [Operand] -&gt; [(Operand, [ParameterAttribute])]
 forall a b. (a -&gt; b) -&gt; [a] -&gt; [b]
 </span><span class="hs-identifier hs-var">map</span></span><span> </span><span class="hs-special">(</span><span class="hs-special">,</span><span class="hs-special">[</span><span class="hs-special">]</span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">[Operand]
-</span><a href="#local-6989586621679140680"><span class="hs-identifier hs-var">argOperands</span></a></span><span class="hs-special">)</span><span>
+</span><a href="#local-6989586621679140689"><span class="hs-identifier hs-var">argOperands</span></a></span><span class="hs-special">)</span><span>
 </span><span id="line-106"></span><span>    </span><span class="annot"><span class="annottext">Maybe Operand
 </span><span class="hs-identifier hs-var">Nothing</span></span><span> </span><span class="hs-glyph">-&gt;</span><span>
 </span><span id="line-107"></span><span>      </span><span class="annot"><span class="annottext">CodegenError -&gt; m Operand
@@ -571,14 +571,14 @@ forall e (m :: * -&gt; *) a. MonadError e m =&gt; e -&gt; m a
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">SrcLoc -&gt; CodegenErrorType -&gt; CodegenError
 </span><a href="Codegen.Errors.html#CodegenError"><span class="hs-identifier hs-var">CC.CodegenError</span></a></span><span> </span><span class="annot"><span class="annottext">SrcLoc
-</span><a href="#local-6989586621679140675"><span class="hs-identifier hs-var">loc</span></a></span><span> </span><span class="annot"><span class="annottext">(CodegenErrorType -&gt; CodegenError)
+</span><a href="#local-6989586621679140684"><span class="hs-identifier hs-var">loc</span></a></span><span> </span><span class="annot"><span class="annottext">(CodegenErrorType -&gt; CodegenError)
 -&gt; CodegenErrorType -&gt; CodegenError
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">String -&gt; CodegenErrorType
 </span><a href="Codegen.Errors.html#UnsupportedFunctionCall"><span class="hs-identifier hs-var">CC.UnsupportedFunctionCall</span></a></span><span> </span><span class="annot"><span class="annottext">String
-</span><a href="#local-6989586621679140676"><span class="hs-identifier hs-var">funcName</span></a></span><span>
-</span><span id="line-108"></span><span class="annot"><a href="Codegen.ExprGen.Function.html#generateFunctionCall"><span class="hs-identifier hs-var">generateFunctionCall</span></a></span><span> </span><span id="local-6989586621679140684"><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679140684"><span class="hs-identifier hs-var">expr</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
+</span><a href="#local-6989586621679140685"><span class="hs-identifier hs-var">funcName</span></a></span><span>
+</span><span id="line-108"></span><span class="annot"><a href="Codegen.ExprGen.Function.html#generateFunctionCall"><span class="hs-identifier hs-var">generateFunctionCall</span></a></span><span> </span><span id="local-6989586621679140693"><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679140693"><span class="hs-identifier hs-var">expr</span></a></span></span><span> </span><span class="hs-glyph">=</span><span>
 </span><span id="line-109"></span><span>  </span><span class="annot"><span class="annottext">CodegenError -&gt; m Operand
 forall a. CodegenError -&gt; m a
 forall e (m :: * -&gt; *) a. MonadError e m =&gt; e -&gt; m a
@@ -587,10 +587,10 @@ forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">SrcLoc -&gt; CodegenErrorType -&gt; CodegenError
 </span><a href="Codegen.Errors.html#CodegenError"><span class="hs-identifier hs-var">CC.CodegenError</span></a></span><span> </span><span class="hs-special">(</span><span class="annot"><span class="annottext">Expr -&gt; SrcLoc
 </span><a href="Shared.Utils.html#getLoc"><span class="hs-identifier hs-var">SU.getLoc</span></a></span><span> </span><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679140684"><span class="hs-identifier hs-var">expr</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(CodegenErrorType -&gt; CodegenError)
+</span><a href="#local-6989586621679140693"><span class="hs-identifier hs-var">expr</span></a></span><span class="hs-special">)</span><span> </span><span class="annot"><span class="annottext">(CodegenErrorType -&gt; CodegenError)
 -&gt; CodegenErrorType -&gt; CodegenError
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">Expr -&gt; CodegenErrorType
 </span><a href="Codegen.Errors.html#UnsupportedDefinition"><span class="hs-identifier hs-var">CC.UnsupportedDefinition</span></a></span><span> </span><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679140684"><span class="hs-identifier hs-var">expr</span></a></span><span>
+</span><a href="#local-6989586621679140693"><span class="hs-identifier hs-var">expr</span></a></span><span>
 </span><span id="line-110"></span></pre></body></html>
