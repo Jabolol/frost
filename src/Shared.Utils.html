@@ -5,110 +5,111 @@
 </span><span id="line-5"></span><span class="annot"><span class="hs-comment">-- | Extracts the location from an AST node.</span></span><span>
 </span><span id="line-6"></span><span class="annot"><a href="Shared.Utils.html#getLoc"><span class="hs-identifier hs-type">getLoc</span></a></span><span> </span><span class="hs-glyph">::</span><span> </span><span class="annot"><a href="Ast.Types.html#Expr"><span class="hs-identifier hs-type">AT.Expr</span></a></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><a href="Ast.Types.html#SrcLoc"><span class="hs-identifier hs-type">AT.SrcLoc</span></a></span><span>
 </span><span id="line-7"></span><span id="getLoc"><span class="annot"><span class="annottext">getLoc :: Expr -&gt; SrcLoc
-</span><a href="Shared.Utils.html#getLoc"><span class="hs-identifier hs-var hs-var">getLoc</span></a></span></span><span> </span><span id="local-6989586621679139655"><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679139655"><span class="hs-identifier hs-var">expr</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Expr
-</span><a href="#local-6989586621679139655"><span class="hs-identifier hs-var">expr</span></a></span><span> </span><span class="hs-keyword">of</span><span>
-</span><span id="line-8"></span><span>  </span><span class="annot"><a href="Ast.Types.html#Lit"><span class="hs-identifier hs-type">AT.Lit</span></a></span><span> </span><span id="local-6989586621679139657"><span class="annot"><span class="annottext">SrcLoc
-</span><a href="#local-6989586621679139657"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span class="annot"><span class="annottext">Literal
+</span><a href="Shared.Utils.html#getLoc"><span class="hs-identifier hs-var hs-var">getLoc</span></a></span></span><span> </span><span id="local-6989586621679139823"><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679139823"><span class="hs-identifier hs-var">expr</span></a></span></span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">case</span><span> </span><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679139823"><span class="hs-identifier hs-var">expr</span></a></span><span> </span><span class="hs-keyword">of</span><span>
+</span><span id="line-8"></span><span>  </span><span class="annot"><a href="Ast.Types.html#Lit"><span class="hs-identifier hs-type">AT.Lit</span></a></span><span> </span><span id="local-6989586621679139825"><span class="annot"><span class="annottext">SrcLoc
+</span><a href="#local-6989586621679139825"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span class="annot"><span class="annottext">Literal
 </span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SrcLoc
-</span><a href="#local-6989586621679139657"><span class="hs-identifier hs-var">loc</span></a></span><span>
-</span><span id="line-9"></span><span>  </span><span class="annot"><a href="Ast.Types.html#Var"><span class="hs-identifier hs-type">AT.Var</span></a></span><span> </span><span id="local-6989586621679139659"><span class="annot"><span class="annottext">SrcLoc
-</span><a href="#local-6989586621679139659"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679139825"><span class="hs-identifier hs-var">loc</span></a></span><span>
+</span><span id="line-9"></span><span>  </span><span class="annot"><a href="Ast.Types.html#Var"><span class="hs-identifier hs-type">AT.Var</span></a></span><span> </span><span id="local-6989586621679139827"><span class="annot"><span class="annottext">SrcLoc
+</span><a href="#local-6989586621679139827"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span class="annot"><span class="annottext">String
 </span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">Type
 </span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SrcLoc
-</span><a href="#local-6989586621679139659"><span class="hs-identifier hs-var">loc</span></a></span><span>
-</span><span id="line-10"></span><span>  </span><span class="annot"><a href="Ast.Types.html#StructAccess"><span class="hs-identifier hs-type">AT.StructAccess</span></a></span><span> </span><span id="local-6989586621679139661"><span class="annot"><span class="annottext">SrcLoc
-</span><a href="#local-6989586621679139661"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679139827"><span class="hs-identifier hs-var">loc</span></a></span><span>
+</span><span id="line-10"></span><span>  </span><span class="annot"><a href="Ast.Types.html#StructAccess"><span class="hs-identifier hs-type">AT.StructAccess</span></a></span><span> </span><span id="local-6989586621679139829"><span class="annot"><span class="annottext">SrcLoc
+</span><a href="#local-6989586621679139829"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span class="annot"><span class="annottext">Expr
 </span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">Expr
 </span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SrcLoc
-</span><a href="#local-6989586621679139661"><span class="hs-identifier hs-var">loc</span></a></span><span>
-</span><span id="line-11"></span><span>  </span><span class="annot"><a href="Ast.Types.html#ArrayAccess"><span class="hs-identifier hs-type">AT.ArrayAccess</span></a></span><span> </span><span id="local-6989586621679139663"><span class="annot"><span class="annottext">SrcLoc
-</span><a href="#local-6989586621679139663"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679139829"><span class="hs-identifier hs-var">loc</span></a></span><span>
+</span><span id="line-11"></span><span>  </span><span class="annot"><a href="Ast.Types.html#ArrayAccess"><span class="hs-identifier hs-type">AT.ArrayAccess</span></a></span><span> </span><span id="local-6989586621679139831"><span class="annot"><span class="annottext">SrcLoc
+</span><a href="#local-6989586621679139831"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span class="annot"><span class="annottext">Expr
 </span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">Expr
 </span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SrcLoc
-</span><a href="#local-6989586621679139663"><span class="hs-identifier hs-var">loc</span></a></span><span>
-</span><span id="line-12"></span><span>  </span><span class="annot"><a href="Ast.Types.html#UnaryOp"><span class="hs-identifier hs-type">AT.UnaryOp</span></a></span><span> </span><span id="local-6989586621679139665"><span class="annot"><span class="annottext">SrcLoc
-</span><a href="#local-6989586621679139665"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span class="annot"><span class="annottext">UnaryOperation
+</span><a href="#local-6989586621679139831"><span class="hs-identifier hs-var">loc</span></a></span><span>
+</span><span id="line-12"></span><span>  </span><span class="annot"><a href="Ast.Types.html#UnaryOp"><span class="hs-identifier hs-type">AT.UnaryOp</span></a></span><span> </span><span id="local-6989586621679139833"><span class="annot"><span class="annottext">SrcLoc
+</span><a href="#local-6989586621679139833"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span class="annot"><span class="annottext">UnaryOperation
 </span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">Expr
 </span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SrcLoc
-</span><a href="#local-6989586621679139665"><span class="hs-identifier hs-var">loc</span></a></span><span>
-</span><span id="line-13"></span><span>  </span><span class="annot"><a href="Ast.Types.html#Call"><span class="hs-identifier hs-type">AT.Call</span></a></span><span> </span><span id="local-6989586621679139667"><span class="annot"><span class="annottext">SrcLoc
-</span><a href="#local-6989586621679139667"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679139833"><span class="hs-identifier hs-var">loc</span></a></span><span>
+</span><span id="line-13"></span><span>  </span><span class="annot"><a href="Ast.Types.html#Call"><span class="hs-identifier hs-type">AT.Call</span></a></span><span> </span><span id="local-6989586621679139835"><span class="annot"><span class="annottext">SrcLoc
+</span><a href="#local-6989586621679139835"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span class="annot"><span class="annottext">Expr
 </span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">[Expr]
 </span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SrcLoc
-</span><a href="#local-6989586621679139667"><span class="hs-identifier hs-var">loc</span></a></span><span>
-</span><span id="line-14"></span><span>  </span><span class="annot"><a href="Ast.Types.html#If"><span class="hs-identifier hs-type">AT.If</span></a></span><span> </span><span id="local-6989586621679139669"><span class="annot"><span class="annottext">SrcLoc
-</span><a href="#local-6989586621679139669"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679139835"><span class="hs-identifier hs-var">loc</span></a></span><span>
+</span><span id="line-14"></span><span>  </span><span class="annot"><a href="Ast.Types.html#If"><span class="hs-identifier hs-type">AT.If</span></a></span><span> </span><span id="local-6989586621679139837"><span class="annot"><span class="annottext">SrcLoc
+</span><a href="#local-6989586621679139837"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span class="annot"><span class="annottext">Expr
 </span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">Expr
 </span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">Maybe Expr
 </span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SrcLoc
-</span><a href="#local-6989586621679139669"><span class="hs-identifier hs-var">loc</span></a></span><span>
-</span><span id="line-15"></span><span>  </span><span class="annot"><a href="Ast.Types.html#While"><span class="hs-identifier hs-type">AT.While</span></a></span><span> </span><span id="local-6989586621679139671"><span class="annot"><span class="annottext">SrcLoc
-</span><a href="#local-6989586621679139671"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679139837"><span class="hs-identifier hs-var">loc</span></a></span><span>
+</span><span id="line-15"></span><span>  </span><span class="annot"><a href="Ast.Types.html#While"><span class="hs-identifier hs-type">AT.While</span></a></span><span> </span><span id="local-6989586621679139839"><span class="annot"><span class="annottext">SrcLoc
+</span><a href="#local-6989586621679139839"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span class="annot"><span class="annottext">Expr
 </span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">Expr
 </span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SrcLoc
-</span><a href="#local-6989586621679139671"><span class="hs-identifier hs-var">loc</span></a></span><span>
-</span><span id="line-16"></span><span>  </span><span class="annot"><a href="Ast.Types.html#For"><span class="hs-identifier hs-type">AT.For</span></a></span><span> </span><span id="local-6989586621679139673"><span class="annot"><span class="annottext">SrcLoc
-</span><a href="#local-6989586621679139673"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679139839"><span class="hs-identifier hs-var">loc</span></a></span><span>
+</span><span id="line-16"></span><span>  </span><span class="annot"><a href="Ast.Types.html#From"><span class="hs-identifier hs-type">AT.From</span></a></span><span> </span><span id="local-6989586621679139841"><span class="annot"><span class="annottext">SrcLoc
+</span><a href="#local-6989586621679139841"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span class="annot"><span class="annottext">Expr
 </span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">Expr
 </span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">Expr
 </span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">Expr
-</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SrcLoc
-</span><a href="#local-6989586621679139673"><span class="hs-identifier hs-var">loc</span></a></span><span>
-</span><span id="line-17"></span><span>  </span><span class="annot"><a href="Ast.Types.html#Return"><span class="hs-identifier hs-type">AT.Return</span></a></span><span> </span><span id="local-6989586621679139675"><span class="annot"><span class="annottext">SrcLoc
-</span><a href="#local-6989586621679139675"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span class="annot"><span class="annottext">Maybe Expr
-</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SrcLoc
-</span><a href="#local-6989586621679139675"><span class="hs-identifier hs-var">loc</span></a></span><span>
-</span><span id="line-18"></span><span>  </span><span class="annot"><a href="Ast.Types.html#Break"><span class="hs-identifier hs-type">AT.Break</span></a></span><span> </span><span id="local-6989586621679139677"><span class="annot"><span class="annottext">SrcLoc
-</span><a href="#local-6989586621679139677"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SrcLoc
-</span><a href="#local-6989586621679139677"><span class="hs-identifier hs-var">loc</span></a></span><span>
-</span><span id="line-19"></span><span>  </span><span class="annot"><a href="Ast.Types.html#Continue"><span class="hs-identifier hs-type">AT.Continue</span></a></span><span> </span><span id="local-6989586621679139679"><span class="annot"><span class="annottext">SrcLoc
-</span><a href="#local-6989586621679139679"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SrcLoc
-</span><a href="#local-6989586621679139679"><span class="hs-identifier hs-var">loc</span></a></span><span>
-</span><span id="line-20"></span><span>  </span><span class="annot"><a href="Ast.Types.html#Cast"><span class="hs-identifier hs-type">AT.Cast</span></a></span><span> </span><span id="local-6989586621679139681"><span class="annot"><span class="annottext">SrcLoc
-</span><a href="#local-6989586621679139681"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span class="annot"><span class="annottext">Type
 </span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">Expr
 </span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SrcLoc
-</span><a href="#local-6989586621679139681"><span class="hs-identifier hs-var">loc</span></a></span><span>
-</span><span id="line-21"></span><span>  </span><span class="annot"><a href="Ast.Types.html#Declaration"><span class="hs-identifier hs-type">AT.Declaration</span></a></span><span> </span><span id="local-6989586621679139683"><span class="annot"><span class="annottext">SrcLoc
-</span><a href="#local-6989586621679139683"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679139841"><span class="hs-identifier hs-var">loc</span></a></span><span>
+</span><span id="line-17"></span><span>  </span><span class="annot"><a href="Ast.Types.html#Return"><span class="hs-identifier hs-type">AT.Return</span></a></span><span> </span><span id="local-6989586621679139843"><span class="annot"><span class="annottext">SrcLoc
+</span><a href="#local-6989586621679139843"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span class="annot"><span class="annottext">Maybe Expr
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SrcLoc
+</span><a href="#local-6989586621679139843"><span class="hs-identifier hs-var">loc</span></a></span><span>
+</span><span id="line-18"></span><span>  </span><span class="annot"><a href="Ast.Types.html#Break"><span class="hs-identifier hs-type">AT.Break</span></a></span><span> </span><span id="local-6989586621679139845"><span class="annot"><span class="annottext">SrcLoc
+</span><a href="#local-6989586621679139845"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SrcLoc
+</span><a href="#local-6989586621679139845"><span class="hs-identifier hs-var">loc</span></a></span><span>
+</span><span id="line-19"></span><span>  </span><span class="annot"><a href="Ast.Types.html#Continue"><span class="hs-identifier hs-type">AT.Continue</span></a></span><span> </span><span id="local-6989586621679139847"><span class="annot"><span class="annottext">SrcLoc
+</span><a href="#local-6989586621679139847"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SrcLoc
+</span><a href="#local-6989586621679139847"><span class="hs-identifier hs-var">loc</span></a></span><span>
+</span><span id="line-20"></span><span>  </span><span class="annot"><a href="Ast.Types.html#Cast"><span class="hs-identifier hs-type">AT.Cast</span></a></span><span> </span><span id="local-6989586621679139849"><span class="annot"><span class="annottext">SrcLoc
+</span><a href="#local-6989586621679139849"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span class="annot"><span class="annottext">Type
+</span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">Expr
+</span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SrcLoc
+</span><a href="#local-6989586621679139849"><span class="hs-identifier hs-var">loc</span></a></span><span>
+</span><span id="line-21"></span><span>  </span><span class="annot"><a href="Ast.Types.html#Declaration"><span class="hs-identifier hs-type">AT.Declaration</span></a></span><span> </span><span id="local-6989586621679139851"><span class="annot"><span class="annottext">SrcLoc
+</span><a href="#local-6989586621679139851"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span class="annot"><span class="annottext">String
 </span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">Type
 </span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">Maybe Expr
 </span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SrcLoc
-</span><a href="#local-6989586621679139683"><span class="hs-identifier hs-var">loc</span></a></span><span>
-</span><span id="line-22"></span><span>  </span><span class="annot"><a href="Ast.Types.html#Assignment"><span class="hs-identifier hs-type">AT.Assignment</span></a></span><span> </span><span id="local-6989586621679139685"><span class="annot"><span class="annottext">SrcLoc
-</span><a href="#local-6989586621679139685"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span class="annot"><span class="annottext">Expr
+</span><a href="#local-6989586621679139851"><span class="hs-identifier hs-var">loc</span></a></span><span>
+</span><span id="line-22"></span><span>  </span><span class="annot"><a href="Ast.Types.html#Assignment"><span class="hs-identifier hs-type">AT.Assignment</span></a></span><span> </span><span id="local-6989586621679139853"><span class="annot"><span class="annottext">SrcLoc
+</span><a href="#local-6989586621679139853"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span class="annot"><span class="annottext">Expr
 </span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">Expr
 </span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SrcLoc
-</span><a href="#local-6989586621679139685"><span class="hs-identifier hs-var">loc</span></a></span><span>
-</span><span id="line-23"></span><span>  </span><span class="annot"><a href="Ast.Types.html#Op"><span class="hs-identifier hs-type">AT.Op</span></a></span><span> </span><span id="local-6989586621679139687"><span class="annot"><span class="annottext">SrcLoc
-</span><a href="#local-6989586621679139687"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span class="annot"><span class="annottext">Operation
+</span><a href="#local-6989586621679139853"><span class="hs-identifier hs-var">loc</span></a></span><span>
+</span><span id="line-23"></span><span>  </span><span class="annot"><a href="Ast.Types.html#Op"><span class="hs-identifier hs-type">AT.Op</span></a></span><span> </span><span id="local-6989586621679139855"><span class="annot"><span class="annottext">SrcLoc
+</span><a href="#local-6989586621679139855"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span class="annot"><span class="annottext">Operation
 </span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">Expr
 </span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">Expr
 </span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SrcLoc
-</span><a href="#local-6989586621679139687"><span class="hs-identifier hs-var">loc</span></a></span><span>
-</span><span id="line-24"></span><span>  </span><span class="annot"><a href="Ast.Types.html#Function"><span class="hs-identifier hs-type">AT.Function</span></a></span><span> </span><span id="local-6989586621679139689"><span class="annot"><span class="annottext">SrcLoc
-</span><a href="#local-6989586621679139689"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679139855"><span class="hs-identifier hs-var">loc</span></a></span><span>
+</span><span id="line-24"></span><span>  </span><span class="annot"><a href="Ast.Types.html#Function"><span class="hs-identifier hs-type">AT.Function</span></a></span><span> </span><span id="local-6989586621679139857"><span class="annot"><span class="annottext">SrcLoc
+</span><a href="#local-6989586621679139857"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span class="annot"><span class="annottext">String
 </span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">Type
 </span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">[String]
 </span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">Expr
 </span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SrcLoc
-</span><a href="#local-6989586621679139689"><span class="hs-identifier hs-var">loc</span></a></span><span>
-</span><span id="line-25"></span><span>  </span><span class="annot"><a href="Ast.Types.html#ForeignFunction"><span class="hs-identifier hs-type">AT.ForeignFunction</span></a></span><span> </span><span id="local-6989586621679139691"><span class="annot"><span class="annottext">SrcLoc
-</span><a href="#local-6989586621679139691"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span class="annot"><span class="annottext">String
+</span><a href="#local-6989586621679139857"><span class="hs-identifier hs-var">loc</span></a></span><span>
+</span><span id="line-25"></span><span>  </span><span class="annot"><a href="Ast.Types.html#ForeignFunction"><span class="hs-identifier hs-type">AT.ForeignFunction</span></a></span><span> </span><span id="local-6989586621679139859"><span class="annot"><span class="annottext">SrcLoc
+</span><a href="#local-6989586621679139859"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span class="annot"><span class="annottext">String
 </span><span class="hs-identifier">_</span></span><span> </span><span class="annot"><span class="annottext">Type
 </span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SrcLoc
-</span><a href="#local-6989586621679139691"><span class="hs-identifier hs-var">loc</span></a></span><span>
-</span><span id="line-26"></span><span>  </span><span class="annot"><a href="Ast.Types.html#Block"><span class="hs-identifier hs-type">AT.Block</span></a></span><span> </span><span id="local-6989586621679139693"><span class="annot"><span class="annottext">[Expr]
-</span><a href="#local-6989586621679139693"><span class="hs-identifier hs-var">exprs</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Expr -&gt; SrcLoc
+</span><a href="#local-6989586621679139859"><span class="hs-identifier hs-var">loc</span></a></span><span>
+</span><span id="line-26"></span><span>  </span><span class="annot"><a href="Ast.Types.html#Block"><span class="hs-identifier hs-type">AT.Block</span></a></span><span> </span><span id="local-6989586621679139861"><span class="annot"><span class="annottext">[Expr]
+</span><a href="#local-6989586621679139861"><span class="hs-identifier hs-var">exprs</span></a></span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">Expr -&gt; SrcLoc
 </span><a href="Shared.Utils.html#getLoc"><span class="hs-identifier hs-var">getLoc</span></a></span><span> </span><span class="annot"><span class="annottext">(Expr -&gt; SrcLoc) -&gt; Expr -&gt; SrcLoc
 forall a b. (a -&gt; b) -&gt; a -&gt; b
 </span><span class="hs-operator hs-var">$</span></span><span> </span><span class="annot"><span class="annottext">[Expr] -&gt; Expr
 forall a. HasCallStack =&gt; [a] -&gt; a
 </span><span class="hs-identifier hs-var">head</span></span><span> </span><span class="annot"><span class="annottext">[Expr]
-</span><a href="#local-6989586621679139693"><span class="hs-identifier hs-var">exprs</span></a></span><span>
-</span><span id="line-27"></span><span>  </span><span class="annot"><a href="Ast.Types.html#Assembly"><span class="hs-identifier hs-type">AT.Assembly</span></a></span><span> </span><span id="local-6989586621679139696"><span class="annot"><span class="annottext">SrcLoc
-</span><a href="#local-6989586621679139696"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span class="annot"><span class="annottext">AsmExpr
+</span><a href="#local-6989586621679139861"><span class="hs-identifier hs-var">exprs</span></a></span><span>
+</span><span id="line-27"></span><span>  </span><span class="annot"><a href="Ast.Types.html#Assembly"><span class="hs-identifier hs-type">AT.Assembly</span></a></span><span> </span><span id="local-6989586621679139864"><span class="annot"><span class="annottext">SrcLoc
+</span><a href="#local-6989586621679139864"><span class="hs-identifier hs-var">loc</span></a></span></span><span> </span><span class="annot"><span class="annottext">AsmExpr
 </span><span class="hs-identifier">_</span></span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="annot"><span class="annottext">SrcLoc
-</span><a href="#local-6989586621679139696"><span class="hs-identifier hs-var">loc</span></a></span><span>
+</span><a href="#local-6989586621679139864"><span class="hs-identifier hs-var">loc</span></a></span><span>
 </span><span id="line-28"></span></pre></body></html>
