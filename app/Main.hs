@@ -56,8 +56,8 @@ optionsInfo =
   O.info
     (O.helper <*> optionsParser)
     ( O.fullDesc
-        <> O.progDesc "Compile FrostLang source code to LLVM IR"
-        <> O.header "FrostLang Compiler"
+        <> O.progDesc "Compile Frost source code to LLVM Intermediate Representation"
+        <> O.header "The Frost Programming Language Compiler"
     )
 
 compile :: String -> String -> Bool -> E.ExceptT CompileError IO String

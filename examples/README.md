@@ -39,7 +39,7 @@ run the LLVM IR. For example, to run the Mandelbrot set example, you can run the
 following commands:
 
 ```sh
-$ ./glados -i mandelbrot.ff -o mandelbrot.ll
+$ frostc -i mandelbrot.ff -o mandelbrot.ll
 ```
 
 > [!TIP]
@@ -91,7 +91,7 @@ Have a look at [`echo.ff`](echo.ff) for the acutal implementation
 2. Compile the program
 
 ```sh
-$ ./glados -i echo.ff -o echo.ll
+$ frostc -i echo.ff -o echo.ll
 ```
 
 3. Run the server
@@ -125,7 +125,7 @@ sum: int int -> int = a b {
 2. Compile the `sum.ff` file to LLVM IR:
 
 ```sh
-$ ./glados -i sum.ff -o sum.ll
+$ frostc -i sum.ff -o sum.ll
 ```
 
 #### Embedding in `C`
