@@ -78,7 +78,7 @@ jobs:
 
       - name: Generate coverage report
         run: |
-          hpc-codecov cabal:glados-test --exclude Main,Paths_glados --out codecov.json --format codecov --verbose
+          hpc-codecov cabal:frostc-test --exclude Main,Paths_frostc --out codecov.json --format codecov --verbose
 
       - name: Publish coverage report to Discord
         if: github.ref == 'refs/heads/main'
@@ -95,7 +95,7 @@ jobs:
         if: github.ref == 'refs/heads/main'
         run: |
           cabal haddock --haddock-html --haddock-hyperlink-source --haddock-quickjump
-          echo "DOCS_DIR=$(find dist-newstyle/build -type d -path '*/doc/html/glados' | head -n 1)" >> $GITHUB_ENV
+          echo "DOCS_DIR=$(find dist-newstyle/build -type d -path '*/doc/html/frostc' | head -n 1)" >> $GITHUB_ENV
   
       - name: Deploy Haddock to GitHub Pages
         uses: ./external/actions-gh-pages

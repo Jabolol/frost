@@ -38,8 +38,8 @@ jobs:
 
       - name: Get binary path
         run: |
-          mv "$(cabal list-bin exe:glados)" "$(cabal list-bin exe:glados)_$(uname -s)_$(uname -m)"
-          echo "GLADOS_BIN=$(cabal list-bin exe:glados)_$(uname -s)_$(uname -m)" >> $GITHUB_ENV
+          mv "$(cabal list-bin exe:frostc)" "$(cabal list-bin exe:frostc)_$(uname -s)_$(uname -m)"
+          echo "GLADOS_BIN=$(cabal list-bin exe:frostc)_$(uname -s)_$(uname -m)" >> $GITHUB_ENV
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4

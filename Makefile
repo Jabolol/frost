@@ -1,8 +1,8 @@
-PROJECT_NAME := glados
+PROJECT_NAME := frostc
 BUILD_DIR := dist-newstyle
 EXECUTABLE := $(PROJECT_NAME)
 
-BUILD_OUTPUT := $(shell cabal list-bin exe:glados)
+BUILD_OUTPUT := $(shell cabal list-bin exe:frostc)
 
 COLOR_RESET := \033[0m
 COLOR_BLUE := \033[1;34m

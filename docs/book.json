@@ -1,6 +1,6 @@
 {
-  "title": "FrostLang HandBook",
-  "description": "Developer Cheat Sheet for the FrostLang Programming Language",
+  "title": "The Frost Programming Language Handbook",
+  "description": "Developer Cheat Sheet for the the Frost Programming Language",
   "plugins": [
     "code",
     "search",

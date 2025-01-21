@@ -21,7 +21,7 @@ Before you begin, ensure you have the following tools installed:
    Clone the Frost repository and initialize its submodules:
 
    ```bash
-   git clone --recursive https://github.com/Jabolol/glados.git
+   git clone --recursive https://github.com/Jabolol/frost.git
    cd frost
    ```
 
@@ -68,7 +68,7 @@ Before you begin, ensure you have the following tools installed:
 
 We maintain Haddock documentation for the Frost compiler. It is currently hosted
 on GitHub Pages and can be accessed at
-[https://jabolol.github.io/glados/](https://jabolol.github.io/glados/).
+[https://jabolol.github.io/frost/](https://jabolol.github.io/frost/).
 
 To generate the documentation locally, run the following command:
 
